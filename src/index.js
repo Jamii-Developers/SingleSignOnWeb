@@ -1,17 +1,19 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from 'react'
+import { createRoot } from 'react-dom/client';
+import './sass/index.sass'
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+import Home from './home'
+import Header from './defaultClasses/indexheader'
+import Footer from './defaultClasses/indexfooter'
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+
+const header_container = document.getElementById('header')
+const header = createRoot( header_container )
+const main_body_container = document.getElementById( 'main_body')
+const main_body = createRoot( main_body_container )
+const footer_container = document.getElementById( 'footer' );
+const footer = createRoot( footer_container )
+
+header.render( < Header /> )
+main_body.render( < Home /> )
+footer.render( < Footer /> )
