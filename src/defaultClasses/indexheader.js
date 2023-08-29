@@ -9,38 +9,38 @@ import ContactUs from '../contactus'
 
 function HomeButton( ){
 	return(
-		<button id="home" className="col button_active" onClick={( ) => openPage('home')}>Home</button>
+		<button id="home" className="col button_active" onClick={ ( ) => openPage('home')}>Home</button>
 	)
 }
 
 function LoginButton( ){
 	return(
-		<button id="userlogin" className="col button_active" onClick={( ) => openPage('userlogin')}>Login</button>
+		<button id="userlogin" className="col button_inactive" onClick={( ) => openPage('userlogin')}>Login</button>
 	)
 }
 
 function CreateNewUserButton( ){
 	return(
-		<button id="createnewuser" className="col button_active" onClick={( ) => openPage('createnewuser')}>Sign Up</button>
+		<button id="createnewuser" className="col button_inactive" onClick={( ) => openPage('createnewuser')}>Sign Up</button>
 	)
 }
 
 function AboutUsButton( ){
 	return(
-		<button id="aboutus" className="col button_active" onClick={( ) => openPage('aboutus')}>About Us</button>
+		<button id="aboutus" className="col button_inactive" onClick={( ) => openPage('aboutus')}>About Us</button>
 	)
 }
 
 function ContactUsButton( ){
 	return(
-		<button id="contactus" className="col button_active" onClick={( ) => openPage('contactus')}>Contact Us</button>
+		<button id="contactus" className="col button_inactive" onClick={( ) => openPage('contactus')}>Contact Us</button>
 	)
 }
 
 const Header = ( ) => {
     return(
         <React.StrictMode>
-            <div>
+            <div >
 				< HomeButton />
 				< LoginButton />
                 < CreateNewUserButton />

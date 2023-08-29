@@ -1,6 +1,7 @@
 import './sass/aboutus.sass'
 
-const AboutUs = () => {
+const AboutUs = ( ) => {
+
     return (
           <div className="jumbotron jumbotron-fluid row">
                 <h1>About Us</h1>
@@ -8,6 +9,7 @@ const AboutUs = () => {
                 <p>At Blue Collar we are here to help you showcase your work to your clients while we help you market yourself through us.</p>
           </div>
     )
+    
 }
   
 export default AboutUs
