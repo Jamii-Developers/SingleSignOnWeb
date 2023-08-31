@@ -1,5 +1,10 @@
+import '../sass/indexheader.sass'
+
 import React from 'react'
 import { createRoot } from 'react-dom/client';
+
+import Button from 'react-bootstrap/Button'
+import Navbar from 'react-bootstrap/esm/Navbar';
 
 import Home from '../home'
 import UserLogin from '../userlogin'
@@ -9,31 +14,31 @@ import ContactUs from '../contactus'
 
 function HomeButton( ){
 	return(
-		<button id="home" className="col button_active" onClick={ ( ) => openPage('home')}>Home</button>
+		<Button id="home" className="col button_active" onClick={ ( ) => openPage('home')}>Home</Button>
 	)
 }
 
 function LoginButton( ){
 	return(
-		<button id="userlogin" className="col button_inactive" onClick={( ) => openPage('userlogin')}>Login</button>
+		<Button id="userlogin" className="col button_inactive" onClick={( ) => openPage('userlogin')}>Login</Button>
 	)
 }
 
 function CreateNewUserButton( ){
 	return(
-		<button id="createnewuser" className="col button_inactive" onClick={( ) => openPage('createnewuser')}>Sign Up</button>
+		<Button id="createnewuser" className="col button_inactive" onClick={( ) => openPage('createnewuser')}>Sign Up</Button>
 	)
 }
 
 function AboutUsButton( ){
 	return(
-		<button id="aboutus" className="col button_inactive" onClick={( ) => openPage('aboutus')}>About Us</button>
+		<Button id="aboutus" className="col button_inactive" onClick={ ( ) => openPage('aboutus')}>About Us</Button>
 	)
 }
 
 function ContactUsButton( ){
 	return(
-		<button id="contactus" className="col button_inactive" onClick={( ) => openPage('contactus')}>Contact Us</button>
+		<Button id="contactus" className="col button_inactive header_button_defaults" onClick={( ) => openPage('contactus')}>Contact Us</Button>
 	)
 }
 
@@ -41,11 +46,13 @@ const Header = ( ) => {
     return(
         <React.StrictMode>
             <div >
-				< HomeButton />
-				< LoginButton />
-                < CreateNewUserButton />
-				< AboutUsButton />
-				< ContactUsButton />
+				<Navbar > 
+					< HomeButton className = "header_button_defaults"/>
+					< LoginButton className = "header_button_defaults" />
+					< CreateNewUserButton />
+					< AboutUsButton />
+					< ContactUsButton />
+				</Navbar>
 		    </div>
 	    </React.StrictMode>
     )
