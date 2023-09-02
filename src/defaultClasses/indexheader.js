@@ -1,69 +1,58 @@
 import '../sass/indexheader.sass'
 
 import React from 'react'
-import { createRoot } from 'react-dom/client';
+import { createRoot } from 'react-dom/client'
 
-import Button from 'react-bootstrap/Button'
-import Navbar from 'react-bootstrap/esm/Navbar';
+import Navbar  from 'react-bootstrap/esm/Navbar'
+import Container  from 'react-bootstrap/Container'
+import Nav from 'react-bootstrap/Nav';
+import { NavbarBrand }from 'react-bootstrap'
 
-import Home from '../home'
 import UserLogin from '../userlogin'
 import CreateNewUser from '../createnewuser'
 import AboutUs from '../aboutus'
-import ContactUs from '../contactus'
 
-function HomeButton( ){
-	return(
-		<Button id="home" className="col button_active" onClick={ ( ) => openPage('home')}>Home</Button>
-	)
-}
+
 
 function LoginButton( ){
 	return(
-		<Button id="userlogin" className="col button_inactive" onClick={( ) => openPage('userlogin')}>Login</Button>
+		<Nav.Link id="loginbutton" onClick={ ( ) => openPage('userlogin')} >Login</Nav.Link>
 	)
 }
 
 function CreateNewUserButton( ){
 	return(
-		<Button id="createnewuser" className="col button_inactive" onClick={( ) => openPage('createnewuser')}>Sign Up</Button>
+		<Nav.Link id="createnewuserbutton" onClick={ ( ) => openPage('createnewuser')}>Sign Up</Nav.Link>
 	)
 }
 
 function AboutUsButton( ){
 	return(
-		<Button id="aboutus" className="col button_inactive" onClick={ ( ) => openPage('aboutus')}>About Us</Button>
+		<Nav.Link id="aboutusbutton"  onClick={ ( ) => openPage('aboutus')}>About Us</Nav.Link>
 	)
 }
 
-function ContactUsButton( ){
-	return(
-		<Button id="contactus" className="col button_inactive header_button_defaults" onClick={( ) => openPage('contactus')}>Contact Us</Button>
-	)
-}
+
 
 const Header = ( ) => {
     return(
-        <React.StrictMode>
-            <div >
-				<Navbar > 
-					< HomeButton className = "header_button_defaults"/>
-					< LoginButton className = "header_button_defaults" />
-					< CreateNewUserButton />
-					< AboutUsButton />
-					< ContactUsButton />
-				</Navbar>
-		    </div>
-	    </React.StrictMode>
+		<div id = "IndexHeaderPage" >
+			< Navbar  bg="primary" data-bs-theme="dark" fixed="top"> 
+				<Container>
+					<NavbarBrand>Single Sign-On</NavbarBrand>
+					<Navbar.Toggle aria-controls="basic-navbar-nav" />
+					<Nav className="me-auto">
+						< LoginButton />
+						< CreateNewUserButton />
+						< AboutUsButton />
+					</Nav>
+				</Container>
+			</ Navbar >
+		</div>
     )
 }
 
 const openPage = (page) => {
-	if (page === 'home') {
-		const main_body_container = document.getElementById( 'main_body' )
-		const main_body = createRoot( main_body_container )
-		main_body.render(< Home />)
-	}
 
 	if (page === 'userlogin') {
 		const main_body_container = document.getElementById( 'main_body' )
@@ -82,13 +71,6 @@ const openPage = (page) => {
 		const main_body = createRoot( main_body_container )
 		main_body.render(< AboutUs />)
 	}
-
-	if (page === 'contactus') {
-		const main_body_container = document.getElementById( 'main_body' )
-		const main_body = createRoot( main_body_container )
-		main_body.render(< ContactUs />)
-	}
-
 
 }
 

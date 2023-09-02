@@ -1,13 +1,10 @@
 @import '~bootstrap/scss/bootstrap'
     
 /*All shared variables on data should be placed in this file make it as basic as possible
-
 %header_button_defaults
-    text-align: left
-    text-decoration: none
     display: inline-block
     font-family: Calibri
-    font-size: 16px
+    font-size: 12px
     text-align: center
     text-decoration: none
     display: inline-block
@@ -17,16 +14,35 @@
 %h1_defaults
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
 
+#{h1}
+    @extend %h1_defaults
+
 %h2_defaults
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+
+#{h2}
+    @extend %h2_defaults
 
 %paragraph_defaults
     font-family: Cambria, Cochin, Georgia, Times, Times New Roman, serif
     text-align: justify
 
+#{p}
+    @extend %paragraph_defaults
+
+
 %form_defaults
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+
+#{Form}
+    @extend %form_defaults
 
 %button_defaults
     font-family: Cambria, Cochin, Georgia, Times, Times New Roman, serif
     text-align: center
+
+#{button}
+    @extend %button_defaults
+
+#main_body
+    margin-top: 2%
