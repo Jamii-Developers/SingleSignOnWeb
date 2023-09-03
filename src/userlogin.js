@@ -1,7 +1,13 @@
-import './sass/userlogin.sass'
+import './sass/userlogin.sass';
+import ForgetPassword from './forgetpassword'
+
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
 
 
 const UserLogin = ( ) => {
@@ -11,29 +17,33 @@ const UserLogin = ( ) => {
 
                 <h1 className='h1_defaults'>Single Sign-On Login</h1>
 
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                    <Form.Label> Email address </Form.Label>
-                    <Form.Control type="email" placeholder="Enter Email Address" />
-                    <Form.Text className="text-muted">Your email address won't be shared</Form.Text>
-                </Form.Group>
+                <FloatingLabel controlId="logincredential" label="Email address or Username" className="mb-3">
+                    <Form.Control type="text" placeholder="name@example.com or jamiidev30" />
+                </FloatingLabel>
 
-                <Form.Group className="mb-3" controlId='formBasicPassword'>
-                    <Form.Label>Password </Form.Label>
-                    <Form.Control type="password" placeholder="Enter your password" />
-                    <Form.Text className='text-muted'>Keep your password private</Form.Text>
-                </Form.Group>
+                <FloatingLabel controlId="password" label="Password" className="mb-3">
+                    <Form.Control type="password" placeholder="password"/>
+                </FloatingLabel>
 
-                <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                    <Form.Check type="checkbox" label="Keep me logged in" />
-                </Form.Group>
+                <Form.Check type="switch" id="custom-switch" label="Remember me on this device" className="mb-3"/>
 
-                <Button variant="primary" type="submit">
-                    Login
-                </Button>
-
+                <ButtonGroup size="md" className="mb-3">
+                    <Button variant="primary" type="submit">Login</Button>
+                    <Button variant="secondary" type="submit" onClick={ ( ) => openForgetUsPage( )}>Forgot Password?</Button>
+                </ButtonGroup>
+                
             </Form>
         </div>
     )
 }
 
 export default UserLogin
+
+
+const openForgetUsPage = ( ) => {
+    
+    const main_body_container = document.getElementById( 'main_body' )
+    const main_body = createRoot( main_body_container )
+    main_body.render(< ForgetPassword />)
+	
+}

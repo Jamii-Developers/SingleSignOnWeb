@@ -21,7 +21,7 @@ const AboutUs = ( ) => {
 
                 <p>My hope is that in the future we will be able to introduce more security features like MFA, Biometrics to enhance your account's security plus make it easy</p>
 
-                <p><bold>TLDR</bold> : It works like google's sign in </p>
+                <p>TLDR: It works like Google's sign in </p>
 
           </div>
     )

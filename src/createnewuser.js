@@ -2,6 +2,8 @@ import './sass/createnewuser.sass'
 
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
 
 const CreateNewUser = ( ) => {
     return (
@@ -9,32 +11,26 @@ const CreateNewUser = ( ) => {
                 <Form>
                     <h1>Single Sign-On Sign Up</h1>
 
-                    <Form.Group className="mb-3" controlId="emailGroup">
-                        <Form.Label> Email address </Form.Label>
-                        <Form.Control type="email" placeholder="Enter your Email Address" />
-                        <Form.Text className="text-muted">Your email address won't be shared</Form.Text>
-                    </Form.Group>
+                    <FloatingLabel controlId="email" label="Email address" className="mb-3">
+                        <Form.Control type="email" placeholder="name@example.com" />
+                    </FloatingLabel>
 
-                    <Form.Group className="mb-3" controlId="usernameGroup">
-                        <Form.Label> Username </Form.Label>
-                        <Form.Control type="Text" placeholder="Enter your username" />
-                        <Form.Text className="text-muted">Your username should be unique</Form.Text>
-                    </Form.Group>
+                    <FloatingLabel controlId="username" label="Username" className="mb-3">
+                        <Form.Control type="text" placeholder="jamiiadmin" />
+                    </FloatingLabel>
 
-                    <Form.Group className="mb-3" controlId="PasswordGroup">
-                        <Form.Label> Password </Form.Label>
-                        <Form.Control type="password" placeholder="Enter your password" />
-                        <Form.Text className="text-muted">Please Keep your password private</Form.Text>
-                    </Form.Group>
+                    <FloatingLabel controlId="password" label="Password" className="mb-3">
+                        <Form.Control type="password" placeholder="password"/>
+                    </FloatingLabel>
 
-                    <Form.Group className="mb-3" controlId="RetypedpasswordGroup">
-                        <Form.Label> Retype your password </Form.Label>
-                        <Form.Control type="password" placeholder="Please retype your password" />
-                    </Form.Group>
+                    <FloatingLabel controlId="retypedpassword" label="Re-type your password" className="mb-3">
+                        <Form.Control type="password" placeholder="password"/>
+                    </FloatingLabel>
 
-                    <Button variant="primary" type="submit">
-                        Sign Up
-                    </Button>
+                    <ButtonGroup size="md" className="mb-2">
+                        <Button variant="primary" type="submit">Sign Up</Button>
+                        <Button variant="clear" type="submit">Clear</Button>
+                    </ButtonGroup>
                 </Form>
            
           </div>

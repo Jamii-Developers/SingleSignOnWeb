@@ -32,12 +32,10 @@ function AboutUsButton( ){
 	)
 }
 
-
-
 const Header = ( ) => {
     return(
 		<div id = "IndexHeaderPage" >
-			< Navbar  bg="primary" data-bs-theme="dark" fixed="top"> 
+			< Navbar  bg="primary" data-bs-theme="dark" sticky="top"> 
 				<Container>
 					<NavbarBrand>Single Sign-On</NavbarBrand>
 					<Navbar.Toggle aria-controls="basic-navbar-nav" />
