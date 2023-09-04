@@ -1,5 +1,6 @@
 import './sass/userlogin.sass';
 import ForgetPassword from './forgetpassword'
+import ServerErrorMsg from './frequentlyUsedModals/servererrormsg'
 
 import React from 'react';
 import { useState } from 'react'
@@ -70,5 +71,7 @@ async function sendUserLogin( loginCredential, loginPassword, rememberLogin ) {
     });
 
     const result = await response.json();
-    console.log(result);
+    if( response.status === 400 ){
+        ServerErrorMsg( result.ERROR_MESSAGE)
+    }
 } 
