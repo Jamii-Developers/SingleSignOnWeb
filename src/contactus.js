@@ -26,8 +26,8 @@ const ContactUs = ( ) => {
                         </FloatingLabel>
 
                         <ButtonGroup size="md" className="mb-2">
-                              <Button variant="primary" type="submit">Send</Button>
-                              <Button variant="clear" type="submit">Clear</Button>
+                              <Button variant="outline-primary" type="submit">Send</Button>
+                              <Button variant="outline-info" type="submit">Clear</Button>
                         </ButtonGroup>
                         
                   </Form>

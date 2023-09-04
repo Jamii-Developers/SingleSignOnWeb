@@ -6,13 +6,23 @@ import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 
 const CreateNewUser = ( ) => {
+
+
+    function clear( ){
+        document.getElementById("createnewuserform").reset() 
+    }
+
+    function signUp( ){
+
+    }
+
     return (
           <div id = "CreateNewUserPage">
-                <Form>
+                <Form id = "createnewuserform">
                     <h1>Single Sign-On Sign Up</h1>
 
                     <FloatingLabel controlId="email" label="Email address" className="mb-3">
-                        <Form.Control type="email" placeholder="name@example.com" />
+                        <Form.Control id="email" type="email" placeholder="name@example.com" />
                     </FloatingLabel>
 
                     <FloatingLabel controlId="username" label="Username" className="mb-3">
@@ -28,8 +38,8 @@ const CreateNewUser = ( ) => {
                     </FloatingLabel>
 
                     <ButtonGroup size="md" className="mb-2">
-                        <Button variant="primary" type="submit">Sign Up</Button>
-                        <Button variant="clear" type="submit">Clear</Button>
+                        <Button variant="outline-primary" type="button" onClick={ ( ) => signUp( )}>Sign Up</Button>
+                        <Button variant="outline-info" type="button" onClick={ ( ) => clear( )}>Clear</Button>
                     </ButtonGroup>
                 </Form>
            

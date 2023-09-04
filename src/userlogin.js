@@ -2,6 +2,7 @@ import './sass/userlogin.sass';
 import ForgetPassword from './forgetpassword'
 import ServerErrorMsg from './frequentlyUsedModals/servererrormsg'
 
+
 import React from 'react';
 import { useState } from 'react'
 import { createRoot } from 'react-dom/client';
@@ -10,13 +11,21 @@ import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
-
+import Spinner from 'react-bootstrap/Spinner';
 
 const UserLogin = ( ) => {
+
+    const [serverErrorCode, setServerErrorCode ] = useState("");
+    const [serverErrorSubject, setServerErrorSubject ] = useState("");
+    const [serverErrorMessage, setServerErrorMessage ] = useState("");
+    const [errServMsgShow, setErrServMsgShow ] = useState(false);
+    
 
     const [ loginCredential, setLoginCredential ] = useState("");
     const [ loginPassword, setLoginPassword ] = useState("");
     const [ rememberLogin, setRememberLogin ] = useState( false );
+
+    const [loginButtonSpinner, setLoginButtonSpinner ] = useState( false );
 
     const openForgetUsPage = ( ) => {
     
@@ -28,6 +37,7 @@ const UserLogin = ( ) => {
 
     async function sendUserLogin( loginCredential, loginPassword, rememberLogin ) {
 
+        setLoginButtonSpinner( true )
         var loginJson = { loginCredential,loginPassword };
         var loginData = await JSON.stringify( loginJson );
         
@@ -42,16 +52,26 @@ const UserLogin = ( ) => {
         });
     
         const result = await response.json( );
+        
         console.log(result)
-    
+
+        setLoginButtonSpinner( false );
+
         if( response.status === 400 ){
-           ServerErrorMsg( result );
+            setServerErrorCode( result.ERROR_CODE );
+            setServerErrorSubject( result.ERROR_SUBJECT);
+            setServerErrorMessage( result.ERROR_MESSAGE)
+            setErrServMsgShow(true);
         }
     } 
 
+    function clear( ){
+        document.getElementById("UserLoginForm").reset() 
+    }
+
     return (
         <div id = "UserLoginPage"> 
-            <Form>
+            <Form id = "UserLoginForm">
 
                 <h1 className='h1_defaults'>Single Sign-On Login</h1>
 
@@ -60,17 +80,30 @@ const UserLogin = ( ) => {
                 </FloatingLabel>
 
                 <FloatingLabel controlId="loginpassword" label="Password" className="mb-3">
-                    <Form.Control type="loginpassword" placeholder="Password" onChange={ (e) => setLoginPassword(e.target.value) } />
+                    <Form.Control type="password" placeholder="Login Password" onChange={ (e) => setLoginPassword(e.target.value) } />
                 </FloatingLabel>
 
                 <Form.Check type="switch" id="custom-switch" label="Remember me on this device" className="mb-3" onChange={ (e) => setRememberLogin( e.target.checked ) }/>
 
                 <ButtonGroup size="md" className="mb-3">
-                    <Button variant="primary" type="button" onClick={ ( ) => sendUserLogin( loginCredential , loginPassword, rememberLogin ) }>Login</Button>
-                    <Button variant="secondary" type="button" onClick={ ( ) => openForgetUsPage( )}>Forgot Password?</Button>
+                    <Button variant="outline-primary" type="button" onClick={ ( ) => sendUserLogin( loginCredential , loginPassword, rememberLogin ) }>
+                        {loginButtonSpinner && <Spinner as="span"animation="grow"size="sm" role="status" aria-hidden="false"/>}
+                        Login                           
+                    </Button>
+                    <Button variant="outline-secondary" type="button" onClick={ ( ) => openForgetUsPage( ) } > Forgot Password? </Button>
+                    <Button variant="outline-info" type="button" onClick={ ( ) => clear( ) }>Clear</Button>
                 </ButtonGroup>
                 
             </Form>
+
+            < ServerErrorMsg 
+                show={errServMsgShow} 
+                onHide={ ( ) => setErrServMsgShow( false ) } 
+                errorcode = {serverErrorCode} 
+                errorsubject = {serverErrorSubject} 
+                errormessage = {serverErrorMessage}                             
+            />
+
         </div>
     )
 }

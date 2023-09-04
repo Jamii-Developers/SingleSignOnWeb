@@ -20,8 +20,8 @@ const ForgetPassword = ( ) => {
                     </FloatingLabel>
 
                     <ButtonGroup size="md" className="mb-2">
-                        <Button variant="primary" type="submit">Send</Button>
-                        <Button variant="secondary" type="submit">Clear</Button>
+                        <Button variant="outline-primary" type="button">Send</Button>
+                        <Button variant="outline-info" type="button">Clear</Button>
                     </ButtonGroup>
             </Form>
         </div>
