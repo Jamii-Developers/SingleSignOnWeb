@@ -18,6 +18,37 @@ const UserLogin = ( ) => {
     const [ loginPassword, setLoginPassword ] = useState("");
     const [ rememberLogin, setRememberLogin ] = useState( false );
 
+    const openForgetUsPage = ( ) => {
+    
+        const main_body_container = document.getElementById( 'main_body' )
+        const main_body = createRoot( main_body_container )
+        main_body.render(< ForgetPassword />)
+        
+    }
+
+    async function sendUserLogin( loginCredential, loginPassword, rememberLogin ) {
+
+        var loginJson = { loginCredential,loginPassword };
+        var loginData = await JSON.stringify( loginJson );
+        
+        var userLoginUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'userlogin';
+    
+        const response = await fetch(userLoginUrl, {
+          method: 'POST',
+          body: loginData,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+    
+        const result = await response.json( );
+        console.log(result)
+    
+        if( response.status === 400 ){
+           ServerErrorMsg( result );
+        }
+    } 
+
     return (
         <div id = "UserLoginPage"> 
             <Form>
@@ -45,33 +76,3 @@ const UserLogin = ( ) => {
 }
 
 export default UserLogin
-
-
-const openForgetUsPage = ( ) => {
-    
-    const main_body_container = document.getElementById( 'main_body' )
-    const main_body = createRoot( main_body_container )
-    main_body.render(< ForgetPassword />)
-	
-}
-
-async function sendUserLogin( loginCredential, loginPassword, rememberLogin ) {
-
-    var loginJson = { loginCredential,loginPassword };
-    var loginData = await JSON.stringify( loginJson );
-    
-    var userLoginUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'userlogin';
-
-    const response = await fetch(userLoginUrl, {
-      method: 'POST',
-      body: loginData,
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-
-    const result = await response.json();
-    if( response.status === 400 ){
-        ServerErrorMsg( result.ERROR_MESSAGE)
-    }
-} 

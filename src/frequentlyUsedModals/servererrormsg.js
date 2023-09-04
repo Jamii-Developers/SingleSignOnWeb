@@ -1,29 +1,25 @@
-import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
-function ServerErrorMsg( ERROR_SUBJECT, ERROR_MESSAGE, ERROR_CODE ) {
+const ServerErrorMsg = ( props )  => {
 
-  const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
-  return (
+    console.log("Got to ServerErrorMSG")
+    return (
     <>
-      <Button variant="primary" onClick={handleShow}>
-        {ERROR_SUBJECT}
+      <Button variant="primary" >
+        { props }
       </Button>
 
-      <Modal show={show} onHide={handleClose}>
+      <Modal show={true} >
         <Modal.Header closeButton>
           <Modal.Title></Modal.Title>
         </Modal.Header>
-        <Modal.Body>{ ERROR_MESSAGE }</Modal.Body>
+        <Modal.Body>{ props }</Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" >
             Close
           </Button>
-          <p>{ ERROR_CODE }</p>
+          <p>{ props }</p>
         </Modal.Footer>
       </Modal>
     </>
