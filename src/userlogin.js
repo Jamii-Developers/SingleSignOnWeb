@@ -1,6 +1,6 @@
 import './sass/userlogin.sass';
-import ForgetPassword from './forgetpassword'
-import ServerErrorMsg from './frequentlyUsedModals/servererrormsg'
+import ForgetPassword from './forgetpassword';
+import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
 
 
 import React from 'react';
@@ -39,7 +39,7 @@ const UserLogin = ( ) => {
 
         setLoginButtonSpinner( true )
         var loginJson = { loginCredential,loginPassword };
-        var loginData = await JSON.stringify( loginJson );
+        var loginData = JSON.stringify(loginJson);
         
         var userLoginUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'userlogin';
     
@@ -53,11 +53,12 @@ const UserLogin = ( ) => {
     
         const result = await response.json( );
         
-        console.log(result)
-
         setLoginButtonSpinner( false );
 
-        if( response.status === 400 ){
+        var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
+
+        console.log( error_message_type )
+        if( error_message_type === result.MSGTYPE ){
             setServerErrorCode( result.ERROR_CODE );
             setServerErrorSubject( result.ERROR_SUBJECT);
             setServerErrorMessage( result.ERROR_MESSAGE)
