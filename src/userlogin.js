@@ -12,6 +12,7 @@ import Button from 'react-bootstrap/Button'
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Spinner from 'react-bootstrap/Spinner';
+import Alert from 'react-bootstrap/Alert'
 
 const UserLogin = ( ) => {
 
@@ -40,6 +41,10 @@ const UserLogin = ( ) => {
         setLoginButtonSpinner( true )
         var loginJson = { loginCredential,loginPassword };
         var loginData = JSON.stringify(loginJson);
+
+        if( loginData  )
+
+        
         
         var userLoginUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'userlogin';
     
@@ -70,6 +75,18 @@ const UserLogin = ( ) => {
         document.getElementById("UserLoginForm").reset( ) 
     }
 
+    function ShowEmptyLoginCredentialAlert( ){
+        return(
+            <Alert variant="danger" >Please input a valid Login Credential</Alert>
+        )
+    }
+
+    function ShowEmptyPasswordAlert( ){
+        return(
+            <Alert variant="danger" >Please input a valid a password</Alert>
+        )
+    }
+
     return (
         <div id = "UserLoginPage"> 
             <Form id = "UserLoginForm">
@@ -80,9 +97,13 @@ const UserLogin = ( ) => {
                     <Form.Control type="text" placeholder="user@jamii.com or jamiidev30" onChange={ (e) => setLoginCredential(e.target.value) } />
                 </FloatingLabel>
 
+                < ShowEmptyLoginCredentialAlert />
+
                 <FloatingLabel controlId="loginpassword" label="Password" className="mb-3">
                     <Form.Control type="password" placeholder="Login Password" onChange={ (e) => setLoginPassword(e.target.value) } />
                 </FloatingLabel>
+
+                < ShowEmptyPasswordAlert />
 
                 <Form.Check type="switch" id="custom-switch" label="Remember me on this device" className="mb-3" onChange={ (e) => setRememberLogin( e.target.checked ) }/>
 

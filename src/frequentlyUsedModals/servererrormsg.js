@@ -4,7 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 function ServerErrorMsg( props ) {
 	return (
 
-	<Modal { ...props } >
+	<Modal { ...props } aria-labelledby="parent-modal-title" aria-describedby="parent-modal-description">
 
 		<Modal.Header closeButton>
 			<Modal.Title> 

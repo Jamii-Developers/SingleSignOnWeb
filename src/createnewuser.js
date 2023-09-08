@@ -39,7 +39,7 @@ const CreateNewUser = ( ) => {
 
                     <ButtonGroup size="md" className="mb-2">
                         <Button variant="outline-primary" type="button" onClick={ ( ) => signUp( )}>Sign Up</Button>
-                        <Button variant="outline-info" type="button" onClick={ ( ) => clear( )}>Clear</Button>
+                        <Button variant="outline-info" type="button" onClick={ ( ) => clear( ) }>Clear</Button>
                     </ButtonGroup>
                 </Form>
            
