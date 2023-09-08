@@ -56,18 +56,18 @@ const UserLogin = ( ) => {
         setLoginButtonSpinner( false );
 
         var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
-
+        console.log( result );
         console.log( error_message_type )
         if( error_message_type === result.MSGTYPE ){
-            setServerErrorCode( result.ERROR_CODE );
-            setServerErrorSubject( result.ERROR_SUBJECT);
-            setServerErrorMessage( result.ERROR_MESSAGE)
+            setServerErrorCode( result.ERROR_FIELD_CODE );
+            setServerErrorSubject( result.ERROR_FIELD_SUBJECT);
+            setServerErrorMessage( result.ERROR_FIELD_MESSAGE)
             setErrServMsgShow(true);
         }
     } 
 
     function clear( ){
-        document.getElementById("UserLoginForm").reset() 
+        document.getElementById("UserLoginForm").reset( ) 
     }
 
     return (
