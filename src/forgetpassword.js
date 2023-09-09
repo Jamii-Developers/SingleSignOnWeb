@@ -5,7 +5,7 @@ import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 
-const ForgetPassword = ( ) => {
+const ForgetPassword = ( props ) => {
     return (
         <div id = "ForgetPasswordPage">
             <Form>

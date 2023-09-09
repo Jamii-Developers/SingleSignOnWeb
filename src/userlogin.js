@@ -5,16 +5,17 @@ import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
 
 import React from 'react';
 import { useState } from 'react'
-import { createRoot } from 'react-dom/client';
 
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Spinner from 'react-bootstrap/Spinner';
-import Alert from 'react-bootstrap/Alert'
+import Collapse from 'react-bootstrap/Collapse';
+import Alert from '@mui/material/Alert'
 
-const UserLogin = ( ) => {
+
+const UserLogin = ( props ) => {
 
     const [serverErrorCode, setServerErrorCode ] = useState("");
     const [serverErrorSubject, setServerErrorSubject ] = useState("");
@@ -26,14 +27,11 @@ const UserLogin = ( ) => {
     const [ loginPassword, setLoginPassword ] = useState("");
     const [ rememberLogin, setRememberLogin ] = useState( false );
 
+
     const [loginButtonSpinner, setLoginButtonSpinner ] = useState( false );
 
     const openForgetUsPage = ( ) => {
-    
-        const main_body_container = document.getElementById( 'main_body' )
-        const main_body = createRoot( main_body_container )
-        main_body.render(< ForgetPassword />)
-        
+        props.main_body.render(< ForgetPassword />)
     }
 
     async function sendUserLogin( loginCredential, loginPassword, rememberLogin ) {
@@ -75,16 +73,46 @@ const UserLogin = ( ) => {
         document.getElementById("UserLoginForm").reset( ) 
     }
 
-    function ShowEmptyLoginCredentialAlert( ){
+    const [ showEmptyLoginCredentialAlert, setshowEmptyLoginCredentialAlert ] = useState( false );
+    function ShowEmptyLoginCredentialAlert( props ){
         return(
-            <Alert variant="danger" >Please input a valid Login Credential</Alert>
+            <Collapse { ...props } >
+                <Alert severity="error" className="mb-3">Please input a valid Login Credential</Alert>
+            </Collapse>
+        )
+    }
+    
+    const [ showEmptyPasswordAlert, setShowEmptyPasswordAlert ] = useState( false );
+    function ShowEmptyPasswordAlert( props ){
+        return(
+            <Collapse { ...props } >
+                <Alert severity="error" className="mb-3">Please input a valid a password</Alert>
+            </Collapse>
         )
     }
 
-    function ShowEmptyPasswordAlert( ){
-        return(
-            <Alert variant="danger" >Please input a valid a password</Alert>
-        )
+    
+    function CheckLoginCredential( logincredentialval ){
+        setLoginCredential(  logincredentialval );
+        
+        if( logincredentialval.length === 0 ){
+            setshowEmptyLoginCredentialAlert( true );
+        }else{
+            setshowEmptyLoginCredentialAlert( false );
+        }
+
+    }
+
+    function CheckPassword( passowrdval ){
+
+        setLoginPassword(  passowrdval );
+
+        if( passowrdval.length === 0 ){
+            setShowEmptyPasswordAlert( true );
+        }else{
+            setShowEmptyPasswordAlert( false );
+        }
+
     }
 
     return (
@@ -94,16 +122,16 @@ const UserLogin = ( ) => {
                 <h1 className='h1_defaults'>Single Sign-On Login</h1>
 
                 <FloatingLabel controlId="logincredential" label="Email address or Username" className="mb-3">
-                    <Form.Control type="text" placeholder="user@jamii.com or jamiidev30" onChange={ (e) => setLoginCredential(e.target.value) } />
+                    <Form.Control type="text" placeholder="user@jamii.com or jamiidev30" onInput={ (e) => CheckLoginCredential( e.target.value ) }  />
                 </FloatingLabel>
 
-                < ShowEmptyLoginCredentialAlert />
+                < ShowEmptyLoginCredentialAlert in={showEmptyLoginCredentialAlert} />
 
                 <FloatingLabel controlId="loginpassword" label="Password" className="mb-3">
-                    <Form.Control type="password" placeholder="Login Password" onChange={ (e) => setLoginPassword(e.target.value) } />
+                    <Form.Control type="password" placeholder="Login Password" onChange={ (e) => CheckPassword(e.target.value) } />
                 </FloatingLabel>
 
-                < ShowEmptyPasswordAlert />
+                < ShowEmptyPasswordAlert in={showEmptyPasswordAlert}  />
 
                 <Form.Check type="switch" id="custom-switch" label="Remember me on this device" className="mb-3" onChange={ (e) => setRememberLogin( e.target.checked ) }/>
 

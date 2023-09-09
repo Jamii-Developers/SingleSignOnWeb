@@ -1,7 +1,6 @@
 import '../sass/indexheader.sass'
 
 import React from 'react'
-import { createRoot } from 'react-dom/client'
 
 import Navbar  from 'react-bootstrap/esm/Navbar'
 import Container  from 'react-bootstrap/Container'
@@ -12,27 +11,42 @@ import UserLogin from '../userlogin'
 import CreateNewUser from '../createnewuser'
 import AboutUs from '../aboutus'
 
+const Header = ( props ) => {
 
+	function LoginButton( ){
+		return(
+			<Nav.Link id="loginbutton" onClick={ ( ) => openPage('userlogin')} >Login</Nav.Link>
+		)
+	}
+	
+	function CreateNewUserButton( ){
+		return(
+			<Nav.Link id="createnewuserbutton" onClick={ ( ) => openPage('createnewuser')}>Sign Up</Nav.Link>
+		)
+	}
+	
+	function AboutUsButton( ){
+		return(
+			<Nav.Link id="aboutusbutton"  onClick={ ( ) => openPage('aboutus')}>About Us</Nav.Link>
+		)
+	}
 
-function LoginButton( ){
-	return(
-		<Nav.Link id="loginbutton" onClick={ ( ) => openPage('userlogin')} >Login</Nav.Link>
-	)
-}
+	function openPage(page){
 
-function CreateNewUserButton( ){
-	return(
-		<Nav.Link id="createnewuserbutton" onClick={ ( ) => openPage('createnewuser')}>Sign Up</Nav.Link>
-	)
-}
+		if (page === 'userlogin') {
+			props.main_body.render(< UserLogin main_body = {props.main_body}  />)
+		}
+	
+		if (page === 'createnewuser') {
+			props.main_body.render(< CreateNewUser main_body = {props.main_body}  />)
+		}
+	
+		if (page === 'aboutus') {
+			props.main_body.render(< AboutUs main_body = {props.main_body}  />)
+		}
+	
+	}
 
-function AboutUsButton( ){
-	return(
-		<Nav.Link id="aboutusbutton"  onClick={ ( ) => openPage('aboutus')}>About Us</Nav.Link>
-	)
-}
-
-const Header = ( ) => {
     return(
 		<div id = "IndexHeaderPage" >
 			< Navbar  bg="primary" data-bs-theme="dark" sticky="top"> 
@@ -50,26 +64,6 @@ const Header = ( ) => {
     )
 }
 
-const openPage = (page) => {
 
-	if (page === 'userlogin') {
-		const main_body_container = document.getElementById( 'main_body' )
-		const main_body = createRoot( main_body_container )
-		main_body.render(< UserLogin />)
-	}
-
-	if (page === 'createnewuser') {
-		const main_body_container = document.getElementById( 'main_body' )
-		const main_body = createRoot( main_body_container )
-		main_body.render(< CreateNewUser />)
-	}
-
-	if (page === 'aboutus') {
-		const main_body_container = document.getElementById( 'main_body' )
-		const main_body = createRoot( main_body_container )
-		main_body.render(< AboutUs />)
-	}
-
-}
 
 export default Header

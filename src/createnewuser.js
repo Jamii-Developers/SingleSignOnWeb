@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button'
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 
-const CreateNewUser = ( ) => {
+const CreateNewUser = ( props ) => {
 
 
     function clear( ){
@@ -21,7 +21,7 @@ const CreateNewUser = ( ) => {
                 <Form id = "createnewuserform">
                     <h1>Single Sign-On Sign Up</h1>
 
-                    <FloatingLabel controlId="email" label="Email address" className="mb-3">
+                    <FloatingLabel label="Email address" className="mb-3">
                         <Form.Control id="email" type="email" placeholder="name@example.com" />
                     </FloatingLabel>
 

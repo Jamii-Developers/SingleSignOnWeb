@@ -15,6 +15,6 @@ const main_body = createRoot( main_body_container )
 const footer_container = document.getElementById( 'footer' );
 const footer = createRoot( footer_container )
 
-header.render( < Header /> )
-main_body.render( < UserLogin /> )
-footer.render( < Footer /> )
+header.render( < Header main_body = {main_body} /> )
+main_body.render( < UserLogin main_body = {main_body}  /> )
+footer.render( < Footer main_body = {main_body} /> )
