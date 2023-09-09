@@ -1,6 +1,7 @@
 import './sass/userlogin.sass';
 import ForgetPassword from './forgetpassword';
 import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
+import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg'
 
 
 import React from 'react';
@@ -11,8 +12,8 @@ import Button from 'react-bootstrap/Button'
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Spinner from 'react-bootstrap/Spinner';
+import Alert from '@mui/material/Alert';
 import Collapse from 'react-bootstrap/Collapse';
-import Alert from '@mui/material/Alert'
 
 
 const UserLogin = ( props ) => {
@@ -21,11 +22,22 @@ const UserLogin = ( props ) => {
     const [serverErrorSubject, setServerErrorSubject ] = useState("");
     const [serverErrorMessage, setServerErrorMessage ] = useState("");
     const [errServMsgShow, setErrServMsgShow ] = useState(false);
+
+    const [ui_subject, setUi_subject ] = useState("");
+    const [ui_message, setUi_message ] = useState("");
+    const [succServMsgShow, setSuccServMsgShow ] = useState(false);
     
 
     const [ loginCredential, setLoginCredential ] = useState("");
     const [ loginPassword, setLoginPassword ] = useState("");
     const [ rememberLogin, setRememberLogin ] = useState( false );
+
+    const [errordata , setErrorData ] = useState({
+        loginCredentialErrorTrigger : false,
+        loginCredentialErrorMessage : "",
+        loginPasswordErrorTrigger : false,
+        loginPasswordErrorMessage : "",
+    });
 
 
     const [loginButtonSpinner, setLoginButtonSpinner ] = useState( false );
@@ -34,18 +46,35 @@ const UserLogin = ( props ) => {
         props.main_body.render(< ForgetPassword />)
     }
 
-    async function sendUserLogin( loginCredential, loginPassword, rememberLogin ) {
+    async function sendUserLogin( ) {
 
+        setLoginCredential( loginCredential.toLowerCase( ) );
+
+        if( loginCredential === ""  ){
+            setServerErrorCode( "Generated at CreateNewUserJS" );
+            setServerErrorSubject( "Login Credential!" );
+            setServerErrorMessage( "No login credential has been provided")
+            setErrServMsgShow(true);
+            return;
+        }
+
+        if( loginPassword === ""  ){
+            setServerErrorCode( "Generated at CreateNewUserJS" );
+            setServerErrorSubject( "Login Password!" );
+            setServerErrorMessage( "No login password has been provided")
+            setErrServMsgShow(true);
+            return;
+        }
+        
+        
         setLoginButtonSpinner( true )
-        var loginJson = { loginCredential,loginPassword };
+        var loginJson = { 
+            loginCredential,
+            loginPassword };
         var loginData = JSON.stringify(loginJson);
 
-        if( loginData  )
-
-        
-        
+        console.log( loginData );
         var userLoginUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'userlogin';
-    
         const response = await fetch(userLoginUrl, {
           method: 'POST',
           body: loginData,
@@ -59,13 +88,20 @@ const UserLogin = ( props ) => {
         setLoginButtonSpinner( false );
 
         var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
-        console.log( result );
-        console.log( error_message_type )
+
         if( error_message_type === result.MSGTYPE ){
             setServerErrorCode( result.ERROR_FIELD_CODE );
             setServerErrorSubject( result.ERROR_FIELD_SUBJECT);
             setServerErrorMessage( result.ERROR_FIELD_MESSAGE)
             setErrServMsgShow(true);
+            return;
+        }
+
+        var succ_message_type = process.env.REACT_APP_RESPONSE_TYPE_USERLOGIN
+        if( succ_message_type === result.MSGTYPE ){
+            setUi_subject( result.UI_SUBJECT);
+            setUi_message( result.UI_MESSAGE)
+            setSuccServMsgShow(true);
         }
     } 
 
@@ -73,46 +109,41 @@ const UserLogin = ( props ) => {
         document.getElementById("UserLoginForm").reset( ) 
     }
 
-    const [ showEmptyLoginCredentialAlert, setshowEmptyLoginCredentialAlert ] = useState( false );
-    function ShowEmptyLoginCredentialAlert( props ){
-        return(
-            <Collapse { ...props } >
-                <Alert severity="error" className="mb-3">Please input a valid Login Credential</Alert>
-            </Collapse>
-        )
-    }
-    
-    const [ showEmptyPasswordAlert, setShowEmptyPasswordAlert ] = useState( false );
-    function ShowEmptyPasswordAlert( props ){
-        return(
-            <Collapse { ...props } >
-                <Alert severity="error" className="mb-3">Please input a valid a password</Alert>
-            </Collapse>
-        )
+    function ShowLoginCredentialError(  ){
+        return( 
+            <Collapse in ={ errordata.loginCredentialErrorTrigger }>
+                <Alert variant="filled" severity="warning" className='mb-3' >{ errordata.loginCredentialErrorMessage }</Alert>   
+            </Collapse>                    
+        );
     }
 
-    
-    function CheckLoginCredential( logincredentialval ){
-        setLoginCredential(  logincredentialval );
-        
-        if( logincredentialval.length === 0 ){
-            setshowEmptyLoginCredentialAlert( true );
-        }else{
-            setshowEmptyLoginCredentialAlert( false );
+    function ShowLoginPasswordError(  ){
+        return( 
+            <Collapse in ={ errordata.loginPasswordErrorTrigger }>
+                <Alert variant="filled" severity="warning" className='mb-3' >{ errordata.loginPasswordErrorMessage }</Alert>   
+            </Collapse>                    
+        );
+    }
+
+    function CheckLoginCredential( loginCredential ){
+        if( loginCredential === "" ){
+            setErrorData( prevState => { return { ...prevState ,loginCredentialErrorMessage : "Your Login Credential is empty" } } );
+            setErrorData( prevState => { return { ...prevState ,loginCredentialErrorTrigger : true } } );
+            return;
         }
 
+        setErrorData( prevState => { return { ...prevState ,loginCredentialErrorTrigger : false } } );
     }
 
-    function CheckPassword( passowrdval ){
+    function CheckLoginPassword( loginPassword){
 
-        setLoginPassword(  passowrdval );
-
-        if( passowrdval.length === 0 ){
-            setShowEmptyPasswordAlert( true );
-        }else{
-            setShowEmptyPasswordAlert( false );
+        if( loginPassword === "" ){
+            setErrorData( prevState => { return { ...prevState ,loginPasswordErrorMessage : "Your Login Password is empty" } } );
+            setErrorData( prevState => { return { ...prevState ,loginPasswordErrorTrigger : true } } );
+            return;
         }
 
+        setErrorData( prevState => { return { ...prevState ,loginPasswordErrorTrigger : false } } );
     }
 
     return (
@@ -121,19 +152,19 @@ const UserLogin = ( props ) => {
 
                 <h1 className='h1_defaults'>Single Sign-On Login</h1>
 
-                <FloatingLabel controlId="logincredential" label="Email address or Username" className="mb-3">
-                    <Form.Control type="text" placeholder="user@jamii.com or jamiidev30" onInput={ (e) => CheckLoginCredential( e.target.value ) }  />
+                <FloatingLabel label="Email address or Username" className="mb-3">
+                    <Form.Control type="text" placeholder="user@jamii.com or jamiidev30" onInput={ (e) => setLoginCredential( e.target.value ) } onChange = { (e) => CheckLoginCredential( e.target.value ) } />
                 </FloatingLabel>
 
-                < ShowEmptyLoginCredentialAlert in={showEmptyLoginCredentialAlert} />
+                <ShowLoginCredentialError />
 
-                <FloatingLabel controlId="loginpassword" label="Password" className="mb-3">
-                    <Form.Control type="password" placeholder="Login Password" onChange={ (e) => CheckPassword(e.target.value) } />
+                <FloatingLabel label="Password" className="mb-3">
+                    <Form.Control type="password" placeholder="Login Password" onInput={ (e) => setLoginPassword( e.target.value ) } onChange = { (e) => CheckLoginPassword( e.target.value ) }/>
                 </FloatingLabel>
 
-                < ShowEmptyPasswordAlert in={showEmptyPasswordAlert}  />
+                <ShowLoginPasswordError />
 
-                <Form.Check type="switch" id="custom-switch" label="Remember me on this device" className="mb-3" onChange={ (e) => setRememberLogin( e.target.checked ) }/>
+                <Form.Check type="switch" id="custom-switch" label="Remember me on this device" className="mb-3" onSelect={ (e) => setRememberLogin( e.target.checked ) }/>
 
                 <ButtonGroup size="md" className="mb-3">
                     <Button variant="outline-primary" type="button" onClick={ ( ) => sendUserLogin( loginCredential , loginPassword, rememberLogin ) }>
@@ -147,11 +178,18 @@ const UserLogin = ( props ) => {
             </Form>
 
             < ServerErrorMsg 
-                show={errServMsgShow} 
-                onHide={ ( ) => setErrServMsgShow( false ) } 
+                open={errServMsgShow}  
+                onClose={ ( ) => setErrServMsgShow( false )  }
                 errorcode = {serverErrorCode} 
                 errorsubject = {serverErrorSubject} 
                 errormessage = {serverErrorMessage}                             
+            />
+
+            < ServerSuccessMsg 
+                open={succServMsgShow}  
+                onClose={ ( ) => setSuccServMsgShow( false )  }
+                ui_subject = {ui_subject} 
+                ui_message = {ui_message}                             
             />
 
         </div>

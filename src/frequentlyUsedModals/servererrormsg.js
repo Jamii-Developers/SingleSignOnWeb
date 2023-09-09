@@ -1,29 +1,22 @@
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import Grow from '@mui/material/Grow';
 
 function ServerErrorMsg( props ) {
-	return (
 
-	<Modal { ...props } aria-labelledby="parent-modal-title" aria-describedby="parent-modal-description">
+	const { vertical, horizontal, transition } = ( { 
+		vertical : 'top', 
+		horizontal : 'center',
+		transition : Grow  });
 
-		<Modal.Header closeButton>
-			<Modal.Title> 
-				{ props.errorsubject } 
-			</Modal.Title>
-		</Modal.Header>
-
-		<Modal.Body> 
-			<p>{ props.errormessage }</p>
-
-			<p>Error Code: { props.errorcode }</p>
-		</Modal.Body>
-
-		<Modal.Footer>
-			<Button variant='secondary' onClick={props.onHide}>Close</Button>
-		</Modal.Footer>
-		
-	</Modal>
-
+	return(
+		<Snackbar { ...props } autoHideDuration={3000} anchorOrigin={ { vertical, horizontal } } TransitionComponent={transition} >
+			<Alert onClose={props.onClose} severity="error" sx={ { width: '100%'  } } variant="filled">
+				<p><b>{props.errorsubject}</b></p>
+				<p>{props.errormessage}</p>
+				{/* <p>Error code : {props.errorcode}</p> */}
+			</Alert>
+		</Snackbar>
 	);
 }
 

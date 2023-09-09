@@ -29,7 +29,7 @@ const Footer = ( props ) => {
 	} 
     return(
         <div id = "IndexFooterPage" >
-			< Navbar  className='bg-body-tertiary' fixed="bottom"> 
+			< Navbar  className='bg-body-tertiary' sticky="bottom"> 
 				<Container>
 					<NavbarBrand>More information</NavbarBrand>
                     < ContactUsButton />
