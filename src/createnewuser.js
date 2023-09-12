@@ -1,6 +1,7 @@
-import './sass/createnewuser.sass'
+import './sass/createnewuser.sass';
 import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
-import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg'
+import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg';
+import UserLogin from './userlogin';
 
 import React from 'react';
 import { useState } from 'react'
@@ -50,7 +51,7 @@ const CreateNewUser = ( props ) => {
 
 
     function clear( ){
-        document.getElementById("createnewuserform").reset() 
+        document.getElementById("createnewuserform").reset( ) 
     }
 
     async function signUp( ){
@@ -157,6 +158,7 @@ const CreateNewUser = ( props ) => {
             setServerErrorSubject( result.ERROR_FIELD_SUBJECT);
             setServerErrorMessage( result.ERROR_FIELD_MESSAGE)
             setErrServMsgShow(true);
+            return;
         }
         console.log( result.MSGTYPE )
         var succ_message_type = process.env.REACT_APP_RESPONSE_TYPE_CREATE_NEW_USER
@@ -164,7 +166,11 @@ const CreateNewUser = ( props ) => {
             setUi_subject( result.UI_SUBJECT);
             setUi_message( result.UI_MESSAGE)
             setSuccServMsgShow(true);
+            document.getElementById("createnewuserform").reset( );
+            props.main_body.render( < UserLogin main_body = {props.main_body}  /> ); 
         }
+
+        
 
     }
 

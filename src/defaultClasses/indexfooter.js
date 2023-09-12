@@ -7,11 +7,6 @@ import { NavbarBrand }from 'react-bootstrap'
 
 import ContactUs from '../contactus'
 
-
-
-
-
-
 const Footer = ( props ) => {
 
 	function ContactUsButton( ){
