@@ -152,7 +152,6 @@ const CreateNewUser = ( props ) => {
         setLoginButtonSpinner( false );
 
         var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
-
         if( error_message_type === result.MSGTYPE ){
             setServerErrorCode( result.ERROR_FIELD_CODE );
             setServerErrorSubject( result.ERROR_FIELD_SUBJECT);
@@ -160,7 +159,7 @@ const CreateNewUser = ( props ) => {
             setErrServMsgShow(true);
             return;
         }
-        console.log( result.MSGTYPE )
+
         var succ_message_type = process.env.REACT_APP_RESPONSE_TYPE_CREATE_NEW_USER
         if( succ_message_type === result.MSGTYPE ){
             setUi_subject( result.UI_SUBJECT);
@@ -275,8 +274,11 @@ const CreateNewUser = ( props ) => {
         );
     }
 
+    
+
     return (
           <div id = "CreateNewUserPage">
+
                 <Form id = "createnewuserform">
                     <h1>Single Sign-On Sign Up</h1>
 

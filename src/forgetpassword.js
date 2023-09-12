@@ -4,10 +4,21 @@ import Form from 'react-bootstrap/Form';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import Alert from '@mui/material/Alert';
+
 
 const ForgetPassword = ( props ) => {
+
+    function PageUnderDevelopmentNotice(  ){
+        return( 
+            
+            <Alert variant="filled" severity="info" className='mb-3' >Page under development</Alert>   
+                            
+        );
+    }
     return (
         <div id = "ForgetPasswordPage">
+            <PageUnderDevelopmentNotice />
             <Form>
                     <h1> Forgot your password ?</h1>
 

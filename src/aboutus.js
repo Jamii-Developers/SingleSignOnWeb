@@ -1,9 +1,22 @@
 import './sass/aboutus.sass'
 
+import Alert from '@mui/material/Alert';
+
+
 const AboutUs = ( ) => {
+
+      function PageUnderDevelopmentNotice(  ){
+            return( 
+                
+                <Alert variant="filled" severity="info" className='mb-3' >Page under development</Alert>   
+                                
+            );
+      }
+      
 
     return (
           <div id = "AboutUsPage">
+            <PageUnderDevelopmentNotice />
 
                 <h1>About Us</h1>
 
