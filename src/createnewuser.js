@@ -31,7 +31,7 @@ const CreateNewUser = ( props ) => {
     const [ password , setPassword ] = useState( "" );
     const [ retypedpassword , setRetypedPassword ] = useState( "" );
 
-    const mailformat = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(.\w{2,3})+$/;
+    const mailformat = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
     const specialChars =/[`!@#$%^&*()_\-+=[\]{};':"|,.<>/?~ ]/;
 
     

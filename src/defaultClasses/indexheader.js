@@ -1,15 +1,15 @@
-import '../sass/indexheader.sass'
+import '../sass/indexheader.sass';
 
-import React from 'react'
+import React from 'react';
 
-import Navbar  from 'react-bootstrap/esm/Navbar'
-import Container  from 'react-bootstrap/Container'
+import Navbar  from 'react-bootstrap/esm/Navbar';
+import Container  from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import { NavbarBrand }from 'react-bootstrap'
 
-import UserLogin from '../userlogin'
-import CreateNewUser from '../createnewuser'
-import AboutUs from '../aboutus'
+import UserLogin from '../userlogin';
+import CreateNewUser from '../createnewuser';
+import AboutUs from '../aboutus';
 
 const Header = ( props ) => {
 
@@ -49,7 +49,7 @@ const Header = ( props ) => {
 
     return(
 		<div id = "IndexHeaderPage" >
-			< Navbar  bg="primary" data-bs-theme="dark" sticky="top"> 
+			< Navbar  bg="primary" data-bs-theme="dark" sticky="top">
 				<Container>
 					<NavbarBrand>Single Sign-On</NavbarBrand>
 					<Navbar.Toggle aria-controls="basic-navbar-nav" />
