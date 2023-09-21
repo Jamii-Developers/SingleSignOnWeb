@@ -47,7 +47,7 @@ const CreateNewUser = ( props ) => {
 
     });
 
-    const [loginButtonSpinner, setLoginButtonSpinner ] = useState( false );
+    const [createNewUserButtonSpinner, setCreateNewUserButtonSpinner ] = useState( false );
 
 
     function clear( ){
@@ -136,7 +136,7 @@ const CreateNewUser = ( props ) => {
 
         var createNewUserData = JSON.stringify( createNewUserJson );
 
-        setLoginButtonSpinner( true )
+        setCreateNewUserButtonSpinner( true )
         var createNewUserUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'createnewuser';
     
         const response = await fetch( createNewUserUrl, {
@@ -149,7 +149,7 @@ const CreateNewUser = ( props ) => {
     
         const result = await response.json( );
         
-        setLoginButtonSpinner( false );
+        setCreateNewUserButtonSpinner( false );
 
         var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
         if( error_message_type === result.MSGTYPE ){
@@ -168,11 +168,7 @@ const CreateNewUser = ( props ) => {
             document.getElementById("createnewuserform").reset( );
             props.main_body.render( < UserLogin main_body = {props.main_body}  /> ); 
         }
-
-        
-
     }
-
     
     function CheckEmail( email ){
         if( email === "" ){
@@ -274,8 +270,6 @@ const CreateNewUser = ( props ) => {
         );
     }
 
-    
-
     return (
           <div id = "CreateNewUserPage">
 
@@ -308,7 +302,7 @@ const CreateNewUser = ( props ) => {
 
                     <ButtonGroup size="md" className="mb-2">
                         <Button variant="outline-primary" type="button" onClick={ ( ) => signUp( ) }>
-                            {loginButtonSpinner && <Spinner as="span"animation="grow"size="sm" role="status" aria-hidden="false"/>}
+                            {createNewUserButtonSpinner && <Spinner as="span"animation="grow"size="sm" role="status" aria-hidden="false"/>}
                             Sign Up
                             </Button>
                         <Button variant="outline-info" type="button" onClick={ ( ) => clear( ) }>Clear</Button>
