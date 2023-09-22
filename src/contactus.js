@@ -293,19 +293,19 @@ const ContactUs = ( ) => {
             </Form>
 
             < ServerErrorMsg 
-                    open={serverErrorResponse.errServMsgShow}  
-                    onClose={ ( ) => setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : false } } ) }
-                    errorcode = {serverErrorResponse.serverErrorCode} 
-                    errorsubject = {serverErrorResponse.serverErrorSubject} 
-                    errormessage = {serverErrorResponse.serverErrorMessage}                             
-                />
+                  open={serverErrorResponse.errServMsgShow}  
+                  onClose={ ( ) => setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : false } } ) }
+                  errorcode = {serverErrorResponse.serverErrorCode} 
+                  errorsubject = {serverErrorResponse.serverErrorSubject} 
+                  errormessage = {serverErrorResponse.serverErrorMessage}                             
+            />
 
-                < ServerSuccessMsg 
-                    open={serverSuccessResponse.succServMsgShow}  
-                    onClose={ ( ) => setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow : false } } ) }
-                    ui_subject = {serverSuccessResponse.ui_subject} 
-                    ui_message = {serverSuccessResponse.ui_message}                             
-                />
+            < ServerSuccessMsg 
+                  open={serverSuccessResponse.succServMsgShow}  
+                  onClose={ ( ) => setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow : false } } ) }
+                  ui_subject = {serverSuccessResponse.ui_subject} 
+                  ui_message = {serverSuccessResponse.ui_message}                             
+            />
             
           </div>
       )

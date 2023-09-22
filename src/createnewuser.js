@@ -1,7 +1,6 @@
 import './sass/createnewuser.sass';
 import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg';
-import UserLogin from './userlogin';
 
 import React from 'react';
 import { useState } from 'react'
@@ -13,26 +12,34 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Spinner from 'react-bootstrap/Spinner';
 import Alert from '@mui/material/Alert';
 import Collapse from 'react-bootstrap/Collapse';
+import { uniqueSort } from 'jquery';
 
 
 const CreateNewUser = ( props ) => {
 
-    const [serverErrorCode, setServerErrorCode ] = useState("");
-    const [serverErrorSubject, setServerErrorSubject ] = useState("");
-    const [serverErrorMessage, setServerErrorMessage ] = useState("");
-    const [errServMsgShow, setErrServMsgShow ] = useState(false);
-
-    const [ui_subject, setUi_subject ] = useState("");
-    const [ui_message, setUi_message ] = useState("");
-    const [succServMsgShow, setSuccServMsgShow ] = useState(false);
-
-    const [ emailaddress , setEmailAddress] = useState( "" );
-    const [ username , setUsername ] = useState( "" );
-    const [ password , setPassword ] = useState( "" );
-    const [ retypedpassword , setRetypedPassword ] = useState( "" );
 
     const mailformat = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
     const specialChars =/[`!@#$%^&*()_\-+=[\]{};':"|,.<>/?~ ]/;
+
+    const[ serverErrorResponse , setServerErrorResponse ] = useState({
+        serverErrorCode : "",
+        serverErrorSubject: "",
+        serverErrorMessage: "",
+        errServMsgShow : false
+  	});
+
+  	const[ serverSuccessResponse, setServerSuccessResponse ] = useState({
+        ui_subject : "",
+        ui_message : "",
+        succServMsgShow: false
+  	})
+
+  const[ pageFields, setPageFields ] = useState({
+        email : "",
+        username : "",
+        password : "",
+		retypedpassword : ""
+  })
 
     
     const [errordata , setErrorData ] = useState({
@@ -55,80 +62,84 @@ const CreateNewUser = ( props ) => {
     }
 
     async function signUp( ){
-        setEmailAddress( emailaddress.toLowerCase( ) );
-        setUsername( username.toLowerCase( ) );
 
-        if( emailaddress === "" ){
-            setServerErrorCode( "Generated at CreateNewUserJS" );
-            setServerErrorSubject( "Email Input Error!" );
-            setServerErrorMessage( "No email address has been provided")
-            setErrServMsgShow(true);
+		setPageFields( prevState => { return { ...prevState , email : pageFields.email.toLowerCase( )} } )
+		setPageFields( prevState => { return { ...prevState , username : pageFields.username.toLowerCase( )} } )
+
+        if( pageFields.email === "" ){
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Email Input Error!"   } } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "No email address has been provided."} } )
+			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
             return;
         }
 
-        if( !emailaddress.match( mailformat ) ){
-            setServerErrorCode( "Generated at CreateNewUserJS" );
-            setServerErrorSubject( "Email Input Error!" );
-            setServerErrorMessage( "This is not a valid Email address. Please input the format 'user@jamii.com' ")
-            setErrServMsgShow(true);
+        if( !pageFields.email.match( mailformat ) ){
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Email Input Error!"   } } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "This is not a valid Email address. Please input the format 'user@jamii.com'."} } )
+			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
             return;
         }
 
-        if( username === "" ){
-            setServerErrorCode( "Generated at CreateNewUserJS" );
-            setServerErrorSubject( "Username Error!" );
-            setServerErrorMessage( "No username has been provided")
-            setErrServMsgShow(true);
+        if( pageFields.username === "" ){
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Username Error!"   } } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "No username has been provided"} } )
+			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
             return;
         }
 
-        if( username.length < 5 ){
-            setServerErrorCode( "Generated at CreateNewUserJS" );
-            setServerErrorSubject( "Username Error!" );
-            setServerErrorMessage( "Your username cannot be less than 5 characters")
-            setErrServMsgShow(true);
+        if( pageFields.username.length < 5 ){
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Username Error!"   } } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "Your username cannot be less than 5 characters"} } )
+			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
             return;
         }
-        if( username.match( specialChars ) ){
-            setServerErrorCode( "Generated at CreateNewUserJS" );
-            setServerErrorSubject( "Username Error!" );
-            setServerErrorMessage( "Your username cannot contain any special characters")
-            setErrServMsgShow(true);
-            return;
-        }
-
-        if( password === "" ){
-            setServerErrorCode( "Generated at CreateNewUserJS" );
-            setServerErrorSubject( "Password Input Error! " );
-            setServerErrorMessage( "No password address has been provided")
-            setErrServMsgShow(true);
+        if( pageFields.username.match( specialChars ) ){
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Username Error!"   } } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "Your username cannot contain any special characters"} } )
+			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
             return;
         }
 
-        if( password.length < 8 ){
-            setServerErrorCode( "Generated at CreateNewUserJS" );
-            setServerErrorSubject( "Password Input Error! " );
-            setServerErrorMessage( "Your password cannot be less than 8 characters")
-            setErrServMsgShow(true);
+        if( pageFields.password === "" ){
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Password Input Error!"    } } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "No password address has been provided"} } )
+			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
             return;
         }
 
-        if( retypedpassword === "" ){
-            setServerErrorCode( "Generated at CreateNewUserJS" );
-            setServerErrorSubject( "Retyped Password Input!" );
-            setServerErrorMessage( "No email address has been provided")
-            setErrServMsgShow(true);
+        if( pageFields.password.length < 8 ){
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Password Input Error!"    } } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "Your password cannot be less than 8 characters" } } )
+			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
             return;
         }
 
-        if( password !== retypedpassword ){
-            setServerErrorCode( "Generated at CreateNewUserJS" );
-            setServerErrorSubject( "Password Error:" );
-            setServerErrorMessage( "The passwords do not match")
-            setErrServMsgShow(true);
+        if( pageFields.retypedpassword === "" ){
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Retyped Password Input!"    } } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "No email address has been provided" } } )
+			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
             return;
         }
 
+        if( pageFields.password !== pageFields.retypedpassword ){
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Password Error:"   } } )
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "The passwords do not match" } } )
+			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+            return;
+        }
+
+		let emailaddress = pageFields.email;
+		let username = pageFields.username;
+		let password = pageFields.password;
         var createNewUserJson = { 
             emailaddress,
             username,
@@ -152,22 +163,23 @@ const CreateNewUser = ( props ) => {
         setCreateNewUserButtonSpinner( false );
 
         var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
-        if( error_message_type === result.MSGTYPE ){
-            setServerErrorCode( result.ERROR_FIELD_CODE );
-            setServerErrorSubject( result.ERROR_FIELD_SUBJECT);
-            setServerErrorMessage( result.ERROR_FIELD_MESSAGE)
-            setErrServMsgShow(true);
-            return;
-        }
+		if( error_message_type === result.MSGTYPE ){
+				setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.ERROR_FIELD_CODE } } )
+				setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.ERROR_FIELD_SUBJECT  } } )
+				setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.ERROR_FIELD_MESSAGE } } )
+				setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+				return;
+		}
 
         var succ_message_type = process.env.REACT_APP_RESPONSE_TYPE_CREATE_NEW_USER
-        if( succ_message_type === result.MSGTYPE ){
-            setUi_subject( result.UI_SUBJECT);
-            setUi_message( result.UI_MESSAGE)
-            setSuccServMsgShow(true);
-            document.getElementById("createnewuserform").reset( );
-            props.main_body.render( < UserLogin main_body = {props.main_body}  /> ); 
-        }
+		if( succ_message_type === result.MSGTYPE ){ 
+
+				setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.UI_SUBJECT } } )
+				setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.UI_MESSAGE } } )
+				setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
+				document.getElementById("createnewuserform").reset( );
+				clear( );
+		}
     }
     
     function CheckEmail( email ){
@@ -187,21 +199,21 @@ const CreateNewUser = ( props ) => {
         
     }
 
-    function CheckUsername( username ){
+    function CheckUsername( u ){
 
-        if( username === "" ){
+        if( uniqueSort === "" ){
             setErrorData( prevState => { return { ...prevState ,usernameErrorMessage : "Username is empty" } } );
             setErrorData( prevState => { return { ...prevState ,usernameErrorTrigger : true } } );
             return;
         }
 
-        if( username.match(specialChars ) ){
+        if( u.match(specialChars ) ){
             setErrorData( prevState => { return { ...prevState ,usernameErrorMessage : "Your username cannot contain any special characters" } } );
             setErrorData( prevState => { return { ...prevState ,usernameErrorTrigger : true } } );
             return;
         }
 
-        if( username.length < 5  ){
+        if( u.length < 5  ){
             setErrorData( prevState => { return { ...prevState ,usernameErrorMessage : "Username cannot be less than 5 characters" } } );
             setErrorData( prevState => { return { ...prevState ,usernameErrorTrigger : true } } );
             return;
@@ -218,7 +230,7 @@ const CreateNewUser = ( props ) => {
             return;
         }
 
-        if( password.length < 8 ){
+        if( e.length < 8 ){
             setErrorData( prevState => { return { ...prevState ,passwordErrorMessage : "The password cannot have less than 8 characters!" } } );
             setErrorData( prevState => { return { ...prevState ,passwordErrorTrigger : true } } );
             return;
@@ -229,7 +241,7 @@ const CreateNewUser = ( props ) => {
 
     function checkRetypedPassword( e ){
 
-        if( e !== password ){
+        if( e !== pageFields.password ){
             setErrorData( prevState => { return { ...prevState ,retypedPasswordErrorMessage : "Retyped password does not match!" } } );
             setErrorData( prevState => { return { ...prevState ,retypedPasswordErrorTrigger : true } } );
             return;
@@ -277,25 +289,25 @@ const CreateNewUser = ( props ) => {
                     <h1>Single Sign-On Sign Up</h1>
 
                     <FloatingLabel label="Email address" className="mb-3">
-                        <Form.Control id="email" type="email" placeholder="name@example.com" onInput={ ( e ) => setEmailAddress( e.target.value ) } onChange={ ( e ) => CheckEmail( e.target.value ) } />
+                        <Form.Control id="email" type="email" placeholder="name@example.com" onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , email : e.target.value } } ) } onChange={ ( e ) => CheckEmail( e.target.value ) } />
                     </FloatingLabel>
 
                     < ShowEmailMessageError />
 
                     <FloatingLabel controlId="username" label="Username" className="mb-3">
-                        <Form.Control type="text" placeholder="jamiiadmin" onInput={ ( e ) => setUsername( e.target.value  )} onChange={ ( e ) => CheckUsername( e.target.value ) }  />
+                        <Form.Control id="username"  type="text" placeholder="jamiiadmin" onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , username : e.target.value } } ) }  onChange={ ( e ) => CheckUsername( e.target.value ) }  />
                     </FloatingLabel>
 
                     <ShowUsernameError />
 
-                    <FloatingLabel controlId="password" label="Password" className="mb-3">
-                        <Form.Control type="password" placeholder="password" onInput={ ( e ) => setPassword( e.target.value  )} onChange={ ( e ) => checkPassword( e.target.value ) }/>
+                    <FloatingLabel  label="Password" className="mb-3">
+                        <Form.Control id = "password" type="password" placeholder="password" onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , password : e.target.value } } ) }  onChange={ ( e ) => checkPassword( e.target.value ) }/>
                     </FloatingLabel>
 
                     <ShowPasswordError/>
 
-                    <FloatingLabel controlId="retypedpassword" label="Re-type your password" className="mb-3">
-                        <Form.Control type="password" placeholder="password" onInput={ ( e ) => setRetypedPassword( e.target.value  ) } onChange = { ( e ) => checkRetypedPassword( e.target.value  ) }/>
+                    <FloatingLabel label="Re-type your password" className="mb-3">
+                        <Form.Control id="retypedpassword" type="password" placeholder="password" onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , email : e.target.value } } ) } onChange = { ( e ) => checkRetypedPassword( e.target.value  ) }/>
                     </FloatingLabel>
 
                     <ShowRetypedMessageError />
@@ -310,18 +322,18 @@ const CreateNewUser = ( props ) => {
                 </Form>
 
                 < ServerErrorMsg 
-                    open={errServMsgShow}  
-                    onClose={ ( ) => setErrServMsgShow( false )  }
-                    errorcode = {serverErrorCode} 
-                    errorsubject = {serverErrorSubject} 
-                    errormessage = {serverErrorMessage}                             
+                    open={serverErrorResponse.errServMsgShow}  
+                    onClose={ ( ) => setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : false } } ) }
+                    errorcode = {serverErrorResponse.serverErrorCode} 
+                    errorsubject = {serverErrorResponse.serverErrorSubject} 
+                    errormessage = {serverErrorResponse.serverErrorMessage}                             
                 />
 
                 < ServerSuccessMsg 
-                    open={succServMsgShow}  
-                    onClose={ ( ) => setSuccServMsgShow( false )  }
-                    ui_subject = {ui_subject} 
-                    ui_message = {ui_message}                             
+					open={serverSuccessResponse.succServMsgShow}  
+					onClose={ ( ) => setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow : false } } ) }
+					ui_subject = {serverSuccessResponse.ui_subject} 
+					ui_message = {serverSuccessResponse.ui_message}                             
                 />
            
           </div>
