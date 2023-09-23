@@ -112,7 +112,6 @@ const UserLogin = ( props ) => {
             setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.UI_SUBJECT } } )
             setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.UI_MESSAGE } } )
             setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
-            document.getElementById("createnewuserform").reset( );
             clear( );
         }
     } 
@@ -178,7 +177,7 @@ const UserLogin = ( props ) => {
 
                 <FloatingLabel label="Password" className="mb-3">
                     <Form.Control type="password" placeholder="Login Password"  
-                        onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , loginCredential : e.target.value } } ) }
+                        onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , loginPassword : e.target.value } } ) }
                         onChange = { (e) => CheckLoginPassword( e.target.value ) }
                     />
                 </FloatingLabel>
