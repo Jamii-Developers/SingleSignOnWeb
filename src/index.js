@@ -17,5 +17,3 @@ const footer = createRoot( footer_container );
 header.render( < Header main_body = {main_body} /> )
 main_body.render( < UserLogin main_body = {main_body}  /> )
 footer.render( < Footer main_body = {main_body} /> )
-
-

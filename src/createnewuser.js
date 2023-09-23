@@ -59,6 +59,10 @@ const CreateNewUser = ( props ) => {
 
     function clear( ){
         document.getElementById("createnewuserform").reset( ) 
+        setPageFields( prevState => { return { ...prevState , email : "" } } );
+        setPageFields( prevState => { return { ...prevState , username : "" } } );
+        setPageFields( prevState => { return { ...prevState , password : "" } } );
+        setPageFields( prevState => { return { ...prevState , retypedpassword : "" } } );
     }
 
     async function signUp( ){
@@ -73,7 +77,7 @@ const CreateNewUser = ( props ) => {
 			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
             return;
         }
-
+        console.log(pageFields.email);
         if( !pageFields.email.match( mailformat ) ){
 			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
 			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Email Input Error!"   } } )
@@ -182,14 +186,14 @@ const CreateNewUser = ( props ) => {
 		}
     }
     
-    function CheckEmail( email ){
-        if( email === "" ){
+    function CheckEmail( e ){
+        if( e === "" ){
             setErrorData( prevState => { return { ...prevState ,emailErrorMessage : "Email address is empty" } } );
             setErrorData( prevState => { return { ...prevState ,emailErrorTrigger : true } } );
             return;
         }
 
-        if( !email.match( mailformat ) ){
+        if( !e.match( mailformat ) ){
             setErrorData( prevState => { return { ...prevState ,emailErrorMessage : "Email format should be [****]@[***].[***]" } } );
             setErrorData( prevState => { return { ...prevState ,emailErrorTrigger : true } } );
             return;
@@ -307,7 +311,7 @@ const CreateNewUser = ( props ) => {
                     <ShowPasswordError/>
 
                     <FloatingLabel label="Re-type your password" className="mb-3">
-                        <Form.Control id="retypedpassword" type="password" placeholder="password" onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , email : e.target.value } } ) } onChange = { ( e ) => checkRetypedPassword( e.target.value  ) }/>
+                        <Form.Control id="retypedpassword" type="password" placeholder="password" onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , retypedpassword : e.target.value } } ) } onChange = { ( e ) => checkRetypedPassword( e.target.value  ) }/>
                     </FloatingLabel>
 
                     <ShowRetypedMessageError />

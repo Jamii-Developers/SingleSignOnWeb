@@ -118,7 +118,10 @@ const UserLogin = ( props ) => {
     } 
 
     function clear( ){
-        document.getElementById("UserLoginForm").reset( ) 
+        document.getElementById("UserLoginForm").reset( );
+        setPageFields( prevState => { return { ...prevState , loginCredential : "" } } );
+        setPageFields( prevState => { return { ...prevState , loginPassword : "" } } );
+        setPageFields( prevState => { return { ...prevState , rememberLogin : false } } );
     }
 
     function ShowLoginCredentialError(  ){

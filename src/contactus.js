@@ -50,6 +50,9 @@ const ContactUs = ( ) => {
 
       function clear( ){
             document.getElementById("contactusform").reset( ) 
+            setPageFields( prevState => { return { ...prevState , email : "" } } );
+            setPageFields( prevState => { return { ...prevState , username : "" } } );
+            setPageFields( prevState => { return { ...prevState , thoughts : "" } } );
       }
 
       function PageUnderDevelopmentNotice(  ){
@@ -202,12 +205,12 @@ const ContactUs = ( ) => {
                   return;
             }
 
-            var email = pageFields.email;
+            var emailaddress = pageFields.email;
             var username = pageFields.username;
             var client_thoughts = pageFields.thoughts;
 
             var contactUsJSON = {
-                  email,
+                  emailaddress,
                   username,
                   client_thoughts,
             }
@@ -243,11 +246,9 @@ const ContactUs = ( ) => {
 
             var succ_message_type = process.env.REACT_APP_RESPONSE_TYPE_CONTACTUS
             if( succ_message_type === result.MSGTYPE ){ 
-
                   setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.UI_SUBJECT } } )
                   setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.UI_MESSAGE } } )
                   setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
-                  document.getElementById("createnewuserform").reset( );
                   clear( );
             }
       }
@@ -256,7 +257,7 @@ const ContactUs = ( ) => {
       return (
             <div id = "ContactUsPage">
 
-            <PageUnderDevelopmentNotice />
+            {/* <PageUnderDevelopmentNotice /> */}
 
             <Form id = "contactusform" >
 
