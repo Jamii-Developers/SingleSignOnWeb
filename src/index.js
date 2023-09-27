@@ -1,19 +1,35 @@
 import React from 'react'
 import { createRoot }  from 'react-dom/client';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 
 import './sass/index.sass'
-import UserLogin from './userlogin'
 import Header from './defaultClasses/indexheader'
-import Footer from './defaultClasses/indexfooter'
+import UserLogin from './userlogin'
+import CreateNewUser from './createnewuser';
+import AboutUs from './aboutus';
+import ContactUs from './contactus';
+import ForgetPassword from './forgetpassword';
 
 
-const header_container = document.getElementById('header');
-const header = createRoot( header_container );
-const main_body_container = document.getElementById( 'main_body');
-const main_body = createRoot( main_body_container );
-const footer_container = document.getElementById( 'footer' );
-const footer = createRoot( footer_container );
+export default function PageBrowser( ){
+    return (
+        <BrowserRouter>
+        <Routes>
+            <Route path="/" element={ < Header /> } >
+                <Route index element={ < UserLogin /> } />
+                <Route path="signup" element={ < CreateNewUser /> } />
+                <Route path="aboutus" element={ < AboutUs /> } />
+                <Route path="contactus" element={ < ContactUs /> } />
+                <Route path="forgetpassword" element={ < ForgetPassword /> } />
+            </Route>
+        </Routes>
+        </BrowserRouter>
+    )
+}
 
-header.render( < Header main_body = {main_body} /> )
-main_body.render( < UserLogin main_body = {main_body}  /> )
-footer.render( < Footer main_body = {main_body} /> )
+const root = createRoot(document.getElementById('root'));
+root.render(<PageBrowser />);
+
+
+

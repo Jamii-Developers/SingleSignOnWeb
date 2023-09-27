@@ -6,46 +6,36 @@ import Navbar  from 'react-bootstrap/esm/Navbar';
 import Container  from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import { NavbarBrand }from 'react-bootstrap'
+import { Outlet, Link } from "react-router-dom";
 
-import UserLogin from '../userlogin';
-import CreateNewUser from '../createnewuser';
-import AboutUs from '../aboutus';
+
 
 const Header = ( props ) => {
 
 	function LoginButton( ){
 		return(
-			<Nav.Link id="loginbutton" onClick={ ( ) => openPage('userlogin')} >Login</Nav.Link>
+			<Nav.Link id="loginbutton"><Link to="/" class="jamiibuttonlink" >Login</Link></Nav.Link>
 		)
 	}
 	
 	function CreateNewUserButton( ){
 		return(
-			<Nav.Link id="createnewuserbutton" onClick={ ( ) => openPage('createnewuser')}>Sign Up</Nav.Link>
+			<Nav.Link id="createnewuserbutton"><Link to="/signup" class="jamiibuttonlink" >Sign Up</Link></Nav.Link>
 		)
 	}
 	
 	function AboutUsButton( ){
 		return(
-			<Nav.Link id="aboutusbutton"  onClick={ ( ) => openPage('aboutus')}>About Us</Nav.Link>
+			<Nav.Link id="aboutusbutton"  ><Link to="/aboutus" class="jamiibuttonlink">About Us</Link></Nav.Link>
 		)
 	}
 
-	function openPage(page){
-
-		if (page === 'userlogin') {
-			props.main_body.render(< UserLogin main_body = {props.main_body}  />)
-		}
-	
-		if (page === 'createnewuser') {
-			props.main_body.render(< CreateNewUser main_body = {props.main_body}  />)
-		}
-	
-		if (page === 'aboutus') {
-			props.main_body.render(< AboutUs main_body = {props.main_body}  />)
-		}
-	
+	function ContactUsButton( ){
+		return(
+			<Nav.Link id="contactusbutton"  ><Link to="/contactus" class="jamiibuttonlink">Contact Us</Link></Nav.Link>
+		)
 	}
+
 
     return(
 		<div id = "IndexHeaderPage" >
@@ -57,9 +47,11 @@ const Header = ( props ) => {
 						< LoginButton />
 						< CreateNewUserButton />
 						< AboutUsButton />
+						< ContactUsButton />
 					</Nav>
 				</Container>
 			</ Navbar >
+			<Outlet />
 		</div>
     )
 }

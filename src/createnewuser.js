@@ -4,6 +4,8 @@ import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg';
 
 import React from 'react';
 import { useState } from 'react'
+import { useNavigate } from "react-router-dom";
+
 
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
@@ -20,6 +22,8 @@ const CreateNewUser = ( props ) => {
 
     const mailformat = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
     const specialChars =/[`!@#$%^&*()_\-+=[\]{};':"|,.<>/?~ ]/;
+
+    const navigate = useNavigate( );
 
     const[ serverErrorResponse , setServerErrorResponse ] = useState({
         serverErrorCode : "",
@@ -183,6 +187,9 @@ const CreateNewUser = ( props ) => {
 				setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
 				document.getElementById("createnewuserform").reset( );
 				clear( );
+                await new Promise(r => setTimeout(r, 2000));
+                navigate("/");
+
 		}
     }
     
@@ -298,7 +305,7 @@ const CreateNewUser = ( props ) => {
 
                     < ShowEmailMessageError />
 
-                    <FloatingLabel controlId="username" label="Username" className="mb-3">
+                    <FloatingLabel label="Username" className="mb-3">
                         <Form.Control id="username"  type="text" placeholder="jamiiadmin" onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , username : e.target.value } } ) }  onChange={ ( e ) => CheckUsername( e.target.value ) }  />
                     </FloatingLabel>
 

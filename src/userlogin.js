@@ -1,11 +1,12 @@
 import './sass/userlogin.sass';
-import ForgetPassword from './forgetpassword';
 import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg'
 
 
 import React from 'react';
 import { useState } from 'react'
+import { Outlet, Link } from "react-router-dom";
+
 
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
@@ -47,10 +48,6 @@ const UserLogin = ( props ) => {
 
 
     const [ loginButtonSpinner, setLoginButtonSpinner ] = useState( false );
-
-    const openForgetUsPage = ( ) => {
-        props.main_body.render(< ForgetPassword />)
-    }
 
     async function sendUserLogin( ) {
         setPageFields( prevState => { return { ...prevState ,loginCredential : pageFields.loginCredential.toLowerCase( ) } } );
@@ -113,6 +110,7 @@ const UserLogin = ( props ) => {
             setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.UI_MESSAGE } } )
             setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
             clear( );
+            await new Promise(r => setTimeout(r, 2000));
         }
     } 
 
@@ -161,7 +159,9 @@ const UserLogin = ( props ) => {
     }
 
     return (
+        <>        
         <div id = "UserLoginPage"> 
+            
             <Form id = "UserLoginForm">
 
                 <h1 className='h1_defaults'>Single Sign-On Login</h1>
@@ -192,7 +192,7 @@ const UserLogin = ( props ) => {
                         {loginButtonSpinner && <Spinner as="span"animation="grow"size="sm" role="status" aria-hidden="false"/>}
                         Login                           
                     </Button>
-                    <Button variant="outline-secondary" type="button" onClick={ ( ) => openForgetUsPage( ) } > Forgot Password? </Button>
+                    <Button variant="outline-secondary" type="button" ><Link class="jamiibuttonlink" to="/forgetpassword">Forget Password?</Link> </Button>
                     <Button variant="outline-info" type="button" onClick={ ( ) => clear( ) }>Clear</Button>
                 </ButtonGroup>
                 
@@ -212,8 +212,10 @@ const UserLogin = ( props ) => {
 					ui_subject = {serverSuccessResponse.ui_subject} 
 					ui_message = {serverSuccessResponse.ui_message}                             
                 />
-
+                
         </div>
+        <Outlet/>
+        </>
     )
 }
 

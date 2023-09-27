@@ -55,11 +55,11 @@ const ContactUs = ( ) => {
             setPageFields( prevState => { return { ...prevState , thoughts : "" } } );
       }
 
-      function PageUnderDevelopmentNotice(  ){
-            return( 
-                <Alert variant="filled" severity="info" className='mb-3' >Page under development</Alert>            
-            );
-      }
+      // function PageUnderDevelopmentNotice(  ){
+      //       return( 
+      //           <Alert variant="filled" severity="info" className='mb-3' >Page under development</Alert>            
+      //       );
+      // }
 
       function ShowEmailError(  ){
             return( 
