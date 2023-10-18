@@ -234,7 +234,7 @@ const CreateNewUser = ( props ) => {
     }
 
     function checkPassword( e ){
-
+        
         if( e === "" ){
             setErrorData( prevState => { return { ...prevState ,passwordErrorMessage : "Password is empty!" } } );
             setErrorData( prevState => { return { ...prevState ,passwordErrorTrigger : true } } );
