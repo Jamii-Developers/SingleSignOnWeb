@@ -234,7 +234,7 @@ const CreateNewUser = ( props ) => {
     }
 
     function checkPassword( e ){
-
+        
         if( e === "" ){
             setErrorData( prevState => { return { ...prevState ,passwordErrorMessage : "Password is empty!" } } );
             setErrorData( prevState => { return { ...prevState ,passwordErrorTrigger : true } } );
@@ -265,11 +265,12 @@ const CreateNewUser = ( props ) => {
         return( 
             <Collapse in ={ errordata.emailErrorTrigger } >
                 <Alert variant="filled" severity="warning" className='mb-3' >{ errordata.emailErrorMessage }</Alert>   
-            </Collapse>                    
+            </Collapse>       
+
         );
     }
 
-    function ShowUsernameError(  ){
+    function ShowUsernameError( ){
         return( 
             <Collapse in ={ errordata.usernameErrorTrigger }>
                 <Alert variant="filled" severity="warning" className='mb-3' >{ errordata.usernameErrorMessage }</Alert>   
