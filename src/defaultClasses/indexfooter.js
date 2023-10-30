@@ -16,10 +16,11 @@ const Footer = ( props ) => {
 	}
 
 	const openPage = ( page ) => {
-		
+
 		if (page === 'contactus') {
 			props.main_body.render(< ContactUs />)
 		}
+	
 	} 
     return(
         <div id = "IndexFooterPage" >

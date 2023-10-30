@@ -30,29 +30,6 @@ export default function PageBrowser( ){
 
 const root = createRoot(document.getElementById('root'));
 root.render(<PageBrowser />);
-document.cookie = "username=John Doe; expires=Thu, 18 Dec 2023 12:00:00 UTC; path=/";
-function getCookie(name) {
-    const cookies = document.cookie.split('; ');
-    for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].split('=');
-        if (cookie[0] === name) {
-            return cookie[1];
-        }
-    }
-    return null;
-}
-
-const username = getCookie("username");
-if (username) {
-    console.log("Username: " + username);
-} else {
-    console.log("Username cookie not found.");
-}
-document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-
-
-
-
 
 
 
