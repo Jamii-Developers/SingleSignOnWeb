@@ -2,11 +2,11 @@ import './sass/userlogin.sass';
 import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg'
 
-
 import React from 'react';
-import { useState } from 'react'
+import { useState, useEffect } from "react";
 import { Outlet, Link } from "react-router-dom";
-
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
@@ -19,6 +19,19 @@ import Collapse from 'react-bootstrap/Collapse';
 
 const UserLogin = ( props ) => {
 
+    const [ userSessionCookie, setCookie] = useCookies( "userSession" );
+    const navigate = useNavigate();
+
+    useEffect( ( ) => { CheckIfCoockieExists( )});
+
+
+    function CheckIfCoockieExists() {
+        if( ("userSession" in userSessionCookie)  ){
+            console.log(userSessionCookie.userSession)
+            navigate("/myhome");
+        } 
+    }
+    
     const[ serverErrorResponse , setServerErrorResponse ] = useState({
         serverErrorCode : "",
         serverErrorSubject: "",
@@ -36,7 +49,7 @@ const UserLogin = ( props ) => {
         loginCredential : "",
         loginPassword : "",
         devicename : "",
-        rememberLogin : false
+        rememberLogin : true
     });
 
     const [errordata , setErrorData ] = useState({
@@ -81,7 +94,6 @@ const UserLogin = ( props ) => {
         };
         var loginData = JSON.stringify(loginJson);
 
-        console.log( loginData );
         var userLoginUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'userlogin';
         const response = await fetch(userLoginUrl, {
           method: 'POST',
@@ -111,6 +123,11 @@ const UserLogin = ( props ) => {
             setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
             clear( );
             await new Promise(r => setTimeout(r, 2000));
+
+            if( pageFields.rememberLogin ){
+                CreateUserSession( result );
+                navigate("/myhome")
+            }
         }
     } 
 
@@ -158,11 +175,15 @@ const UserLogin = ( props ) => {
         setErrorData( prevState => { return { ...prevState ,loginPasswordErrorTrigger : false } } );
     }
 
+    function CreateUserSession( cookie ){
+        setCookie( "userSession", cookie,  {path: "/"} );
+    }
+
     return (
-        <>        
-        <div id = "UserLoginPage"> 
+        < >        
+        <div id = "UserLoginPage" > 
             
-            <Form id = "UserLoginForm">
+            <Form id = "UserLoginForm" on={CheckIfCoockieExists}>
 
                 <h1 className='h1_defaults'>Single Sign-On Login</h1>
 
@@ -184,7 +205,7 @@ const UserLogin = ( props ) => {
                 <ShowLoginPasswordError />
 
                 <Form.Check type="switch" id="custom-switch" label="Remember me on this device" className="mb-3" 
-                    onSelect={ ( e ) => setPageFields( prevState => { return { ...prevState , rememberLogin : e.target.value } } ) }
+                    onChange={ ( e ) => setPageFields( prevState => { return { ...prevState , rememberLogin : e.target.checked } } ) }
                 />
 
                 <ButtonGroup size="md" className="mb-3">
@@ -193,7 +214,7 @@ const UserLogin = ( props ) => {
                         Login                           
                     </Button>
                     <Button variant="outline-secondary" type="button" ><Link class="jamiibuttonlink" to="/forgetpassword">Forget Password?</Link> </Button>
-                    <Button variant="outline-info" type="button" onClick={ ( ) => clear( ) }>Clear</Button>
+                    <Button variant="outline-info" type="button" onClick={ ( ) => clear( ) }> Clear </Button>
                 </ButtonGroup>
                 
             </Form>

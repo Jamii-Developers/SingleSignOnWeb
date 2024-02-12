@@ -1,6 +1,6 @@
 import React from "react";
   
-const social = () => {
+const Social = () => {
   return (
     <div>
       <h1>Social</h1>
@@ -8,4 +8,4 @@ const social = () => {
   );
 };
   
-export default social;
+export default Social;
