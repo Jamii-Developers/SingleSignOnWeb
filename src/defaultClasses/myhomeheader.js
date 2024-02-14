@@ -7,7 +7,7 @@ import Container  from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import { NavbarBrand }from 'react-bootstrap'
 import { Outlet, Link } from "react-router-dom";
-import { Cookies, useCookies } from "react-cookie";
+import {  useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
@@ -15,12 +15,12 @@ import { useEffect } from "react";
 
 const Header = ( props ) => {
 
-	const [ cookies, userSessionCookie, removeCookie ] = useCookies( "userSession" );
+	const [ cookies, removeCookie ] = useCookies( "userSession" );
   	const navigate = useNavigate( );
 
 	useEffect( ( ) => { CheckIfCoockieExists( )});
     function CheckIfCoockieExists() {
-        if( ! cookies.userSession   ){
+        if( !cookies.userSession   ){
             navigate("/");
         } 
     }
@@ -39,7 +39,7 @@ const Header = ( props ) => {
 
 	function LogOutButton( ){
 		return(
-			<Nav.Link id="logoutbutton"  ><Link onClick={ ( ) => DestroyCookie ( )} class="jamiibuttonlink">Log out</Link></Nav.Link>
+			<Nav.Link id="logoutbutton"  ><Link onClick={ ( ) => DestroyCookie( )} class="jamiibuttonlink">Log out</Link></Nav.Link>
 		)
 	}
 

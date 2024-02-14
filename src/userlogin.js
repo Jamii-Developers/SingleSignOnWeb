@@ -19,15 +19,15 @@ import Collapse from 'react-bootstrap/Collapse';
 
 const UserLogin = ( props ) => {
 
-    const [ userSessionCookie, setCookie] = useCookies( "userSession" );
+    const [ cookies, setCookie] = useCookies( "userSession" );
     const navigate = useNavigate();
 
     useEffect( ( ) => { CheckIfCoockieExists( )});
 
 
     function CheckIfCoockieExists() {
-        if( ("userSession" in userSessionCookie)  ){
-            console.log(userSessionCookie.userSession)
+        if( cookies.userSession  ){
+            console.log(cookies.userSession)
             navigate("/myhome");
         } 
     }
