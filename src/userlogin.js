@@ -124,10 +124,9 @@ const UserLogin = ( props ) => {
             clear( );
             await new Promise(r => setTimeout(r, 2000));
 
-            if( pageFields.rememberLogin ){
-                CreateUserSession( result );
-                navigate("/myhome")
-            }
+            // Create Cookie and navigate to the home page
+            CreateUserSession( result );
+            navigate("/myhome")
         }
     } 
 
@@ -176,7 +175,11 @@ const UserLogin = ( props ) => {
     }
 
     function CreateUserSession( cookie ){
-        setCookie( "userSession", cookie,  {path: "/"} );
+        if( pageFields.rememberLogin ){
+            setCookie( "userSession", cookie,  {path: "/", maxAge:86400 } );
+        }else{
+            setCookie( "userSession", cookie,  {path: "/", maxAge:3600 } );
+        } 
     }
 
     return (

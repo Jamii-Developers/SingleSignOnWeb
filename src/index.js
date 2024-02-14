@@ -29,6 +29,9 @@ export default function PageBrowser( ){
             </Route>
             <Route path="/myhome" element={ < MyHomeHeader /> } >
                 <Route index element={ < MyHome /> } />
+                <Route path="/myhome/aboutus" element={ < AboutUs /> } />
+                <Route path="/myhome/contactus" element={ < ContactUs /> } />
+                <Route path="/myhome/forgetpassword" element={ < ForgetPassword /> } />
             </Route>
         </Routes>
         </BrowserRouter>
