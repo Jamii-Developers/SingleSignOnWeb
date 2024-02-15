@@ -1,4 +1,5 @@
 import '../sass/indexheader.sass';
+import ServerSuccessMsg from '../frequentlyUsedModals/serversuccessmsg'
 
 import React from 'react';
 
@@ -7,16 +8,22 @@ import Container  from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import { NavbarBrand }from 'react-bootstrap'
 import { Outlet, Link } from "react-router-dom";
-import {  useCookies } from "react-cookie";
+import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect , useState } from "react";
 
 
 
-const Header = ( props ) => {
+const Header = ( ) => {
 
-	const [ cookies, removeCookie ] = useCookies( "userSession" );
+	const [ cookies, setCookie ] = useCookies( "userSession" );
   	const navigate = useNavigate( );
+
+	  const[ serverSuccessResponse, setServerSuccessResponse ] = useState({
+        ui_subject : "",
+        ui_message : "",
+        succServMsgShow: false
+  	});
 
 	useEffect( ( ) => { CheckIfCoockieExists( )});
     function CheckIfCoockieExists() {
@@ -43,8 +50,16 @@ const Header = ( props ) => {
 		)
 	}
 
-	function DestroyCookie( ){
-		removeCookie( "userSession" );
+	async function DestroyCookie( ){
+
+		setCookie( "userSession", null,  {path: "/", maxAge: -999999 } );
+
+		setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : "Success" } } )
+		setServerSuccessResponse( prevState => { return { ...prevState , ui_message : "You have been logged out successfully" } } )
+		setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
+
+		await new Promise(r => setTimeout(r, 2000));
+
 		navigate("/");
 	}
 
@@ -63,6 +78,13 @@ const Header = ( props ) => {
 				</Container>
 			</ Navbar >
 			<Outlet />
+
+			< ServerSuccessMsg 
+				open={serverSuccessResponse.succServMsgShow}  
+				onClose={ ( ) => setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow : false } } ) }
+				ui_subject = {serverSuccessResponse.ui_subject} 
+				ui_message = {serverSuccessResponse.ui_message}                             
+            />
 		</div>
     )
 }
