@@ -180,7 +180,7 @@ const CreateNewUser = ( props ) => {
 		}
 
         var succ_message_type = process.env.REACT_APP_RESPONSE_TYPE_CREATE_NEW_USER
-		if( succ_message_type === result.MSGTYPE ){ 
+		if( succ_message_type === result.MSG_TYPE ){ 
 
 				setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.UI_SUBJECT } } )
 				setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.UI_MESSAGE } } )

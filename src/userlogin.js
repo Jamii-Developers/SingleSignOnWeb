@@ -22,7 +22,7 @@ const UserLogin = ( props ) => {
     const [ cookies, setCookie] = useCookies( "userSession" );
     const navigate = useNavigate();
 
-    useEffect( ( ) => { CheckIfCoockieExists( )});
+    useEffect( ( ) => { CheckIfCoockieExists( ) } );
 
 
     function CheckIfCoockieExists() {
@@ -117,7 +117,7 @@ const UserLogin = ( props ) => {
         }
 
         var succ_message_type = process.env.REACT_APP_RESPONSE_TYPE_USERLOGIN
-        if( succ_message_type === result.MSGTYPE ){ 
+        if( succ_message_type === result.MSG_TYPE ){ 
             setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.UI_SUBJECT } } )
             setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.UI_MESSAGE } } )
             setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
