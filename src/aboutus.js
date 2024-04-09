@@ -25,7 +25,7 @@ const AboutUs = ( ) => {
       
 
       return (
-          <div id = "AboutUsPage">
+          <div id = "AboutUsPage" sticky = ""right >
             <PageUnderDevelopmentNotice />
 
                 <h1>About Us</h1>
