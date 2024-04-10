@@ -1,11 +1,11 @@
 import React from "react";
   
-const Social = () => {
+const Profile = () => {
   return (
     <div>
-      <h1>Social</h1>
+      <h1>Profile</h1>
     </div>
   );
 };
   
-export default Social;
+export default Profile;

@@ -126,7 +126,7 @@ const UserLogin = ( props ) => {
 
             // Create Cookie and navigate to the home page
             CreateUserSession( result );
-            navigate("/myhome")
+            navigate("/myhome/dashboard")
         }
     } 
 

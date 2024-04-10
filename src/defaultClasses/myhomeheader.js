@@ -1,4 +1,5 @@
 import '../sass/myhomeindexheader.sass';
+import ServerSuccessMsg from '../frequentlyUsedModals/serversuccessmsg'
 
 import React from 'react';
 
@@ -14,7 +15,7 @@ const Header = ( ) => {
 	const [ cookies, setCookie ] = useCookies( "userSession" );
   	const navigate = useNavigate( );
 
-	  const[ serverSuccessResponse, setServerSuccessResponse ] = useState({
+	const[ serverSuccessResponse, setServerSuccessResponse ] = useState({
         ui_subject : "",
         ui_message : "",
         succServMsgShow: false
@@ -43,29 +44,40 @@ const Header = ( ) => {
 
     return(
 		<div id = "MyHomeHeaderPage" >
-			<Sidebar data-bs-theme="dark" bg="primary">
-				<Menu>
-					<SubMenu label="Social">
-						<MenuItem>Friends </MenuItem>
-						<MenuItem>Followers</MenuItem>
-						<MenuItem>Friend Requests</MenuItem>
-						<MenuItem>Follower Requests</MenuItem>
-						<MenuItem>Blocked List</MenuItem>
-					</SubMenu>
-					<SubMenu label="File Management">
-						<MenuItem>Review Current Files </MenuItem>
-						<MenuItem>Recycle bin</MenuItem>
-					</SubMenu>
-					<SubMenu label="Settings">
-						<MenuItem>Profile</MenuItem>
-						<MenuItem>Permissions</MenuItem>
-					</SubMenu>
-					<MenuItem component={<Link to="/myhome/aboutus"/>}>About Us</MenuItem>
-					<MenuItem component={ <Link to="/myhome/contactus"/> }>Contact Us</MenuItem>
-					<MenuItem onClick={ ( ) => DestroyCookie( ) }>Log Out</MenuItem>
-				</Menu>
-			</Sidebar>
-			<Outlet />
+			<div id = "SidebarContent">
+				<Sidebar data-bs-theme="dark" bg="primary">
+					<Menu>
+						<MenuItem component={<Link to="/myhome/dashboard"/>}>Home</MenuItem>
+						<SubMenu component={<Link to="/myhome/socialdashboard"/>} label="Social">
+							<MenuItem component={<Link to="/myhome/friends"/>}>Friends </MenuItem>
+							<MenuItem component={<Link to="/myhome/followers"/>}>Followers</MenuItem>
+							<MenuItem component={<Link to="/myhome/blockedlist"/>}>Blocked List</MenuItem>
+						</SubMenu>
+						<SubMenu component={<Link to="/myhome/filemanagementdashboard"/>} label="File Management">
+							<MenuItem component={<Link to="/myhome/currentfiles"/>}>Review Current Files </MenuItem>
+							<MenuItem component={<Link to="/myhome/recyclebin"/>}>Recycle bin</MenuItem>
+						</SubMenu>
+						<SubMenu component={<Link to="/myhome/settingsdashboard"/>} label="Settings">
+							<MenuItem component={<Link to="/myhome/profile"/>}>Profile</MenuItem>
+							<MenuItem component={<Link to="/myhome/permissions"/>}>Permissions</MenuItem>
+						</SubMenu>
+						<MenuItem component={<Link to="/myhome/aboutus"/>}>About Us</MenuItem>
+						<MenuItem component={ <Link to="/myhome/contactus"/> }>Contact Us</MenuItem>
+						<MenuItem onClick={ ( ) => DestroyCookie( ) }>Log Out</MenuItem>
+					</Menu>
+				</Sidebar>
+			</div>
+
+			< ServerSuccessMsg 
+				open={serverSuccessResponse.succServMsgShow}  
+				onClose={ ( ) => setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow : false } } ) }
+				ui_subject = {serverSuccessResponse.ui_subject} 
+				ui_message = {serverSuccessResponse.ui_message}                             
+			/>
+
+			<div id = "MainContent">
+				<Outlet />
+			</div>
 		</div>
     )
 }
