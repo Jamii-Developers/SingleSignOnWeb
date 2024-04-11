@@ -12,50 +12,34 @@ import { Outlet, Link } from "react-router-dom";
 
 const Header = ( props ) => {
 
-	function LoginButton( ){
-		return(
-			<Nav.Link id="loginbutton"><Link to="/" class="jamiibuttonlink" >Login</Link></Nav.Link>
-		)
-	}
-	
-	function CreateNewUserButton( ){
-		return(
-			<Nav.Link id="createnewuserbutton"><Link to="/signup" class="jamiibuttonlink" >Sign Up</Link></Nav.Link>
-		)
-	}
-	
-	function AboutUsButton( ){
-		return(
-			<Nav.Link id="aboutusbutton"  ><Link to="/aboutus" class="jamiibuttonlink">About Us</Link></Nav.Link>
-		)
-	}
-
-	function ContactUsButton( ){
-		return(
-			<Nav.Link id="contactusbutton"  ><Link to="/contactus" class="jamiibuttonlink">Contact Us</Link></Nav.Link>
-		)
-	}
-
-
     return(
 		<div id = "IndexHeaderPage" >
-			< Navbar  bg="primary" data-bs-theme="dark" sticky="top">
-				<Container>
-					<NavbarBrand>Single Sign-On</NavbarBrand>
-					<Navbar.Toggle aria-controls="basic-navbar-nav" />
-					<Nav className="me-auto">
-						< LoginButton />
-						< CreateNewUserButton />
-						< AboutUsButton />
-						< ContactUsButton />
-					</Nav>
-				</Container>
-			</ Navbar >
-			<Outlet />
+			<div id="NavbarContent">
+				< Navbar  bg="primary" data-bs-theme="dark" sticky="top">
+					<Container>
+						<NavbarBrand>Single Sign-On</NavbarBrand>
+						<Navbar.Toggle aria-controls="basic-navbar-nav" />
+						<Nav className="me-auto">
+							<Nav.Link id="loginbutton"><Link to="/" class="jamiibuttonlink" >Login</Link></Nav.Link>
+							<Nav.Link id="createnewuserbutton"><Link to="/signup" class="jamiibuttonlink" >Sign Up</Link></Nav.Link>
+							<Nav.Link id="aboutusbutton"  ><Link to="/aboutus" class="jamiibuttonlink">About Us</Link></Nav.Link>
+							<Nav.Link id="contactusbutton"  ><Link to="/contactus" class="jamiibuttonlink">Contact Us</Link></Nav.Link>
+						</Nav>
+					</Container>
+				</ Navbar >
+			</div>
+
+			<div id = "MainContent" class = "container">
+				<div class = "row">
+					<div class = "col-xs-4">
+						<Outlet />
+					</div>
+				</div>
+			</div>
 		</div>
     )
 }
 
 
 
-export default Header
+export default Header;

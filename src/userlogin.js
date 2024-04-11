@@ -122,6 +122,7 @@ const UserLogin = ( props ) => {
             setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.UI_MESSAGE } } )
             setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
             clear( );
+            
             await new Promise(r => setTimeout(r, 2000));
 
             // Create Cookie and navigate to the home page
