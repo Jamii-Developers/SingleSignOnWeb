@@ -7,7 +7,7 @@ import { Outlet, Link } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import { useEffect , useState } from "react";
-import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
+import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
 
 
 const Header = ( ) => {
@@ -48,19 +48,9 @@ const Header = ( ) => {
 				<Sidebar data-bs-theme="dark" bg="primary">
 					<Menu>
 						<MenuItem component={<Link to="/myhome/dashboard"/>}>Home</MenuItem>
-						<SubMenu component={<Link to="/myhome/socialdashboard"/>} label="Social">
-							<MenuItem component={<Link to="/myhome/friends"/>}>Friends </MenuItem>
-							<MenuItem component={<Link to="/myhome/followers"/>}>Followers</MenuItem>
-							<MenuItem component={<Link to="/myhome/blockedlist"/>}>Blocked List</MenuItem>
-						</SubMenu>
-						<SubMenu component={<Link to="/myhome/filemanagementdashboard"/>} label="File Management">
-							<MenuItem component={<Link to="/myhome/currentfiles"/>}>Review Current Files </MenuItem>
-							<MenuItem component={<Link to="/myhome/recyclebin"/>}>Recycle bin</MenuItem>
-						</SubMenu>
-						<SubMenu component={<Link to="/myhome/settingsdashboard"/>} label="Settings">
-							<MenuItem component={<Link to="/myhome/profile"/>}>Profile</MenuItem>
-							<MenuItem component={<Link to="/myhome/permissions"/>}>Permissions</MenuItem>
-						</SubMenu>
+						<MenuItem component={<Link to="/myhome/social/"/>}>Social</MenuItem>
+						<MenuItem component={<Link to="/myhome/filemanagement"/>}>File Management</MenuItem>
+						<MenuItem component={<Link to="/myhome/settings"/>}>Settings</MenuItem>
 						<MenuItem component={<Link to="/myhome/aboutus"/>}>About Us</MenuItem>
 						<MenuItem component={ <Link to="/myhome/contactus"/> }>Contact Us</MenuItem>
 						<MenuItem onClick={ ( ) => DestroyCookie( ) }>Log Out</MenuItem>
