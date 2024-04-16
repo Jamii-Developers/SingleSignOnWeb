@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './sass/index.sass'
 import IndexHeader from './defaultClasses/indexheader';
 import MyHomeHeader from './defaultClasses/myhomeheader';
+import BlankProfilePic from './img/blankprofile.png'
 import UserLogin from './userlogin'
 import CreateNewUser from './createnewuser';
 import AboutUs from './aboutus';
@@ -25,6 +26,14 @@ import Profile from './myHomeComponents/SettingsComponents/profile'
 import Permissions from './myHomeComponents/SettingsComponents/permissions'
 import FileManagementHeader from './myHomeComponents/FileManagementComponents/filamanagementheader';
 
+const FetchBlankProfilePic = () => {
+    return (
+      <div>
+        <img src={BlankProfilePic} alt="Blank Profile" />
+      </div>
+    );
+  };
+
 export default function PageBrowser( ){
 
     return (
@@ -38,6 +47,8 @@ export default function PageBrowser( ){
                     <Route path="forgetpassword" element={ < ForgetPassword /> } />
                 </Route>
 
+                
+
 
                 <Route path="/myhome" element={ < MyHomeHeader /> } >
                     <Route index path = "/myhome/dashboard" element={ < Dashboard /> } />
@@ -50,21 +61,29 @@ export default function PageBrowser( ){
                         <Route path="/myhome/social/blockedlist" element={ < BlockedList /> } />
                     </Route>
 
+                    {/* File Management Routes */}
                     <Route path="/myhome/filemanagement" element={ < FileManagementHeader /> } >
                         <Route index element={ < FileManagementDashboard /> } />
                         <Route path="/myhome/filemanagement/currentfiles" element={ < CurrentFiles /> } />
                         <Route path="/myhome/filemanagement/recyclebin" element={ < RecycleBin /> } />
                     </Route>
 
+                    {/* Settings Routes */}
                     <Route path="/myhome/settings/" element={ < SettingsHeader /> } >
                         <Route index element={ < SettingsDashboard /> } />
                         <Route path="/myhome/settings/profile" element={ < Profile /> } />
                         <Route path="/myhome/settings/permissions" element={ < Permissions /> } />
                     </Route>
 
+                    {/* Aux Home Page Routes */}
                     <Route path="/myhome/aboutus" element={ < AboutUs /> } />
                     <Route path="/myhome/contactus" element={ < ContactUs /> } />
                 </Route>
+
+                {/* Static Routes */}
+                
+                <Route path="/img/:blankprofile" element = { <FetchBlankProfilePic/> }  />
+                
 
                 
             </Routes>
@@ -72,6 +91,8 @@ export default function PageBrowser( ){
 
     )
 }
+
+
 
 const root = createRoot(document.getElementById('root'));
 root.render(< PageBrowser />);

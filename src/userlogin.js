@@ -3,10 +3,11 @@ import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg'
 
 import React from 'react';
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Outlet, Link } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
+
 
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
@@ -19,18 +20,9 @@ import Collapse from 'react-bootstrap/Collapse';
 
 const UserLogin = ( props ) => {
 
-    const [ cookies, setCookie] = useCookies( "userSession" );
     const navigate = useNavigate();
-
-    useEffect( ( ) => { CheckIfCoockieExists( ) } );
-
-
-    function CheckIfCoockieExists() {
-        if( cookies.userSession  ){
-            console.log(cookies.userSession)
-            navigate("/myhome");
-        } 
-    }
+    const [ ,setCookie] = useCookies( "userSession" );
+    
     
     const[ serverErrorResponse , setServerErrorResponse ] = useState({
         serverErrorCode : "",
@@ -187,7 +179,7 @@ const UserLogin = ( props ) => {
         < >        
         <div id = "UserLoginPage" > 
             
-            <Form id = "UserLoginForm" on={CheckIfCoockieExists}>
+            <Form id = "UserLoginForm">
 
                 <h1 className='h1_defaults'>Single Sign-On Login</h1>
 
@@ -204,6 +196,7 @@ const UserLogin = ( props ) => {
                     <Form.Control type="password" placeholder="Login Password"  
                         onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , loginPassword : e.target.value } } ) }
                         onChange = { (e) => CheckLoginPassword( e.target.value ) }
+                        onEnter={ ( ) => sendUserLogin( ) }
                     />
                 </FloatingLabel>
                 <ShowLoginPasswordError />
@@ -217,7 +210,7 @@ const UserLogin = ( props ) => {
                         {loginButtonSpinner && <Spinner as="span"animation="grow"size="sm" role="status" aria-hidden="false"/>}
                         Login                           
                     </Button>
-                    <Button variant="outline-secondary" type="button" ><Link class="jamiibuttonlink" to="/forgetpassword">Forget Password?</Link> </Button>
+                    <Button variant="outline-secondary" type="button" ><Link class="jamiibuttonlink" to="/forgetpassword">Forget Password?</Link></Button>
                     <Button variant="outline-info" type="button" onClick={ ( ) => clear( ) }> Clear </Button>
                 </ButtonGroup>
                 

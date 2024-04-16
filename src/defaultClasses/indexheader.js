@@ -5,15 +5,29 @@ import React from 'react';
 import Navbar  from 'react-bootstrap/esm/Navbar';
 import Container  from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
+import { useEffect } from "react";
 import { NavbarBrand }from 'react-bootstrap'
 import { Outlet, Link } from "react-router-dom";
-
-
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 
 const Header = ( props ) => {
 
+	const [ cookies, ] = useCookies( "userSession" );
+    const navigate = useNavigate();
+
+    useEffect( ( ) => { CheckIfCoockieExists( ) } );
+
+
+    function CheckIfCoockieExists() {
+        if( cookies.userSession  ){
+            console.log(cookies.userSession)
+            navigate("/myhome/dashboard");
+        } 
+    }
+
     return(
-		<div id = "IndexHeaderPage" >
+		<div id = "IndexHeaderPage" on={CheckIfCoockieExists}>
 			<div id="NavbarContent">
 				< Navbar  bg="primary" data-bs-theme="dark" sticky="top">
 					<Container>

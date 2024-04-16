@@ -1,4 +1,5 @@
 import React from "react";
+import '../../sass/social.sass'
 
 import Navbar  from 'react-bootstrap/esm/Navbar';
 import Container  from 'react-bootstrap/Container';
