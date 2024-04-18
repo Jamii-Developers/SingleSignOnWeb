@@ -2,17 +2,16 @@ import React from "react";
 
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
-import { useParams } from 'react-router-dom';
+
+import BlankProfilePic from '../../img/blankprofile.png'
 
 const Friends = ( ) => {
-
-	const { blankprofile } = useParams();
 
 	return (
 			<div id="FriendsContent">
 				<h1> Friends </h1>
-				<Card style={{ width: '18rem' }}>
-					<Card.Img variant="top" src={blankprofile} alt="Card image"/>
+				<Card style={{ width: '15rem' }}>
+					<Card.Img variant="top" src={BlankProfilePic} alt="Card image"/>
 					<Card.Body>
 						<Card.Title>Card Title</Card.Title>
 						<Card.Text>
