@@ -21,7 +21,7 @@ const Header = ( ) => {
         succServMsgShow: false
   	});
 
-	useEffect( ( ) => { CheckIfCoockieExists( )});
+	useEffect( ( ) => { CheckIfCoockieExists( ) } );
     function CheckIfCoockieExists() {
         if( !cookies.userSession   ){
             navigate("/");

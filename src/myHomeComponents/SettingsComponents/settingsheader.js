@@ -1,4 +1,5 @@
 import React from "react";
+import '../../sass/settings.sass'
 
 import Navbar  from 'react-bootstrap/esm/Navbar';
 import Container  from 'react-bootstrap/Container';
@@ -6,7 +7,6 @@ import Nav from 'react-bootstrap/Nav';
 import { NavbarBrand }from 'react-bootstrap'
 import { useCookies } from "react-cookie";
 import { Outlet, Link } from "react-router-dom";
-
 
   
 const SettingsHeader = ( props ) => {
