@@ -1,6 +1,7 @@
 import './sass/userlogin.sass';
 import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg'
+import JsonNetworkAdapter from './configs/networkadapter';
 
 import React from 'react';
 import { useState } from "react";
@@ -84,20 +85,22 @@ const UserLogin = ( props ) => {
             loginPassword,
             rememberLogin
         };
-        var loginData = JSON.stringify(loginJson);
+    
 
         var userLoginUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'userlogin';
-        const response = await fetch(userLoginUrl, {
-          method: 'POST',
-          body: loginData,
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
     
-        const result = await response.json( ) ;
+        const result = await JsonNetworkAdapter.post( userLoginUrl, loginJson )
+        .then((response) =>{ return response.data })
         
         setLoginButtonSpinner( false ) ;
+
+        if( result.status === 400 ){
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.status } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.statusText  } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "There is an error with your connection" } } )
+            setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+            return;
+        }
 
         var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
         if( error_message_type === result.MSGTYPE ){
@@ -217,19 +220,19 @@ const UserLogin = ( props ) => {
             </Form>
 
             < ServerErrorMsg 
-                    open={serverErrorResponse.errServMsgShow}  
-                    onClose={ ( ) => setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : false } } ) }
-                    errorcode = {serverErrorResponse.serverErrorCode} 
-                    errorsubject = {serverErrorResponse.serverErrorSubject} 
-                    errormessage = {serverErrorResponse.serverErrorMessage}                             
-                />
+                open={serverErrorResponse.errServMsgShow}  
+                onClose={ ( ) => setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : false } } ) }
+                errorcode = {serverErrorResponse.serverErrorCode} 
+                errorsubject = {serverErrorResponse.serverErrorSubject} 
+                errormessage = {serverErrorResponse.serverErrorMessage}                             
+            />
 
-                < ServerSuccessMsg 
-					open={serverSuccessResponse.succServMsgShow}  
-					onClose={ ( ) => setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow : false } } ) }
-					ui_subject = {serverSuccessResponse.ui_subject} 
-					ui_message = {serverSuccessResponse.ui_message}                             
-                />
+            < ServerSuccessMsg 
+                open={serverSuccessResponse.succServMsgShow}  
+                onClose={ ( ) => setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow : false } } ) }
+                ui_subject = {serverSuccessResponse.ui_subject} 
+                ui_message = {serverSuccessResponse.ui_message}                             
+            />
                 
         </div>
         <Outlet/>

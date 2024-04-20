@@ -1,6 +1,7 @@
 import './sass/createnewuser.sass';
 import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg';
+import JsonNetworkAdapter from './configs/networkadapter';
 
 import React from 'react';
 import { useState } from 'react'
@@ -81,7 +82,7 @@ const CreateNewUser = ( props ) => {
 			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
             return;
         }
-        console.log(pageFields.email);
+
         if( !pageFields.email.match( mailformat ) ){
 			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
 			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Email Input Error!"   } } )
@@ -153,34 +154,34 @@ const CreateNewUser = ( props ) => {
             username,
             password };
 
-        var createNewUserData = JSON.stringify( createNewUserJson );
-
-        setCreateNewUserButtonSpinner( true )
         var createNewUserUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'createnewuser';
-    
-        const response = await fetch( createNewUserUrl, {
-          method: 'POST',
-          body: createNewUserData,
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-    
-        const result = await response.json( );
+        setCreateNewUserButtonSpinner( true )
         
+        const result = await JsonNetworkAdapter.post( createNewUserUrl, createNewUserJson )
+        .then((response) =>{ return response.data });
+
         setCreateNewUserButtonSpinner( false );
 
+        if( result.status === 400 ){
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.status } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.statusText  } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "There is an error with your connection" } } )
+            setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+            return;
+        }
+        
         var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
 		if( error_message_type === result.MSGTYPE ){
-				setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.ERROR_FIELD_CODE } } )
-				setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.ERROR_FIELD_SUBJECT  } } )
-				setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.ERROR_FIELD_MESSAGE } } )
-				setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
-				return;
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.ERROR_FIELD_CODE } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.ERROR_FIELD_SUBJECT  } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.ERROR_FIELD_MESSAGE } } )
+            setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+            return;
 		}
-
+        
+        console.log( result );
         var succ_message_type = process.env.REACT_APP_RESPONSE_TYPE_CREATE_NEW_USER
-		if( succ_message_type === result.MSG_TYPE ){ 
+		if( succ_message_type === result.MSGTYPE ){ 
 
 				setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.UI_SUBJECT } } )
 				setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.UI_MESSAGE } } )
@@ -191,6 +192,7 @@ const CreateNewUser = ( props ) => {
                 navigate("/");
 
 		}
+        setCreateNewUserButtonSpinner( false );
     }
     
     function CheckEmail( e ){
