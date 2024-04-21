@@ -14,14 +14,13 @@ import { useNavigate } from "react-router-dom";
 const Header = ( props ) => {
 
 	const [ cookies, ] = useCookies( "userSession" );
-    const navigate = useNavigate();
+    const navigate = useNavigate( );
 
     useEffect( ( ) => { CheckIfCoockieExists( ) } );
 
 
     function CheckIfCoockieExists() {
         if( cookies.userSession  ){
-            console.log(cookies.userSession)
             navigate("/myhome/dashboard");
         } 
     }

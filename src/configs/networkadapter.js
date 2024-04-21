@@ -16,7 +16,7 @@ const JsonNetworkAdapter = axios.create({
         .then((response) => {
           // Customize the response here if needed
           resolve({
-            data: response.json( ),
+            data: response.json(),
             status: response.status,
             statusText: "Unable to connect!",
             headers: response.headers,

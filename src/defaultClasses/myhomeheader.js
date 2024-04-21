@@ -31,6 +31,7 @@ const Header = ( ) => {
 	async function DestroyCookie( ){
 
 		setCookie( "userSession", null,  {path: "/", maxAge: -999999 } );
+		localStorage.removeItem('cachedUserData');
 
 		setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : "Success" } } )
 		setServerSuccessResponse( prevState => { return { ...prevState , ui_message : "You have been logged out successfully" } } )

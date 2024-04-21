@@ -10,11 +10,11 @@ function ServerErrorMsg( props ) {
 		transition : Grow  });
 
 	return(
-		<Snackbar { ...props } autoHideDuration={3000} anchorOrigin={ { vertical, horizontal } } TransitionComponent={transition} >
+		<Snackbar { ...props } autoHideDuration={4000} anchorOrigin={ { vertical, horizontal } } TransitionComponent={transition} >
 			<Alert onClose={props.onClose} severity="error" sx={ { width: '100%'  } } variant="filled">
 				<p><b>{props.errorsubject}</b></p>
 				<p>{props.errormessage}</p>
-				{/* <p>Error code : {props.errorcode}</p> */}
+				<p>Error code : {props.errorcode}</p>
 			</Alert>
 		</Snackbar>
 	);

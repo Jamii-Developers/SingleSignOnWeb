@@ -10,7 +10,7 @@ function ServerSuccMsg( props ) {
 		transition : Grow  });
 
 	return(
-		<Snackbar { ...props } autoHideDuration={3000} anchorOrigin={ { vertical, horizontal } } TransitionComponent={transition} variant="filled" >
+		<Snackbar { ...props } autoHideDuration={4000} anchorOrigin={ { vertical, horizontal } } TransitionComponent={transition} variant="filled" >
 			<Alert onClose={props.onClose} severity="success" sx={ { width: '100%', height: '100%'  } }>
 				<p><b>{props.ui_subject}</b></p>
 				<p>{props.ui_message}</p>

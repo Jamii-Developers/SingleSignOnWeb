@@ -52,7 +52,6 @@ const UserLogin = ( props ) => {
         loginPasswordErrorMessage : "",
     });
 
-
     const [ loginButtonSpinner, setLoginButtonSpinner ] = useState( false );
 
     async function sendUserLogin( ) {
@@ -76,13 +75,34 @@ const UserLogin = ( props ) => {
         
         
         setLoginButtonSpinner( true )
+        
+        let location;
+        if ("geolocation" in navigator) {
+            // Get current position
+            navigator.geolocation.getCurrentPosition(function(position) {
+              var latitude = position.coords.latitude;
+              var longitude = position.coords.longitude;
+
+              location = latitude+":"+longitude
+              // You can do something with the latitude and longitude here
+              console.log(location);
+            }, function(error) {
+                console.error("Error getting geolocation:", error);
+            });
+        } else {
+            console.log("Geolocation is not supported by this browser.");
+        }
+
         let loginCredential = pageFields.loginCredential;
         let loginPassword = pageFields.loginPassword;
         let rememberLogin = pageFields.rememberLogin;
+        let loginDeviceName = navigator.userAgent;
 
         var loginJson = { 
             loginCredential,
             loginPassword,
+            loginDeviceName,
+            location,
             rememberLogin
         };
     
