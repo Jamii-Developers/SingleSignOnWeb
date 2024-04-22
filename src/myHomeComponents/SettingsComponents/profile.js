@@ -10,6 +10,7 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
+import Spinner from 'react-bootstrap/Spinner';
 
 import { useCookies } from "react-cookie";
 import { useEffect, useState } from "react";
@@ -18,6 +19,7 @@ const Profile =( )=> {
 	
 	const [ cookies ] = useCookies( "userSession" );
 	const [ data, setData ] = useState(null);
+	const [ loginButtonSpinner, setLoginButtonSpinner ] = useState( false );
 	const secretKey = cookies.userSession.USER_KEY;
 
 	const[ serverErrorResponse , setServerErrorResponse ] = useState({
@@ -47,11 +49,29 @@ const Profile =( )=> {
 		privacy : false
 	});
 
-	async function SetPrivacy( value ) {
-		if( value === 0){
+	async function SetFormData( result ) {
+		setPageFields( prevState => { return { ...prevState , firstname : result.firstname } } );
+		setPageFields( prevState => { return { ...prevState , middlename : result.middlename } } );
+		setPageFields( prevState => { return { ...prevState , lastname : result.lastname } } );
+		setPageFields( prevState => { return { ...prevState , address1 : result.address1 } } );
+		setPageFields( prevState => { return { ...prevState , address2 : result.address2 } } );
+		setPageFields( prevState => { return { ...prevState , city : result.city } } );
+		setPageFields( prevState => { return { ...prevState , state : result.state } } );
+		setPageFields( prevState => { return { ...prevState , province : result.province } } );
+		setPageFields( prevState => { return { ...prevState , zipcode : result.zipcode } } );
+		setPageFields( prevState => { return { ...prevState , country : result.country } } );
+		if( result.privacy === 0){
 			setPageFields( prevState => { return { ...prevState , privacy : false } } );
-		}else if( value === 1 ){
+		}else if( result.privacy === 1 ){
 			setPageFields( prevState => { return { ...prevState , privacy : true } } );
+		}
+	}
+
+	const getPrivacy = ( ) => {
+		if( pageFields.privacy === true ){
+			return 1;
+		}else if( pageFields.privacy === false ){
+			return 0;
 		}
 	}
 
@@ -61,7 +81,7 @@ const Profile =( )=> {
 			if( cachedData ){
 				let cache = JSON.parse( Lock( "decrypt", cachedData, secretKey ) );
 				setData( cache );
-				SetPrivacy( cache.privacy )
+				await SetFormData( cache )
 			}else{
 				await FetchLatestUserData( );
 			}
@@ -107,7 +127,7 @@ const Profile =( )=> {
         
 		localStorage.setItem( 'cachedUserData',  Lock( "encrypt", JSON.stringify( result ),secretKey ) );
 	    setData( JSON.parse( JSON.stringify( result ) ) ) ;
-		SetPrivacy( result.privacy )
+		SetFormData( result )
     }
 
 	
@@ -131,14 +151,39 @@ const Profile =( )=> {
 	useEffect(() => { ApplyUserData( ) }, [ ]) ;
 
 	if( !data ){
-		return <div>Loading...</div>
+		return (
+			<div class="text-center">
+				<div class="spinner-border" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+			</div>
+		)
 	}
 
 	const Clear = ( ) => {
 		document.getElementById("UserProfileForm").reset( );
+		const cachedData = localStorage.getItem( "cachedUserData" );
+		let result = JSON.parse( Lock( "decrypt", cachedData, secretKey ) );
+		setPageFields( prevState => { return { ...prevState , firstname : result.firstname } } );
+		setPageFields( prevState => { return { ...prevState , middlename : result.middlename } } );
+		setPageFields( prevState => { return { ...prevState , lastname : result.lastname } } );
+		setPageFields( prevState => { return { ...prevState , address1 : result.address1 } } );
+		setPageFields( prevState => { return { ...prevState , address2 : result.address2 } } );
+		setPageFields( prevState => { return { ...prevState , city : result.city } } );
+		setPageFields( prevState => { return { ...prevState , state : result.state } } );
+		setPageFields( prevState => { return { ...prevState , province : result.province } } );
+		setPageFields( prevState => { return { ...prevState , zipcode : result.zipcode } } );
+		setPageFields( prevState => { return { ...prevState , country : result.country } } );
+		if( result.privacy === 0){
+			setPageFields( prevState => { return { ...prevState , privacy : false } } );
+		}else if( result.privacy === 1 ){
+			setPageFields( prevState => { return { ...prevState , privacy : true } } );
+		}
 	}
 
-	const Update = ( ) => {
+	const Update = async( ) => {
+		setLoginButtonSpinner( true );
+
 		let userkey = cookies.userSession.USER_KEY;
 		let devicekey = cookies.userSession.DEVICE_KEY;
 		let firstname = pageFields.firstname;
@@ -150,7 +195,37 @@ const Profile =( )=> {
 		let state = pageFields.state;
 		let province = pageFields.province;
 		let country = pageFields.country;
-		let privacy = pageFields.privacy;
+		let zipcode = pageFields.zipcode;
+		let privacy = getPrivacy( );
+
+		let postData = { userkey, devicekey, firstname, middlename, lastname, address1, address2, city, state, province, country, zipcode, privacy };
+
+		var edituserdataUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'edituserdata';
+		const result = await JsonNetworkAdapter.post( edituserdataUrl, postData )
+        .then((response) =>{ return response.data });
+
+		var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
+        if( error_message_type === result.MSGTYPE ){
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.ERROR_FIELD_CODE } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.ERROR_FIELD_SUBJECT  } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.ERROR_FIELD_MESSAGE } } )
+            setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+            return;
+        }
+
+		localStorage.removeItem( 'cachedUserData');
+		let storeData = {firstname, middlename, lastname, address1, address2, city, state, province, country, zipcode, privacy}
+		localStorage.setItem( 'cachedUserData',  Lock( "encrypt", JSON.stringify( storeData ), secretKey ) );
+
+		let succMessageShow = process.env.REACT_APP_RESPONSE_TYPE_EDIT_USER_DATA
+		if( result.MSG_TYPE === succMessageShow ){
+			setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.UI_SUBJECT } } )
+            setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.UI_MESSAGE } } )
+            setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
+			Clear( );
+		}
+
+		setLoginButtonSpinner( false );
 	}
 
 	return (
@@ -192,7 +267,7 @@ const Profile =( )=> {
 					<Form.Group className="mb-3" >
 						<Form.Label>First Name</Form.Label>
 						<Form.Control type="text" 
-							placeholder={ CheckNullException(data.firstname,"First Name")}
+							placeholder={ CheckNullException(pageFields.firstname,"First Name")}
 							onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , firstname : e.target.value } } ) }
 						/>
 					</Form.Group>
@@ -202,7 +277,7 @@ const Profile =( )=> {
 					<Form.Group className="mb-3" >
 						<Form.Label>Middle Name</Form.Label>
 						<Form.Control type="text" 
-							placeholder={ CheckNullException( data.middlename,"Middle Name" ) } 
+							placeholder={ CheckNullException( pageFields.middlename,"Middle Name" ) } 
 							onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , middlename : e.target.value } } ) }
 						/>
 					</Form.Group>
@@ -212,7 +287,7 @@ const Profile =( )=> {
 					<Form.Group className="mb-3" >
 						<Form.Label>Last Name</Form.Label>
 						<Form.Control type="text" 
-							placeholder={ CheckNullException( data.lastname,"Last Name" ) } 
+							placeholder={ CheckNullException( pageFields.lastname,"Last Name" ) } 
 							onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , lastname : e.target.value } } ) }
 						/>
 					</Form.Group>
@@ -226,7 +301,7 @@ const Profile =( )=> {
 					<Form.Group className="mb-3" >
 							<Form.Label>Address 1</Form.Label>
 							<Form.Control type="text" 
-								placeholder={ CheckNullException( data.address1,"Address 1" ) } 
+								placeholder={ CheckNullException( pageFields.address1,"Address 1" ) } 
 								onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , address1 : e.target.value } } ) }
 							/>
 						</Form.Group>
@@ -236,7 +311,7 @@ const Profile =( )=> {
 					<Form.Group className="mb-3" >
 							<Form.Label>Address 2</Form.Label>
 							<Form.Control type="text" 
-								placeholder={ CheckNullException( data.address2,"Address 2" ) } 
+								placeholder={ CheckNullException( pageFields.address2,"Address 2" ) } 
 								onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , address2 : e.target.value } } ) }
 							/>
 						</Form.Group>
@@ -250,7 +325,7 @@ const Profile =( )=> {
 					<Form.Group className="mb-3" >
 							<Form.Label>City</Form.Label>
 							<Form.Control type="text" 
-								placeholder={ CheckNullException( data.city,"City" ) } 
+								placeholder={ CheckNullException( pageFields.city,"City" ) } 
 								onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , city : e.target.value } } ) }
 							/>
 						</Form.Group>
@@ -260,7 +335,7 @@ const Profile =( )=> {
 					<Form.Group className="mb-3" >
 							<Form.Label>State</Form.Label>
 							<Form.Control type="text" 
-								placeholder={ CheckNullException( data.state,"State" ) } 
+								placeholder={ CheckNullException( pageFields.state,"State" ) } 
 								onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , state : e.target.value } } ) }/>
 						</Form.Group>
 				</Col>
@@ -269,7 +344,7 @@ const Profile =( )=> {
 					<Form.Group className="mb-3" >
 						<Form.Label>Province</Form.Label>
 						<Form.Control type="text" 
-							placeholder={ CheckNullException( data.province,"Province" ) } 
+							placeholder={ CheckNullException( pageFields.province,"Province" ) } 
 							onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , province : e.target.value } } ) }
 						/>
 						</Form.Group>
@@ -283,7 +358,7 @@ const Profile =( )=> {
 					<Form.Group className="mb-3" >
 						<Form.Label>Zip code</Form.Label>
 						<Form.Control type="text" 
-							placeholder={ CheckNullException( data.zipcode,"Zip Code" ) } 
+							placeholder={ CheckNullException( pageFields.zipcode,"Zip Code" ) } 
 							onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , zipcode : e.target.value } } ) }
 						/>
 					</Form.Group>
@@ -293,7 +368,7 @@ const Profile =( )=> {
 					<Form.Group className="mb-3" >
 						<Form.Label>Country</Form.Label>
 						<Form.Control type="text" 
-							placeholder={ CheckNullException( data.zipcode,"Country" ) } 
+							placeholder={ CheckNullException( pageFields.country,"Country" ) } 
 							onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , country : e.target.value } } ) }
 						/>
 					</Form.Group>
@@ -304,7 +379,10 @@ const Profile =( )=> {
 			<Row>
 				<Col>
 					<ButtonGroup size="md" className="mb-2">
-						<Button variant="outline-primary" type="button" onClick = { ( ) => Update( ) }>Update</Button>
+						<Button variant="outline-primary" type="button" onClick = { ( ) => Update( ) }>
+							{loginButtonSpinner && <Spinner as="span"animation="grow"size="sm" role="status" aria-hidden="false"/>}
+							Update
+						</Button>
 						<Button variant="outline-info" type="button" onClick = { ( ) => Clear( ) }>Clear</Button>
 					</ButtonGroup>
 				</Col>
