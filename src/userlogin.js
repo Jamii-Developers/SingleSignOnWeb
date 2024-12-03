@@ -95,7 +95,7 @@ const UserLogin = ( props ) => {
 
         let loginCredential = pageFields.loginCredential;
         let loginPassword = pageFields.loginPassword;
-        let rememberLogin = pageFields.rememberLogin;
+        let rememberLogin = getRememberLogin( );
         let loginDeviceName = navigator.userAgent;
 
         var loginJson = { 
@@ -106,7 +106,6 @@ const UserLogin = ( props ) => {
             rememberLogin
         };
     
-
         var userLoginUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'userlogin';
     
         const result = await JsonNetworkAdapter.post( userLoginUrl, loginJson )
@@ -139,9 +138,11 @@ const UserLogin = ( props ) => {
             clear( );
             
             await new Promise(r => setTimeout(r, 2000));
-
+            
+            console.log( result )
             // Create Cookie and navigate to the home page
-            CreateUserSession( result );
+            let expirydate = new Date(result.EXPIRY_DATE);
+            setCookie( "userSession", result,  {path: "/", expires: expirydate } );
             navigate("/myhome/dashboard")
         }
     } 
@@ -190,13 +191,13 @@ const UserLogin = ( props ) => {
         setErrorData( prevState => { return { ...prevState ,loginPasswordErrorTrigger : false } } );
     }
 
-    function CreateUserSession( cookie ){
-        if( pageFields.rememberLogin ){
-            setCookie( "userSession", cookie,  {path: "/", maxAge:86400 } );
-        }else{
-            setCookie( "userSession", cookie,  {path: "/", maxAge:3600 } );
-        } 
-    }
+    const getRememberLogin = ( ) => {
+		if( pageFields.rememberLogin === true ){
+			return true;
+		}else if( pageFields.rememberLogin === false ){
+			return false;
+		}
+	}
 
     return (
         < >        

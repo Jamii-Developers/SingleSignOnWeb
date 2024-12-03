@@ -94,10 +94,12 @@ const Profile =( )=> {
 		
 		let userkey = cookies.userSession.USER_KEY;
 		let devicekey = cookies.userSession.DEVICE_KEY;
+		let sessionkey = cookies.userSession.SESSION_KEY;
 
         var cookieData = { 
             userkey,
-            devicekey
+            devicekey,
+			sessionkey
         };
 		
 		var fetchuserdataUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'fetchuserdata';
@@ -186,6 +188,7 @@ const Profile =( )=> {
 
 		let userkey = cookies.userSession.USER_KEY;
 		let devicekey = cookies.userSession.DEVICE_KEY;
+		let sessionkey = cookies.userSession.SESSION_KEY;
 		let firstname = pageFields.firstname;
 		let middlename = pageFields.middlename;
 		let lastname = pageFields.lastname;
@@ -198,7 +201,7 @@ const Profile =( )=> {
 		let zipcode = pageFields.zipcode;
 		let privacy = getPrivacy( );
 
-		let postData = { userkey, devicekey, firstname, middlename, lastname, address1, address2, city, state, province, country, zipcode, privacy };
+		let postData = { userkey, devicekey, sessionkey ,firstname, middlename, lastname, address1, address2, city, state, province, country, zipcode, privacy };
 
 		var edituserdataUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'edituserdata';
 		const result = await JsonNetworkAdapter.post( edituserdataUrl, postData )
@@ -210,6 +213,7 @@ const Profile =( )=> {
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.ERROR_FIELD_SUBJECT  } } )
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.ERROR_FIELD_MESSAGE } } )
             setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+			setLoginButtonSpinner( false );
             return;
         }
 
