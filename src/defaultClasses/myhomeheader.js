@@ -1,5 +1,7 @@
 import '../sass/myhomeindexheader.sass';
+import ServerErrorMsg from '../frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from '../frequentlyUsedModals/serversuccessmsg'
+import JsonNetworkAdapter from '../configs/networkadapter';
 
 import React from 'react';
 
@@ -21,6 +23,13 @@ const Header = ( ) => {
         succServMsgShow: false
   	});
 
+	  const[ serverErrorResponse , setServerErrorResponse ] = useState({
+        serverErrorCode : "",
+        serverErrorSubject: "",
+        serverErrorMessage: "",
+        errServMsgShow : false
+  	});
+
 	useEffect( ( ) => { CheckIfCoockieExists( ) } );
     function CheckIfCoockieExists() {
         if( !cookies.userSession   ){
@@ -30,15 +39,48 @@ const Header = ( ) => {
 
 	async function DestroyCookie( ){
 
+		var userLogoffUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'userlogoff';
+		let userkey = cookies.userSession.USER_KEY;
+		let devicekey = cookies.userSession.DEVICE_KEY;
+		let sessionkey = cookies.userSession.SESSION_KEY;
+    
+		var logoffJson = {
+			userkey,
+			devicekey,
+			sessionkey
+		}
+        const result = await JsonNetworkAdapter.post( userLogoffUrl, logoffJson )
+        .then((response) =>{ return response.data })
+
+		console.log(result)
+
+		if( result.status === 400 ){
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.status } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.statusText  } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "There is an error with your connection" } } )
+            setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+            return;
+        }
+
+		var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
+        if( error_message_type === result.MSGTYPE ){
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.ERROR_FIELD_CODE } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.ERROR_FIELD_SUBJECT  } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.ERROR_FIELD_MESSAGE } } )
+            setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+			await new Promise(r => setTimeout(r, 3000));
+        }
+
+		var succ_message_type = process.env.REACT_APP_RESPONSE_TYPE_LOGOFF
+        if( succ_message_type === result.MSG_TYPE ){
+            setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.UI_SUBJECT } } )
+            setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.UI_MESSAGE } } )
+            setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
+			await new Promise(r => setTimeout(r, 3000));
+        }
+
 		setCookie( "userSession", null,  {path: "/", maxAge: -999999 } );
 		localStorage.removeItem('cachedUserData');
-
-		setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : "Success" } } )
-		setServerSuccessResponse( prevState => { return { ...prevState , ui_message : "You have been logged out successfully" } } )
-		setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
-
-		await new Promise(r => setTimeout(r, 2000));
-
 		navigate("/");
 	}
 
@@ -59,12 +101,20 @@ const Header = ( ) => {
 				</Sidebar>
 			</div>
 
-			< ServerSuccessMsg 
-				open={serverSuccessResponse.succServMsgShow}  
-				onClose={ ( ) => setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow : false } } ) }
-				ui_subject = {serverSuccessResponse.ui_subject} 
-				ui_message = {serverSuccessResponse.ui_message}                             
-			/>
+			< ServerErrorMsg 
+                open={serverErrorResponse.errServMsgShow}  
+                onClose={ ( ) => setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : false } } ) }
+                errorcode = {serverErrorResponse.serverErrorCode} 
+                errorsubject = {serverErrorResponse.serverErrorSubject} 
+                errormessage = {serverErrorResponse.serverErrorMessage}                             
+            />
+
+            < ServerSuccessMsg 
+                open={serverSuccessResponse.succServMsgShow}  
+                onClose={ ( ) => setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow : false } } ) }
+                ui_subject = {serverSuccessResponse.ui_subject} 
+                ui_message = {serverSuccessResponse.ui_message}                             
+            />
 
 			<div id = "MainContent">
 				<Outlet />
