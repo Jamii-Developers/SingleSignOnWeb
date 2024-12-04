@@ -12,6 +12,7 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Alert from '@mui/material/Alert';
 import Collapse from 'react-bootstrap/Collapse';
 import Spinner from 'react-bootstrap/Spinner';
+import JsonNetworkAdapter from "./configs/networkadapter";
 
 const ContactUs = ( ) => {
 
@@ -215,28 +216,27 @@ const ContactUs = ( ) => {
                   client_thoughts,
             }
 
-            var contactUsData = JSON.stringify( contactUsJSON );
-
-            console.log( contactUsData )
-
             setSubmitThoughtsButtonSpinner( true );
 
-            var contactUsURL = process.env.REACT_APP_SINGLE_SIGNON_URL+'contactus';
-    
-            const response = await fetch( contactUsURL, {
-                  method: 'POST',
-                  body: contactUsData,
-                  headers: {
-                        'Content-Type': 'application/json'
-                  }
-            });
+            var contactusUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'contactus';
 
-            const result = await response.json( );
+            const result = await JsonNetworkAdapter.post( contactusUrl, contactUsJSON )
+                .then((response) =>{ return response.data })
+                .catch((error) => { return error;});
             
             setSubmitThoughtsButtonSpinner( false );
+            console.log( result )
+
+            if( result.status === 404 ){
+                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.status } } )
+                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.statusText  } } )
+                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.message } } )
+                  setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+                  return;
+            }
 
             var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
-            if( error_message_type === result.MSG_TYPE ){
+            if( error_message_type === result.ERROR_MSG_TYPE ){
                   setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.ERROR_FIELD_CODE } } )
                   setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.ERROR_FIELD_SUBJECT  } } )
                   setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.ERROR_FIELD_MESSAGE } } )
@@ -245,7 +245,7 @@ const ContactUs = ( ) => {
             }
 
             var succ_message_type = process.env.REACT_APP_RESPONSE_TYPE_CONTACTUS
-            if( succ_message_type === result.MSGTYPE ){ 
+            if( succ_message_type === result.MSG_TYPE ){
                   setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.UI_SUBJECT } } )
                   setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.UI_MESSAGE } } )
                   setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );

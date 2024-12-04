@@ -109,14 +109,16 @@ const UserLogin = ( props ) => {
         var userLoginUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'userlogin';
     
         const result = await JsonNetworkAdapter.post( userLoginUrl, loginJson )
-        .then((response) =>{ return response.data })
-        
-        setLoginButtonSpinner( false ) ;
+            .then((response) =>{ return response.data })
+            .catch((error) => { return error;});
 
-        if( result.status === 400 ){
+        setLoginButtonSpinner( false ) ;
+        console.log( result )
+
+        if( result.status === 404 ){
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.status } } )
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.statusText  } } )
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "There is an error with your connection" } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.message } } )
             setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
             return;
         }

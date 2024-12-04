@@ -18,15 +18,19 @@ const JsonNetworkAdapter = axios.create({
           resolve({
             data: response.json(),
             status: response.status,
-            statusText: "Unable to connect!",
+            statusText: "Connection successfull!",
             headers: response.headers,
             config: config,
           });
         })
         .catch((error) => {
           // Handle errors here
-          reject(error);
-          
+          reject({
+            message: "Something went wrong!",
+            status: 404,
+            statusText: "Oops!",
+            config: config,
+          });
         });
     });
   },

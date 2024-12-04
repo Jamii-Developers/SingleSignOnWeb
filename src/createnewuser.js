@@ -158,20 +158,21 @@ const CreateNewUser = ( props ) => {
         setCreateNewUserButtonSpinner( true )
         
         const result = await JsonNetworkAdapter.post( createNewUserUrl, createNewUserJson )
-        .then((response) =>{ return response.data });
+            .then((response) =>{ return response.data })
+            .catch((error) => { return error;});
 
         setCreateNewUserButtonSpinner( false );
 
-        if( result.status === 400 ){
+        if( result.status === 404 ){
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.status } } )
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.statusText  } } )
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "There is an error with your connection" } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.message } } )
             setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
             return;
         }
         
         var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
-		if( error_message_type === result.MSGTYPE ){
+		if( error_message_type === result.ERROR_MSG_TYPE ){
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.ERROR_FIELD_CODE } } )
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.ERROR_FIELD_SUBJECT  } } )
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.ERROR_FIELD_MESSAGE } } )
