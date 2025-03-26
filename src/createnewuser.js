@@ -154,7 +154,7 @@ const CreateNewUser = ( props ) => {
             username,
             password };
 
-        var createNewUserUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'createnewuser';
+        var createNewUserUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'public/createnewuser';
         setCreateNewUserButtonSpinner( true )
         
         const result = await JsonNetworkAdapter.post( createNewUserUrl, createNewUserJson )

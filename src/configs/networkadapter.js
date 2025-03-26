@@ -7,18 +7,30 @@ const JsonNetworkAdapter = axios.create({
         return new Promise((resolve, reject) => {
             // Use your custom logic to send the request (e.g., fetch API)
             fetch(config.url, {
-                method: config.method,
+                method: config.method.toUpperCase(),
+                mode: "cors",
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: config.data
             })
-                .then((response) => {
+                .then( async (response) => {
                     // Customize the response here if needed
+                    const responseData = await response.json().catch( ( ) => ( { } ) ); // Ensure JSON parsing doesn't fail
+
+                    if (!response.ok) {
+                        return reject({
+                            message: "Request failed",
+                            status: response.status,
+                            statusText: response.statusText,
+                            data: responseData,
+                            config: config,
+                        });
+                    }
                     resolve({
-                        data: response.json(),
+                        data: responseData,
                         status: response.status,
-                        statusText: "Connection successfull!",
+                        statusText: "Connection successful!",
                         headers: response.headers,
                         config: config,
                     });

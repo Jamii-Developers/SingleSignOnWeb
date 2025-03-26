@@ -97,16 +97,18 @@ const UserLogin = ( props ) => {
         let loginPassword = pageFields.loginPassword;
         let rememberLogin = getRememberLogin( );
         let loginDeviceName = navigator.userAgent;
+        let loginDeviceId = "";
 
         var loginJson = { 
             loginCredential,
             loginPassword,
             loginDeviceName,
+            loginDeviceId,
             location,
             rememberLogin
         };
     
-        var userLoginUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'userlogin';
+        var userLoginUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'public/userlogin';
     
         const result = await JsonNetworkAdapter.post( userLoginUrl, loginJson )
             .then((response) =>{ return response.data })
@@ -124,7 +126,7 @@ const UserLogin = ( props ) => {
         }
 
         var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
-        if( error_message_type === result.MSGTYPE ){
+        if( error_message_type === result.ERROR_MSG_TYPE ){
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.ERROR_FIELD_CODE } } )
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.ERROR_FIELD_SUBJECT  } } )
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.ERROR_FIELD_MESSAGE } } )
