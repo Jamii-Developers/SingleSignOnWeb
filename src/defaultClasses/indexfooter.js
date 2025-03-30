@@ -5,7 +5,7 @@ import Container  from 'react-bootstrap/Container'
 import Nav from 'react-bootstrap/Nav';
 import { NavbarBrand }from 'react-bootstrap'
 
-import ContactUs from '../contactus'
+import Reviewus from '../myHomeComponents/ClientCommunications/reviewus'
 
 const Footer = ( props ) => {
 
@@ -18,7 +18,7 @@ const Footer = ( props ) => {
 	const openPage = ( page ) => {
 
 		if (page === 'contactus') {
-			props.main_body.render(< ContactUs />)
+			props.main_body.render(< Reviewus />)
 		}
 	
 	} 

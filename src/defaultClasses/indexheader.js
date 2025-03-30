@@ -30,13 +30,12 @@ const Header = ( props ) => {
 			<div id="NavbarContent">
 				< Navbar  bg="primary" data-bs-theme="dark" sticky="top">
 					<Container>
-						<NavbarBrand>Single Sign-On</NavbarBrand>
+						<NavbarBrand>JamiiX</NavbarBrand>
 						<Navbar.Toggle aria-controls="basic-navbar-nav" />
 						<Nav className="me-auto">
 							<Nav.Link id="loginbutton"><Link to="/" class="jamiibuttonlink" >Login</Link></Nav.Link>
 							<Nav.Link id="createnewuserbutton"><Link to="/signup" class="jamiibuttonlink" >Sign Up</Link></Nav.Link>
 							<Nav.Link id="aboutusbutton"  ><Link to="/aboutus" class="jamiibuttonlink">About Us</Link></Nav.Link>
-							<Nav.Link id="contactusbutton"  ><Link to="/contactus" class="jamiibuttonlink">Contact Us</Link></Nav.Link>
 						</Nav>
 					</Container>
 				</ Navbar >

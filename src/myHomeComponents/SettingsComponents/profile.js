@@ -102,7 +102,7 @@ const Profile =( )=> {
 			sessionkey
         };
 		
-		var fetchuserdataUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'fetchuserdata';
+		var fetchuserdataUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'user/fetchprofile';
 		const result = await JsonNetworkAdapter.post( fetchuserdataUrl, cookieData )
         	.then((response) =>{ return response.data })
 			.catch((error) => { return error;});
@@ -185,9 +185,9 @@ const Profile =( )=> {
 	const Update = async( ) => {
 		setLoginButtonSpinner( true );
 
-		let userkey = cookies.userSession.USER_KEY;
-		let devicekey = cookies.userSession.DEVICE_KEY;
-		let sessionkey = cookies.userSession.SESSION_KEY;
+		let userKey = cookies.userSession.USER_KEY;
+		let deviceKey = cookies.userSession.DEVICE_KEY;
+		let sessionKey = cookies.userSession.SESSION_KEY;
 		let firstname = pageFields.firstname;
 		let middlename = pageFields.middlename;
 		let lastname = pageFields.lastname;
@@ -200,9 +200,9 @@ const Profile =( )=> {
 		let zipcode = pageFields.zipcode;
 		let privacy = getPrivacy( );
 
-		let postData = { userkey, devicekey, sessionkey ,firstname, middlename, lastname, address1, address2, city, state, province, country, zipcode, privacy };
+		let postData = { userKey, deviceKey, sessionKey ,firstname, middlename, lastname, address1, address2, city, state, province, country, zipcode, privacy };
 
-		var edituserdataUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'edituserdata';
+		var edituserdataUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'user/editprofile';
 		const result = await JsonNetworkAdapter.post( edituserdataUrl, postData )
         	.then((response) =>{ return response.data })
 			.catch((error) => { return error;});

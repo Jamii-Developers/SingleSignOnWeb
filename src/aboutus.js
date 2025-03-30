@@ -16,10 +16,8 @@ const AboutUs = ( ) => {
       }
 
       function PageUnderDevelopmentNotice(  ){
-            return( 
-                
-                <Alert variant="filled" severity="info" className='mb-3' >Page under development</Alert>   
-                                
+            return(
+                <Alert variant="filled" severity="info" className='mb-3' >Page under development</Alert>
             );
       }
       

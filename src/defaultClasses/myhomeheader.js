@@ -39,7 +39,7 @@ const Header = ( ) => {
 
 	async function DestroyCookie( ){
 
-		var userLogoffUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'userlogoff';
+		var userLogoffUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'/user/userlogoff';
 		let userkey = cookies.userSession.USER_KEY;
 		let devicekey = cookies.userSession.DEVICE_KEY;
 		let sessionkey = cookies.userSession.SESSION_KEY;
@@ -95,7 +95,7 @@ const Header = ( ) => {
 						<MenuItem component={<Link to="/myhome/filemanagement"/>}>File Management</MenuItem>
 						<MenuItem component={<Link to="/myhome/settings"/>}>Settings</MenuItem>
 						<MenuItem component={<Link to="/myhome/aboutus"/>}>About Us</MenuItem>
-						<MenuItem component={ <Link to="/myhome/contactus"/> }>Contact Us</MenuItem>
+						<MenuItem component={ <Link to="/myhome/reviewus"/> }>Review Us</MenuItem>
 						<MenuItem onClick={ ( ) => DestroyCookie( ) }>Log Out</MenuItem>
 					</Menu>
 				</Sidebar>

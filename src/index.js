@@ -9,7 +9,7 @@ import BlankProfilePic from './img/blankprofile.png'
 import UserLogin from './userlogin'
 import CreateNewUser from './createnewuser';
 import AboutUs from './aboutus';
-import ContactUs from './contactus';
+import Reviewus from './myHomeComponents/ClientCommunications/reviewus';
 import ForgetPassword from './forgetpassword';
 import Dashboard from './myHomeComponents/dashboard';
 import SocialHeader from './myHomeComponents/SocialComponents/socialheader';
@@ -39,16 +39,14 @@ export default function PageBrowser( ){
     return (
         <BrowserRouter id = "RouterIndex">
             <Routes>
+
+                {/* Landing Page Routes */}
                 <Route path="/" element={ < IndexHeader /> } >
                     <Route index element={ < UserLogin /> } />
                     <Route path="signup" element={ < CreateNewUser /> } />
                     <Route path="aboutus" element={ < AboutUs /> } />
-                    <Route path="contactus" element={ < ContactUs /> } />
                     <Route path="forgetpassword" element={ < ForgetPassword /> } />
                 </Route>
-
-                
-
 
                 <Route path="/myhome" element={ < MyHomeHeader /> } >
                     <Route index path = "/myhome/dashboard" element={ < Dashboard /> } />
@@ -77,7 +75,7 @@ export default function PageBrowser( ){
 
                     {/* Aux Home Page Routes */}
                     <Route path="/myhome/aboutus" element={ < AboutUs /> } />
-                    <Route path="/myhome/contactus" element={ < ContactUs /> } />
+                    <Route path="/myhome/reviewus" element={ < Reviewus /> } />
                 </Route>
 
                 {/* Static Routes */}

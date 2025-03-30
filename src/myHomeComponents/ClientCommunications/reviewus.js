@@ -1,6 +1,7 @@
-import './sass/contactus.sass';
-import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
-import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg';
+import JsonNetworkAdapter from "../../configs/networkadapter";
+import '../../sass/reviewus.sass';
+import ServerErrorMsg from '../../frequentlyUsedModals/servererrormsg';
+import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg';
 
 import { useState } from 'react';
 import React from 'react';
@@ -12,9 +13,9 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Alert from '@mui/material/Alert';
 import Collapse from 'react-bootstrap/Collapse';
 import Spinner from 'react-bootstrap/Spinner';
-import JsonNetworkAdapter from "./configs/networkadapter";
 
-const ContactUs = ( ) => {
+
+const Reviewus = ( ) => {
 
       const mailformat = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
       const specialChars =/[`!@#$%^&*()_\-+=[\]{};':"|,.<>/?~ ]/;
@@ -56,11 +57,11 @@ const ContactUs = ( ) => {
             setPageFields( prevState => { return { ...prevState , thoughts : "" } } );
       }
 
-      // function PageUnderDevelopmentNotice(  ){
-      //       return( 
-      //           <Alert variant="filled" severity="info" className='mb-3' >Page under development</Alert>            
-      //       );
-      // }
+      function PageUnderDevelopmentNotice(  ){
+            return(
+                <Alert variant="filled" severity="info" className='mb-3' >Page under development</Alert>
+            );
+      }
 
       function ShowEmailError(  ){
             return( 
@@ -218,7 +219,7 @@ const ContactUs = ( ) => {
 
             setSubmitThoughtsButtonSpinner( true );
 
-            var contactusUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'contactus';
+            var contactusUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'user/reviewus';
 
             const result = await JsonNetworkAdapter.post( contactusUrl, contactUsJSON )
                 .then((response) =>{ return response.data })
@@ -255,9 +256,9 @@ const ContactUs = ( ) => {
 
 
       return (
-            <div id = "ContactUsPage">
+            <div id = "ReviewUsContent">
 
-            {/* <PageUnderDevelopmentNotice /> */}
+            <PageUnderDevelopmentNotice />
 
             <Form id = "contactusform" >
 
@@ -312,4 +313,4 @@ const ContactUs = ( ) => {
       )
 }
   
-export default ContactUs
+export default Reviewus
