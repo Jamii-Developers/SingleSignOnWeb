@@ -9,12 +9,13 @@ const Conn = {
         CONTENT_JSON: {'Content-type': 'application/json'},
     },
     SERVICE_HEADERS: {
-        USER_LOGIN: {'Service-Header' : 'userlogin'},
-        CREATE_NEW_USER: {'Service-Header' : 'createnewuser'},
-        EDIT_PROFILE: {'Service-Header' : 'editprofile'},
-        FETCH_PROFILE: {'Service-Header' : 'fetchprofile'},
-        USER_LOGOFF: {'Service-Header' : 'userlogoff'},
-        REVIEW_US :  {'Service-Header' : 'reviewus' }
+        USER_LOGIN:         {'Service-Header' : 'userlogin'},
+        CREATE_NEW_USER:    {'Service-Header' : 'createnewuser'},
+        EDIT_PROFILE:       {'Service-Header' : 'editprofile'},
+        FETCH_PROFILE:      {'Service-Header' : 'fetchprofile'},
+        USER_LOGOFF:        {'Service-Header' : 'userlogoff'},
+        REVIEW_US :         {'Service-Header' : 'reviewus' },
+        CONTACT_SUPPORT :   {'Service-Header' : 'contactsupport' }
     }
 };
 

@@ -11,7 +11,7 @@ import {
 	FaSignOutAlt,
 	FaBars,
 	FaTimes,
-	FaUserFriends, FaCommentAlt, FaLock, FaUserCog, FaTrash, FaFolder, FaUserPlus, FaUserSlash
+	FaUserFriends, FaCommentAlt, FaLock, FaUserCog, FaTrash, FaFolder, FaUserPlus, FaUserSlash, FaPhoneAlt, FaEnvelope
 } from 'react-icons/fa';
 
 
@@ -121,26 +121,30 @@ const Header = ( ) => {
 
 						{/*Social Menu*/}
 						<SubMenu icon={<FaUserFriends  />} label = {!collapsed && 'Social'}  >
-							<MenuItem icon={<FaUserFriends />} component={<Link to="/myhome/social/friends" />} collapsed={collapsed} >{!collapsed && 'Friends'}</MenuItem>
-							<MenuItem icon={<FaUserPlus />} component={<Link to="/myhome/social/followers" />}>{!collapsed && 'Followers'}</MenuItem>
-							<MenuItem icon={<FaUserSlash />} component={<Link to="/myhome/social/blockedlist" />}>{!collapsed && 'Blocked List'}</MenuItem>
+							<MenuItem icon={<FaUserFriends />} component={<Link to="/myhome/social/friends" />}>Friends</MenuItem>
+							<MenuItem icon={<FaUserPlus />} component={<Link to="/myhome/social/followers" />}>Followers</MenuItem>
+							<MenuItem icon={<FaUserSlash />} component={<Link to="/myhome/social/blockedlist" />}>Blocked List</MenuItem>
 						</SubMenu>
 
 						{/*File Management Menu*/}
 						<SubMenu icon={<FaFolder  />} label = {!collapsed && 'File Management'}>
-							<MenuItem icon={<FaFileAlt />} component={<Link to="/myhome/filemanagement/currentfiles" />}>{!collapsed && 'Current Files'}</MenuItem>
-							<MenuItem icon={<FaTrash />} component={<Link to="/myhome/filemanagement/recyclebin" />}>{!collapsed && 'Recycle Bin'}</MenuItem>
+							<MenuItem icon={<FaFileAlt />} component={<Link to="/myhome/filemanagement/currentfiles" />}>Current Files</MenuItem>
+							<MenuItem icon={<FaTrash />} component={<Link to="/myhome/filemanagement/recyclebin" />}>Recycle Bin</MenuItem>
 						</SubMenu>
 
 						{/*Settings Menu*/}
 						<SubMenu icon={<FaCog />} label = {!collapsed && 'Settings'}>
-							<MenuItem icon={<FaUserCog />} component={<Link to="/myhome/settings/profile" />}>{!collapsed && 'Profile'}</MenuItem>
-							<MenuItem icon={<FaLock />} component={<Link to="/myhome/settings/permissions" />}>{!collapsed && 'Profile'}</MenuItem>
+							<MenuItem icon={<FaUserCog />} component={<Link to="/myhome/settings/profile" />}>Profile</MenuItem>
+							<MenuItem icon={<FaLock />} component={<Link to="/myhome/settings/permissions" />}>Permissions</MenuItem>
 						</SubMenu>
 
+						{/*Client communication Menu*/}
+						<SubMenu icon={<FaPhoneAlt />} label = {!collapsed && 'Contact Us'}>
+							<MenuItem icon={<FaCommentAlt />} component={<Link to="/myhome/clientcommunication/reviewus" />}>Review Us</MenuItem>
+							<MenuItem icon={<FaEnvelope />} component={<Link to="/myhome/clientcommunication/contactsupport" />}>Contact Support</MenuItem>
+						</SubMenu>
 
 						<MenuItem icon={<FaInfoCircle />} component={<Link to="/myhome/aboutus" />}>{!collapsed && 'About Us'}</MenuItem>
-						<MenuItem icon={<FaCommentAlt />} component={<Link to="/myhome/reviewus" />}>{!collapsed && 'Review Us'}</MenuItem>
 						<MenuItem icon={<FaSignOutAlt />} onClick={() => DestroyCookie()}>{!collapsed && 'Log Out'}</MenuItem>
 					</Menu>
 				</Sidebar>

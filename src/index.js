@@ -10,6 +10,7 @@ import UserLogin from './userlogin'
 import CreateNewUser from './createnewuser';
 import AboutUs from './aboutus';
 import Reviewus from './myHomeComponents/ClientCommunications/reviewus';
+import Contactsupport from './myHomeComponents/ClientCommunications/contactsupport';
 import ForgetPassword from './forgetpassword';
 import Dashboard from './myHomeComponents/dashboard';
 import Friends from './myHomeComponents/SocialComponents/friends'
@@ -64,9 +65,14 @@ export default function PageBrowser( ){
                         <Route path="/myhome/settings/permissions" element={ < Permissions /> } />
                     </Route>
 
+                    {/*Client communications*/}
+                    <Route path="/myhome/clientcommunication/" >
+                        <Route path="/myhome/clientcommunication/reviewus" element={ < Reviewus /> } />
+                        <Route path="/myhome/clientcommunication/contactsupport" element={ < Contactsupport /> } />
+                    </Route>
+
                     {/* Aux Home Page Routes */}
                     <Route path="/myhome/aboutus" element={ < AboutUs /> } />
-                    <Route path="/myhome/reviewus" element={ < Reviewus /> } />
                 </Route>
 
                 {/* Static Routes */}
