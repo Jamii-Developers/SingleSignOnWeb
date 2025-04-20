@@ -7,6 +7,7 @@
 	overflow-y: auto
 	border: 0 !important
 	background-color: #0d6efd
+	z-index: 99999
 
 //sidebar text color
 .ps-menu-root
@@ -25,16 +26,17 @@
 	color: rgb(238, 238, 238) !important
 	background-color: rgb(43, 45, 158)  !important
 
-#MyHomeHeaderPage 
+#MyHomeHeaderPage
 	display: flex
-	height: 100vh 
+	height: 100vh
+	z-index: -99999
 
 #MyHomeHeaderPage 
 	#MainContent 
 		flex-grow: 1 
 		padding: 0px
-		margin:0px
-		width: 100vh
+		margin: 0px
+		width: 20vh
 
 #MyHomeHeaderPage
 	#SidebarContent
