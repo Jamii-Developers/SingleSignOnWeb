@@ -2,6 +2,7 @@ import './sass/createnewuser.sass';
 import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg';
 import JsonNetworkAdapter from './configs/networkadapter';
+import conn from './configs/conn';
 
 import React from 'react';
 import { useState } from 'react'
@@ -154,10 +155,10 @@ const CreateNewUser = ( props ) => {
             username,
             password };
 
-        var createNewUserUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'public/createnewuser';
         setCreateNewUserButtonSpinner( true )
-        
-        const result = await JsonNetworkAdapter.post( createNewUserUrl, createNewUserJson )
+
+        const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON , ...conn.SERVICE_HEADERS.CREATE_NEW_USER };
+        const result = await JsonNetworkAdapter.post( conn.URL.PUBLIC_URL, createNewUserJson, { headers : headers} )
             .then((response) =>{ return response.data })
             .catch((error) => { return error;});
 

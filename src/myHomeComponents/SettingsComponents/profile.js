@@ -14,6 +14,7 @@ import Spinner from 'react-bootstrap/Spinner';
 
 import { useCookies } from "react-cookie";
 import { useEffect, useState } from "react";
+import conn from "../../configs/conn";
   
 const Profile =( )=> {
 	
@@ -92,18 +93,18 @@ const Profile =( )=> {
 
     async function FetchLatestUserData( ) {
 		
-		let userkey = cookies.userSession.USER_KEY;
-		let devicekey = cookies.userSession.DEVICE_KEY;
-		let sessionkey = cookies.userSession.SESSION_KEY;
+		let userKey = cookies.userSession.USER_KEY;
+		let deviceKey = cookies.userSession.DEVICE_KEY;
+		let sessionKey = cookies.userSession.SESSION_KEY;
 
-        var cookieData = { 
-            userkey,
-            devicekey,
-			sessionkey
+        var cookieData = {
+			userKey,
+			deviceKey,
+			sessionKey
         };
-		
-		var fetchuserdataUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'user/fetchprofile';
-		const result = await JsonNetworkAdapter.post( fetchuserdataUrl, cookieData )
+
+		let headers = { ...conn.CONTENT_TYPE.CONTENT_JSON , ...conn.SERVICE_HEADERS.FETCH_PROFILE};
+		const result = await JsonNetworkAdapter.post( conn.URL.USER_URL, cookieData, {  headers : headers } )
         	.then((response) =>{ return response.data })
 			.catch((error) => { return error;});
 
@@ -149,7 +150,7 @@ const Profile =( )=> {
 	}
 	
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	useEffect(() => { ApplyUserData( ) }, [ ]) ;
+	useEffect(() => { ApplyUserData( ) }, [ ] ) ;
 
 	if( !data ){
 		return (
@@ -202,8 +203,8 @@ const Profile =( )=> {
 
 		let postData = { userKey, deviceKey, sessionKey ,firstname, middlename, lastname, address1, address2, city, state, province, country, zipcode, privacy };
 
-		var edituserdataUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'user/editprofile';
-		const result = await JsonNetworkAdapter.post( edituserdataUrl, postData )
+		let headers = { ...conn.CONTENT_TYPE.CONTENT_JSON , ...conn.SERVICE_HEADERS.EDIT_PROFILE};
+		const result = await JsonNetworkAdapter.post( conn.URL.USER_URL, postData, { headers: headers } )
         	.then((response) =>{ return response.data })
 			.catch((error) => { return error;});
 

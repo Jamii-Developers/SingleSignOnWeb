@@ -3,7 +3,7 @@ import '../../sass/reviewus.sass';
 import ServerErrorMsg from '../../frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg';
 
-import { useState } from 'react';
+import { useEffect, useState } from "react";
 import React from 'react';
 
 import Form from 'react-bootstrap/Form';
@@ -13,10 +13,13 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Alert from '@mui/material/Alert';
 import Collapse from 'react-bootstrap/Collapse';
 import Spinner from 'react-bootstrap/Spinner';
+import conn from "../../configs/conn";
+import {useCookies} from "react-cookie";
 
 
 const Reviewus = ( ) => {
 
+      const [ cookies ] = useCookies( "userSession" );
       const mailformat = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
       const specialChars =/[`!@#$%^&*()_\-+=[\]{};':"|,.<>/?~ ]/;
 
@@ -34,8 +37,8 @@ const Reviewus = ( ) => {
       })
 
       const[ pageFields, setPageFields ] = useState({
-            email : "",
-            username : "",
+            email : cookies.userSession.EMAIL_ADDRESS,
+            username : cookies.userSession.USERNAME,
             thoughts : ""
       })
 
@@ -50,10 +53,9 @@ const Reviewus = ( ) => {
 
       const [ submitThoughtsButtonSpinner, setSubmitThoughtsButtonSpinner ] = useState( false );
 
+
       function clear( ){
-            document.getElementById("contactusform").reset( ) 
-            setPageFields( prevState => { return { ...prevState , email : "" } } );
-            setPageFields( prevState => { return { ...prevState , username : "" } } );
+            document.getElementById("ReviewUs").reset( )
             setPageFields( prevState => { return { ...prevState , thoughts : "" } } );
       }
 
@@ -63,70 +65,12 @@ const Reviewus = ( ) => {
             );
       }
 
-      function ShowEmailError(  ){
-            return( 
-                <Collapse in ={ errordata.emailErrorTrigger }>
-                    <Alert variant="filled" severity="warning" className='mb-3' >{ errordata.emailErrorMessage }</Alert>   
-                </Collapse>                    
-            );
-      }
-
-      function ShowUsernameError(  ){
-            return( 
-                <Collapse in ={ errordata.usernameErrorTrigger }>
-                    <Alert variant="filled" severity="warning" className='mb-3' >{ errordata.usernameErrorMessage }</Alert>   
-                </Collapse>                    
-            );
-      }
-
       function ShowThoughtsError( ){
             return( 
                   <Collapse in ={ errordata.thoughtsErrorTrigger }>
                       <Alert variant="filled" severity="warning" className='mb-3' >{ errordata.thoughtsErrorMessage }</Alert>   
                   </Collapse>                    
               );
-      }
-
-      function CheckEmail( email ){
-
-            if( email === "" ){
-                  setErrorData( prevState => { return { ...prevState , emailErrorMessage : "No email address has been provided" } } );
-                  setErrorData( prevState => { return { ...prevState , emailErrorTrigger : true } } );
-                  return;
-            }
-
-            if( !email.match( mailformat ) ){
-                  setErrorData( prevState => { return { ...prevState , emailErrorMessage : "This is not a valid Email address. Please input the format 'user@jamii.com' " } } );
-                  setErrorData( prevState => { return { ...prevState , emailErrorTrigger : true } } );
-                  return;
-            }
-
-            setErrorData( prevState => { return { ...prevState , emailErrorTrigger : false } } );
-
-      }
-
-      function CheckUsername( username ){
-
-            if( username === "" ){
-                  setErrorData( prevState => { return { ...prevState , usernameErrorMessage : "No username has been provided" } } );
-                  setErrorData( prevState => { return { ...prevState , usernameErrorTrigger : true } } );
-                  return;
-            }
-
-            if( username.match( specialChars ) ){
-                  setErrorData( prevState => { return { ...prevState , usernameErrorMessage : "Special Characters are not allowed in usernames" } } );
-                  setErrorData( prevState => { return { ...prevState , usernameErrorTrigger : true } } );
-                  return;
-            }
-
-            if( username.length < 5 ){
-                  setErrorData( prevState => { return { ...prevState , usernameErrorMessage : "Usernames require 5 or more characters" } } );
-                  setErrorData( prevState => { return { ...prevState , usernameErrorTrigger : true } } );
-                  return;
-            }
-
-            setErrorData( prevState => { return { ...prevState , usernameErrorTrigger : false } } );
-
       }
 
       function CheckThoughts( thoughts ){
@@ -148,49 +92,6 @@ const Reviewus = ( ) => {
 
       async function submitThoughts( ){
 
-            setPageFields( prevState => { return { ...prevState , email : pageFields.email.toLowerCase( ) } } ) ;
-            setPageFields( prevState => { return { ...prevState , username : pageFields.username.toLowerCase( ) } } ) ;
-
-            if( pageFields.email === "" ){
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at ContactUsJS" } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Email Input Error!" } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "The email address is empty " } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
-                  return;
-            }
-
-            if( !pageFields.email.match( mailformat ) ){
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at ContactUsJS" } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Email Input Error!" } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "This is not a valid Email address. Please input the format 'user@jamii.com' " } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
-                  return;
-            }
-
-            if( pageFields.username === "" ){
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at ContactUsJS" } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Username Input Error!" } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "The username is not entered. " } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
-                  return;
-            }
-
-            if( pageFields.username.match( specialChars ) ){
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at ContactUsJS" } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Username Input Error!" } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "Your username should not have any special characters" } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
-                  return;
-            }
-
-            if( pageFields.username.length < 5 ){
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at ContactUsJS" } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Username Input Error!" } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "Your username should not be less than 5 characters " } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
-                  return;
-            }
-
             if( pageFields.thoughts === ""  ){
                   setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at ContactUsJS" } } )
                   setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Thought Input Error!" } } )
@@ -207,11 +108,17 @@ const Reviewus = ( ) => {
                   return;
             }
 
-            var emailaddress = pageFields.email;
-            var username = pageFields.username;
-            var client_thoughts = pageFields.thoughts;
+            let userKey = cookies.userSession.USER_KEY;
+            let deviceKey = cookies.userSession.DEVICE_KEY;
+            let sessionKey = cookies.userSession.SESSION_KEY;
+            let emailaddress = cookies.userSession.EMAIL_ADDRESS;
+            let username = cookies.userSession.USERNAME;
+            let client_thoughts = pageFields.thoughts;
 
-            var contactUsJSON = {
+            let contactUsJSON = {
+                  userKey,
+                  deviceKey,
+                  sessionKey,
                   emailaddress,
                   username,
                   client_thoughts,
@@ -219,14 +126,12 @@ const Reviewus = ( ) => {
 
             setSubmitThoughtsButtonSpinner( true );
 
-            var contactusUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'user/reviewus';
-
-            const result = await JsonNetworkAdapter.post( contactusUrl, contactUsJSON )
+            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON , ...conn.SERVICE_HEADERS.REVIEW_US };
+            const result = await JsonNetworkAdapter.post( conn.URL.USER_URL, contactUsJSON, { headers : headers } )
                 .then((response) =>{ return response.data })
                 .catch((error) => { return error;});
             
             setSubmitThoughtsButtonSpinner( false );
-            console.log( result )
 
             if( result.status === 404 ){
                   setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.status } } )
@@ -254,30 +159,21 @@ const Reviewus = ( ) => {
             }
       }
 
-
       return (
             <div id = "ReviewUsContent">
 
-            <PageUnderDevelopmentNotice />
+            <Form id = "ReviewUs" >
 
-            <Form id = "contactusform" >
-
-                  <h1>Contact Us</h1>
+                  <h1>Review Us</h1>
                   <p>At Jamii developers as we aim to improve and grow our solutions we appreciate any feedback in form of complements or complaints provided to us.</p>
 
-                  <FloatingLabel label="Email address" className="mb-3">
-                        <Form.Control id = "email" type="email" placeholder="name@example.com" 
-                        onInput={(e) => setPageFields( prevState => { return { ...prevState , email : e.target.value } } ) }  
-                        onChange={(e) => CheckEmail( e.target.value ) }/>
+                  <FloatingLabel label = "Email Address" className="mb-2">
+                        <Form.Control  id = "email" type="text" value={ cookies.userSession.EMAIL_ADDRESS } disabled/>
                   </FloatingLabel>
-                  <ShowEmailError />
 
-                  <FloatingLabel  label="Username" className="mb-3">
-                        <Form.Control id = "username" type="text" placeholder="Username" 
-                        onInput={(e) => setPageFields( prevState => { return { ...prevState , username : e.target.value } } ) }  
-                        onChange={(e) => CheckUsername( e.target.value ) }/>
+                  <FloatingLabel label = "Username" className="mb-3">
+                        <Form.Control  id = "username" type="text" value={ cookies.userSession.USERNAME } disabled/>
                   </FloatingLabel>
-                  <ShowUsernameError />
 
                   <FloatingLabel label="Leave your thoughts here" className="mb-3" >
                         <Form.Control id = "thoughts" as="textarea" placeholder="Leave your thoughts here" style={ { height: '100px' } } 
@@ -287,7 +183,7 @@ const Reviewus = ( ) => {
                   <ShowThoughtsError />
 
                   <ButtonGroup size="md" className="mb-2">
-                        <Button variant="outline-primary" type="button" onClick={ ( )=>submitThoughts( ) } >
+                        <Button variant="outline-primary" type="button" onClick={ ( )=> submitThoughts( ) } >
                         { submitThoughtsButtonSpinner && <Spinner as="span"animation="grow"size="sm" role="status" aria-hidden="false"/>}Send
                         </Button>
                         <Button variant="outline-info" type="button" onClick={ ( )=>clear( ) }>Clear</Button>

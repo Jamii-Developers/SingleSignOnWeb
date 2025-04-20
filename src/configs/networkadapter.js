@@ -9,9 +9,7 @@ const JsonNetworkAdapter = axios.create({
             fetch(config.url, {
                 method: config.method.toUpperCase(),
                 mode: "cors",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: config.headers,
                 body: config.data
             })
                 .then( async (response) => {

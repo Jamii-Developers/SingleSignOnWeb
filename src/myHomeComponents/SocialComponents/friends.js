@@ -24,13 +24,7 @@ const Friends = ( ) => {
 	return (
 			<div id="FriendsContent">
 				<h1> Friends </h1>
-				<Card style={{ width: '10rem' }}>
-					<Card.Img variant="top" src={BlankProfilePic} alt="Card image" />
-					<Card.Body>
-						<Card.Title>Card Title</Card.Title>
-						<Button variant="primary">View Friend</Button>
-					</Card.Body>
-				</Card>
+
 			</div>
 	);
 };

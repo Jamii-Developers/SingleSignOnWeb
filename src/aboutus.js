@@ -8,7 +8,8 @@ const AboutUs = ( ) => {
       const services = [
             "Filing Cabinet - in development",
             "Social - assembling requirements",
-            "Organizer - assembling requirements"
+            "Organizer - assembling requirements",
+            "Document creation - Part of the features in place will include the ability to work on items and have them saved on the website.",
       ]
 
       function ListOfServices( props ){
@@ -24,7 +25,6 @@ const AboutUs = ( ) => {
 
       return (
           <div id = "AboutUsPage" sticky = ""right >
-            <PageUnderDevelopmentNotice />
 
                 <h1>About Us</h1>
 
@@ -36,7 +36,7 @@ const AboutUs = ( ) => {
 
                 <br/>
 
-                <h3>2. What is a this "Single Sign-On" ? </h3>
+                <h3>2. What is a this "JamiiX" ? </h3>
 
                 <p>The intial development of the project did not have a particular aim. So I the owner begun by ensuring we look for a method that allows all our users to access the various products with one single sign on. That way you my awesowe user only requires to login through one portal and for each app you add or install, you don't need to sign in more than once </p>
 

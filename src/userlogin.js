@@ -2,6 +2,7 @@ import './sass/userlogin.sass';
 import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg'
 import JsonNetworkAdapter from './configs/networkadapter';
+import conn from './configs/conn';
 
 import React from 'react';
 import { useState } from "react";
@@ -85,7 +86,7 @@ const UserLogin = ( props ) => {
 
               location = latitude+":"+longitude
               // You can do something with the latitude and longitude here
-              console.log(location);
+
             }, function(error) {
                 console.error("Error getting geolocation:", error);
             });
@@ -107,15 +108,13 @@ const UserLogin = ( props ) => {
             location,
             rememberLogin
         };
-    
-        var userLoginUrl = process.env.REACT_APP_SINGLE_SIGNON_URL+'public/userlogin';
-    
-        const result = await JsonNetworkAdapter.post( userLoginUrl, loginJson )
+
+        const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON , ...conn.SERVICE_HEADERS.USER_LOGIN };
+        const result = await JsonNetworkAdapter.post( conn.URL.PUBLIC_URL, loginJson, { headers : headers } )
             .then((response) =>{ return response.data })
             .catch((error) => { return error;});
 
         setLoginButtonSpinner( false ) ;
-        console.log( result )
 
         if( result.status === 404 ){
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.status } } )

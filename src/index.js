@@ -12,11 +12,6 @@ import AboutUs from './aboutus';
 import Reviewus from './myHomeComponents/ClientCommunications/reviewus';
 import ForgetPassword from './forgetpassword';
 import Dashboard from './myHomeComponents/dashboard';
-import SocialHeader from './myHomeComponents/SocialComponents/socialheader';
-import SocialDashboard from './myHomeComponents/SocialComponents/dashboard';
-import FileManagementDashboard from './myHomeComponents/FileManagementComponents/dashboard';
-import SettingsHeader from './myHomeComponents/SettingsComponents/settingsheader';
-import SettingsDashboard from './myHomeComponents/SettingsComponents/dashboard';
 import Friends from './myHomeComponents/SocialComponents/friends'
 import Followers from './myHomeComponents/SocialComponents/followers'
 import BlockedList from './myHomeComponents/SocialComponents/blockedlist'
@@ -24,7 +19,6 @@ import CurrentFiles from './myHomeComponents/FileManagementComponents/currentfil
 import RecycleBin from './myHomeComponents/FileManagementComponents/recyclebin'
 import Profile from './myHomeComponents/SettingsComponents/profile'
 import Permissions from './myHomeComponents/SettingsComponents/permissions'
-import FileManagementHeader from './myHomeComponents/FileManagementComponents/filamanagementheader';
 
 const FetchBlankProfilePic = () => {
     return (
@@ -52,23 +46,20 @@ export default function PageBrowser( ){
                     <Route index path = "/myhome/dashboard" element={ < Dashboard /> } />
 
                     {/* Social Page Routes */}
-                    <Route path="/myhome/social/" element={ < SocialHeader /> } >
-                        <Route index element={ < SocialDashboard /> } />
+                    <Route path="/myhome/social/"  >
                         <Route path="/myhome/social/friends" element={ < Friends /> } />
                         <Route path="/myhome/social/followers" element={ < Followers /> } />
                         <Route path="/myhome/social/blockedlist" element={ < BlockedList /> } />
                     </Route>
 
                     {/* File Management Routes */}
-                    <Route path="/myhome/filemanagement" element={ < FileManagementHeader /> } >
-                        <Route index element={ < FileManagementDashboard /> } />
+                    <Route path="/myhome/filemanagement" >
                         <Route path="/myhome/filemanagement/currentfiles" element={ < CurrentFiles /> } />
                         <Route path="/myhome/filemanagement/recyclebin" element={ < RecycleBin /> } />
                     </Route>
 
                     {/* Settings Routes */}
-                    <Route path="/myhome/settings/" element={ < SettingsHeader /> } >
-                        <Route index element={ < SettingsDashboard /> } />
+                    <Route path="/myhome/settings/" >
                         <Route path="/myhome/settings/profile" element={ < Profile /> } />
                         <Route path="/myhome/settings/permissions" element={ < Permissions /> } />
                     </Route>
@@ -81,9 +72,6 @@ export default function PageBrowser( ){
                 {/* Static Routes */}
                 
                 <Route path="/img/:blankprofile" element = { <FetchBlankProfilePic/> }  />
-                
-
-                
             </Routes>
         </BrowserRouter>
 
