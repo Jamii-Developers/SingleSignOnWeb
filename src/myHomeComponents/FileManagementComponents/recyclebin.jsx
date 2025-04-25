@@ -1,6 +1,6 @@
 import React from "react";
   
-const RecycleBin = () => {
+const Recyclebin = () => {
   return (
     <div>
       <h1>Recycle Bin</h1>
@@ -8,4 +8,4 @@ const RecycleBin = () => {
   );
 };
   
-export default RecycleBin;
+export default Recyclebin;

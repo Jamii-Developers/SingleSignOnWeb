@@ -2,7 +2,7 @@ import React from "react";
 
 import '../../sass/settings.sass';
 import JsonNetworkAdapter from "../../configs/networkadapter";
-import ServerErrorMsg from "../../frequentlyUsedModals/servererrormsg";
+import Servererrormsg from "../../frequentlyUsedModals/servererrormsg";
 import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg'
 import Lock from "../../configs/encryption";
 
@@ -403,7 +403,7 @@ const Profile =( )=> {
 
 			</Form>
 
-			< ServerErrorMsg
+			< Servererrormsg
 				open={serverErrorResponse.errServMsgShow}
 				onClose={ ( ) => setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : false } } ) }
 				errorcode = {serverErrorResponse.serverErrorCode}

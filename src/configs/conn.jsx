@@ -1,9 +1,23 @@
-const ROOT_CONN = 'http://127.0.0.1:8080/api/';
-const Conn = {
 
+
+let selectedServer = null;
+
+const Conn = {
+    SERVERS : [
+        'http://localhost:8080/api/',
+        'https://singlesignonservice.onrender.com/api/'
+    ],
+    setServer: (url) => {
+        selectedServer = url;
+    },
+    getServer: () => selectedServer,
     URL : {
-        PUBLIC_URL: ROOT_CONN + 'public',
-        USER_URL: ROOT_CONN + 'user',
+        get PUBLIC_URL() {
+            return selectedServer ? selectedServer + 'public' : null;
+        },
+        get USER_URL() {
+            return selectedServer ? selectedServer + 'user' : null;
+        }
     },
     CONTENT_TYPE : {
         CONTENT_JSON: {'Content-type': 'application/json'},
@@ -16,7 +30,7 @@ const Conn = {
         USER_LOGOFF:        {'Service-Header' : 'userlogoff'},
         REVIEW_US :         {'Service-Header' : 'reviewus' },
         CONTACT_SUPPORT :   {'Service-Header' : 'contactsupport' }
-    }
+    },
 };
 
 export default Conn;

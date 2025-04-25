@@ -5,7 +5,7 @@ import Card from 'react-bootstrap/Card';
 
 import BlankProfilePic from '../../img/blankprofile.png'
 
-const BlockedList = ( props ) => {
+const Blockedlist = (props ) => {
 
     return (
       <div >
@@ -15,4 +15,4 @@ const BlockedList = ( props ) => {
     );
 };
 
-export default BlockedList;
+export default Blockedlist;

@@ -1,5 +1,5 @@
 import './sass/userlogin.sass';
-import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
+import Servererrormsg from './frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg'
 import JsonNetworkAdapter from './configs/networkadapter';
 import conn from './configs/conn';
@@ -20,7 +20,7 @@ import Alert from '@mui/material/Alert';
 import Collapse from 'react-bootstrap/Collapse';
 
 
-const UserLogin = ( props ) => {
+const Userlogin = (props ) => {
 
     const navigate = useNavigate();
     const [ ,setCookie] = useCookies( "userSession" );
@@ -109,13 +109,18 @@ const UserLogin = ( props ) => {
             rememberLogin
         };
 
+        if (!conn.getServer()) {
+            throw new Error("Server not initialized. Run networkDetector() first.");
+        }
+
         const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON , ...conn.SERVICE_HEADERS.USER_LOGIN };
-        const result = await JsonNetworkAdapter.post( conn.URL.PUBLIC_URL, loginJson, { headers : headers } )
+
+        const result = await JsonNetworkAdapter.post( conn.URL.PUBLIC_URL, loginJson, { headers: headers } )
             .then((response) =>{ return response.data })
             .catch((error) => { return error;});
 
         setLoginButtonSpinner( false ) ;
-
+        console.log( result );
         if( result.status === 404 ){
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.status } } )
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.statusText  } } )
@@ -243,7 +248,7 @@ const UserLogin = ( props ) => {
                 
             </Form>
 
-            < ServerErrorMsg 
+            < Servererrormsg
                 open={serverErrorResponse.errServMsgShow}  
                 onClose={ ( ) => setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : false } } ) }
                 errorcode = {serverErrorResponse.serverErrorCode} 
@@ -264,4 +269,4 @@ const UserLogin = ( props ) => {
     )
 }
 
-export default UserLogin;
+export default Userlogin;

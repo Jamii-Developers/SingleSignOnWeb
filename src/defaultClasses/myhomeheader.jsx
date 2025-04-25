@@ -1,5 +1,5 @@
 import '../sass/myhomeindexheader.sass';
-import ServerErrorMsg from '../frequentlyUsedModals/servererrormsg';
+import Servererrormsg from '../frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from '../frequentlyUsedModals/serversuccessmsg'
 import JsonNetworkAdapter from '../configs/networkadapter';
 import {
@@ -150,7 +150,7 @@ const Header = ( ) => {
 				</Sidebar>
 			</div>
 
-			< ServerErrorMsg
+			< Servererrormsg
 				open={serverErrorResponse.errServMsgShow}
 				onClose={() => setServerErrorResponse(prevState => {
 					return {...prevState, errServMsgShow: false}

@@ -1,11 +1,11 @@
-import React from 'react';
 import JsonNetworkAdapter from "../../configs/networkadapter";
 import '../../sass/clientcommunication.sass';
-import ServerErrorMsg from '../../frequentlyUsedModals/servererrormsg';
+import Servererrormsg from '../../frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg';
 
+import React from 'react';
 import { useState } from "react";
-import { useCookies } from "react-cookie";
+
 
 import Form from 'react-bootstrap/Form';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
@@ -15,8 +15,10 @@ import Alert from '@mui/material/Alert';
 import Collapse from 'react-bootstrap/Collapse';
 import Spinner from 'react-bootstrap/Spinner';
 import conn from "../../configs/conn";
+import {useCookies} from "react-cookie";
 
-const ContactSupport = ( ) => {
+
+const Reviewus = ( ) => {
 
       const [ cookies ] = useCookies( "userSession" );
 
@@ -52,7 +54,7 @@ const ContactSupport = ( ) => {
 
 
       function clear( ){
-            document.getElementById("ContactSupportForm").reset( )
+            document.getElementById("ReviewUs").reset( )
             setPageFields( prevState => { return { ...prevState , thoughts : "" } } );
       }
 
@@ -123,7 +125,7 @@ const ContactSupport = ( ) => {
 
             setSubmitThoughtsButtonSpinner( true );
 
-            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON , ...conn.SERVICE_HEADERS.CONTACT_SUPPORT };
+            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON , ...conn.SERVICE_HEADERS.REVIEW_US };
             const result = await JsonNetworkAdapter.post( conn.URL.USER_URL, contactUsJSON, { headers : headers } )
                 .then((response) =>{ return response.data })
                 .catch((error) => { return error;});
@@ -147,7 +149,7 @@ const ContactSupport = ( ) => {
                   return;
             }
 
-            var succ_message_type = "SUC|025"
+            var succ_message_type = process.env.REACT_APP_RESPONSE_TYPE_CONTACTUS
             if( succ_message_type === result.MSG_TYPE ){
                   setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.UI_SUBJECT } } )
                   setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.UI_MESSAGE } } )
@@ -157,12 +159,12 @@ const ContactSupport = ( ) => {
       }
 
       return (
-            <div id = "ContactSupportContent">
+            <div id = "ReviewUsContent">
 
-                  <Form id = "ContactSupportForm" >
+                  <Form id = "ReviewUs" >
 
-                        <h1>Contact Support</h1>
-                        <p>If you are having issues with some functionalities at within JamiiX feel free to share your issue and we will get back to you within 24-48 hrs.</p>
+                        <h1>Review Us</h1>
+                        <p>At Jamii developers as we aim to improve and grow our solutions we appreciate any feedback in form of complements or complaints provided to us.</p>
 
                         <FloatingLabel label = "Email Address" className="mb-2">
                               <Form.Control  id = "email" type="text" value={ cookies.userSession.EMAIL_ADDRESS } disabled/>
@@ -172,8 +174,8 @@ const ContactSupport = ( ) => {
                               <Form.Control  id = "username" type="text" value={ cookies.userSession.USERNAME } disabled/>
                         </FloatingLabel>
 
-                        <FloatingLabel label="Share your issue here" className="mb-3" >
-                              <Form.Control id = "thoughts" as="textarea" placeholder="Share your issue here" style={ { height: '100px' } }
+                        <FloatingLabel label="Leave your thoughts here" className="mb-3" >
+                              <Form.Control id = "thoughts" as="textarea" placeholder="Leave your thoughts here" style={ { height: '100px' } }
                               onInput={(e) => setPageFields( prevState => { return { ...prevState , thoughts : e.target.value } } ) }
                               onChange={(e) => CheckThoughts( e.target.value ) }/>
                         </FloatingLabel>
@@ -187,7 +189,7 @@ const ContactSupport = ( ) => {
                         </ButtonGroup>
                   </Form>
 
-                  < ServerErrorMsg
+                  < Servererrormsg
                         open={serverErrorResponse.errServMsgShow}
                         onClose={ ( ) => setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : false } } ) }
                         errorcode = {serverErrorResponse.serverErrorCode}
@@ -206,4 +208,4 @@ const ContactSupport = ( ) => {
       )
 }
   
-export default ContactSupport
+export default Reviewus

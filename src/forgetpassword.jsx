@@ -7,7 +7,7 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Alert from '@mui/material/Alert';
 
 
-const ForgetPassword = ( props ) => {
+const Forgetpassword = (props ) => {
 
     function PageUnderDevelopmentNotice(  ){
         return( 
@@ -39,4 +39,4 @@ const ForgetPassword = ( props ) => {
     )
 }
 
-export default ForgetPassword
+export default Forgetpassword

@@ -3,7 +3,7 @@ import './sass/aboutus.sass'
 import Alert from '@mui/material/Alert';
 
 
-const AboutUs = ( ) => {
+const Aboutus = ( ) => {
       
       const services = [
             "Filing Cabinet - in development",
@@ -63,4 +63,4 @@ const AboutUs = ( ) => {
     
 }
   
-export default AboutUs
+export default Aboutus

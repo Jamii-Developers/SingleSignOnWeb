@@ -1,5 +1,5 @@
 import './sass/createnewuser.sass';
-import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
+import Servererrormsg from './frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg';
 import JsonNetworkAdapter from './configs/networkadapter';
 import conn from './configs/conn';
@@ -19,7 +19,7 @@ import Collapse from 'react-bootstrap/Collapse';
 import { uniqueSort } from 'jquery';
 
 
-const CreateNewUser = ( props ) => {
+const Createnewuser = (props ) => {
 
 
     const mailformat = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
@@ -337,7 +337,7 @@ const CreateNewUser = ( props ) => {
                     </ButtonGroup>
                 </Form>
 
-                < ServerErrorMsg 
+                < Servererrormsg
                     open={serverErrorResponse.errServMsgShow}  
                     onClose={ ( ) => setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : false } } ) }
                     errorcode = {serverErrorResponse.serverErrorCode} 
@@ -356,4 +356,4 @@ const CreateNewUser = ( props ) => {
     )
 }
 
-export default CreateNewUser
+export default Createnewuser

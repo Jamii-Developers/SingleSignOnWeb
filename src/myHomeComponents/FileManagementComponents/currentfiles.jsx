@@ -1,6 +1,6 @@
 import React from "react";
 
-const CurrentFiles = ( props ) => {
+const Currentfiles = (props ) => {
 
     return (
       <div >
@@ -9,4 +9,4 @@ const CurrentFiles = ( props ) => {
     );
 };
 
-export default CurrentFiles;
+export default Currentfiles;

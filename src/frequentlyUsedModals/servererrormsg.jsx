@@ -2,7 +2,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Grow from '@mui/material/Grow';
 
-function ServerErrorMsg( props ) {
+function Servererrormsg(props ) {
 
 	const { vertical, horizontal, transition } = ( { 
 		vertical : 'top', 
@@ -20,4 +20,4 @@ function ServerErrorMsg( props ) {
 	);
 }
 
-export default ServerErrorMsg;
+export default Servererrormsg;
