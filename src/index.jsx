@@ -45,11 +45,36 @@ const PageBrowser = ( ) => {
     }, []);
 
     if (serverError) {
-        return <div style={{ color: 'red', padding: '2rem' }}>{serverError}</div>;
+        return (
+            <div style={{
+                color: '#721c24',
+                backgroundColor: '#f8d7da',
+                border: '1px solid #f5c6cb',
+                borderRadius: '8px',
+                padding: '2rem',
+                margin: '2rem',
+                textAlign: 'center',
+                fontSize: '1.2rem',
+            }}>
+                🚨 {serverError}
+            </div>
+        );
     }
 
     if (!serverReady) {
-        return <div style={{ padding: '2rem' }}>Checking server connection...</div>;
+        return (
+            <div style={{
+                backgroundColor: '#e2e3e5',
+                borderRadius: '8px',
+                padding: '2rem',
+                margin: '2rem',
+                textAlign: 'center',
+                fontSize: '1.2rem',
+                color: '#383d41',
+            }}>
+                🔄 Connecting to the server... Please wait.
+            </div>
+        );
     }
 
     return (
