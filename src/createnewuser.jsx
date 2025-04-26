@@ -3,6 +3,7 @@ import Servererrormsg from './frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg';
 import JsonNetworkAdapter from './configs/networkadapter';
 import conn from './configs/conn';
+import constants from "./utils/constants";
 
 import React from 'react';
 import { useState } from 'react'
@@ -157,36 +158,35 @@ const Createnewuser = (props ) => {
 
         setCreateNewUserButtonSpinner( true )
 
+        console.log(createNewUserJson);
         const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON , ...conn.SERVICE_HEADERS.CREATE_NEW_USER };
         const result = await JsonNetworkAdapter.post( conn.URL.PUBLIC_URL, createNewUserJson, { headers : headers} )
-            .then((response) =>{ return response.data })
+            .then((response) =>{ return response })
             .catch((error) => { return error;});
 
         setCreateNewUserButtonSpinner( false );
 
-        if( result.status === 404 ){
+        console.log( result);
+
+        if( result.status !== 200 ){
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.status } } )
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.statusText  } } )
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.message } } )
             setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
             return;
         }
-        
-        var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
-		if( error_message_type === result.ERROR_MSG_TYPE ){
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.ERROR_FIELD_CODE } } )
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.ERROR_FIELD_SUBJECT  } } )
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.ERROR_FIELD_MESSAGE } } )
+
+		if( constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE ){
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.data.ERROR_FIELD_CODE } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.data.ERROR_FIELD_SUBJECT  } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.data.ERROR_FIELD_MESSAGE } } )
             setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
             return;
 		}
-        
-        console.log( result );
-        var succ_message_type = process.env.REACT_APP_RESPONSE_TYPE_CREATE_NEW_USER
-		if( succ_message_type === result.MSGTYPE ){ 
 
-				setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.UI_SUBJECT } } )
-				setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.UI_MESSAGE } } )
+		if( constants.SUCCESS_MESSAGE.TYPE_CREATE_NEW_USER === result.data.MSG_TYPE ){
+				setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.data.UI_SUBJECT } } )
+				setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.data.UI_MESSAGE } } )
 				setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
 				document.getElementById("createnewuserform").reset( );
 				clear( );
