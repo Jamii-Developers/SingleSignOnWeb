@@ -9,7 +9,8 @@ const Constants = {
         TYPE_CHANGE_PASSWORD :  "SUC|004",
         TYPE_EDIT_REACTIVATE :  "SUC|005",
         TYPE_EDIT_DEACTIVATE :  "SUC|006",
-        TYPE_CONTACTUS :        "SUC|007",
+        TYPE_REVIEWUS :         "SUC|007",
+        TYPE_CONTACTSUPPORT :   "SUC|025",
         TYPE_LOGOFF:            "SUC|024"
     },
 

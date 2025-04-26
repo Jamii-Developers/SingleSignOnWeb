@@ -2,6 +2,7 @@ import '../sass/myhomeindexheader.sass';
 import Servererrormsg from '../frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from '../frequentlyUsedModals/serversuccessmsg'
 import JsonNetworkAdapter from '../configs/networkadapter';
+import constants from "../utils/constants";
 import {
 	FaHome,
 	FaUsers,
@@ -68,11 +69,11 @@ const Header = ( ) => {
 
 		let headers = { ...conn.CONTENT_TYPE.CONTENT_JSON , ...conn.SERVICE_HEADERS.USER_LOGOFF};
         const result = await JsonNetworkAdapter.post( conn.URL.USER_URL, logoffJson, { headers:headers } )
-        	.then((response) =>{ return response.data })
+        	.then((response) =>{ return response })
 			.catch((error) => { return error;});
 
 
-		if( result.status === 404 ){
+		if( result.status !== 200 ){
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.status } } )
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.statusText  } } )
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.message } } )
@@ -80,19 +81,18 @@ const Header = ( ) => {
             return;
         }
 
-		var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
-        if( error_message_type === result.ERROR_MSG_TYPE ){
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.ERROR_FIELD_CODE } } )
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.ERROR_FIELD_SUBJECT  } } )
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.ERROR_FIELD_MESSAGE } } )
+
+        if(  constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE ){
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.data.ERROR_FIELD_CODE } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.data.ERROR_FIELD_SUBJECT  } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.data.ERROR_FIELD_MESSAGE } } )
             setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
 			await new Promise(r => setTimeout(r, 3000));
         }
 
-		var succ_message_type = process.env.REACT_APP_RESPONSE_TYPE_LOGOFF
-        if( succ_message_type === result.MSG_TYPE ){
-            setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.UI_SUBJECT } } )
-            setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.UI_MESSAGE } } )
+        if( constants.SUCCESS_MESSAGE.TYPE_LOGOFF === result.data.MSG_TYPE ){
+            setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.data.UI_SUBJECT } } )
+            setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.data.UI_MESSAGE } } )
             setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
 			await new Promise(r => setTimeout(r, 3000));
         }

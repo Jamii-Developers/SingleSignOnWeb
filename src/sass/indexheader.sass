@@ -1,18 +1,73 @@
 @import 'foundation'
 
-.button_active
-    @extend %header_button_defaults
-    color: #ffffff
-    background: rgb(0, 3, 167)
-    border-left-color: rgb(0, 3, 167)
-    
-.button_inactive
-    @extend %header_button_defaults
-    color: rgb(0, 3, 167)
-    background: #cfc9c9f6
-    border-left-color: rgb(0, 3, 167)
-    border-width: 1px
-
+/* Navbar Enhancements */
 #NavbarContent
+  background: rgba(0, 58, 167, 0.95)
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15)
+  padding: 0.5rem 1rem
+  transition: all 0.3s ease
 
 #MainContent
+  margin-top: 40px // Move the page content down so it doesn't hide behind the navbar
+
+/* Navbar Buttons */
+.button_active
+  @extend %header_button_defaults
+  color: #ffffff
+  background: rgb(0, 3, 167)
+  border-left-color: rgb(0, 3, 167)
+  border: none
+  transition: background-color 0.3s ease, transform 0.2s ease
+
+  &:hover
+    background: darken(rgb(0, 3, 167), 10%)
+    transform: scale(1.05)
+    cursor: pointer
+
+.button_inactive
+  @extend %header_button_defaults
+  color: rgb(0, 3, 167)
+  background: #f2f2f2
+  border: 1px solid rgb(0, 3, 167)
+  padding: 0.5rem 1rem
+  transition: background-color 0.3s ease, transform 0.2s ease
+
+  &:hover
+    background: rgb(0, 3, 167)
+    color: #ffffff
+    transform: scale(1.05)
+    cursor: pointer
+
+/* JamiiX Navbar Brand */
+.navbar-brand
+  font-family: 'Aptos', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+  font-weight: bold
+  font-size: 1.8rem
+  color: #ffffff !important
+  letter-spacing: 1px
+
+/* Navbar Links */
+.nav-link
+  @extend %header_button_defaults
+  font-size: 1rem
+  margin-left: 0.5rem
+  margin-right: 0.5rem
+  transition: color 0.3s ease, background-color 0.3s ease, transform 0.2s ease
+
+  &:hover
+    color: #ffffff
+    background-color: rgba(0, 3, 167, 0.7)
+    transform: scale(1.05)
+
+.jamiibuttonlink
+  @extend %jamii_button_defaults
+  background: #ffffff
+  color: #0078d4
+  border: 1px solid #0078d4
+  transition: background-color 0.3s ease, transform 0.2s ease
+
+  &:hover
+    color: white
+    cursor: pointer
+    transform: scale(1.05)
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1)

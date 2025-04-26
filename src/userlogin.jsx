@@ -149,7 +149,7 @@ const Userlogin = (props ) => {
             console.log( result )
             // Create Cookie and navigate to the home page
             let expirydate = new Date(result.data.EXPIRY_DATE);
-            setCookie( "userSession", result,  {path: "/", expires: expirydate } );
+            setCookie( "userSession", result.data,  {path: "/", expires: expirydate } );
             navigate("/myhome/dashboard")
         }
     } 
@@ -206,6 +206,10 @@ const Userlogin = (props ) => {
 		}
 	}
 
+    const gotoForgetPasswordPage = () => {
+        navigate('/forgetpassword');
+    };
+
     return (
         < >        
         <div id = "UserLoginPage" > 
@@ -241,7 +245,7 @@ const Userlogin = (props ) => {
                         {loginButtonSpinner && <Spinner as="span"animation="grow"size="sm" role="status" aria-hidden="false"/>}
                         Login                           
                     </Button>
-                    <Button variant="outline-secondary" type="button" ><Link class="jamiibuttonlink" to="/forgetpassword">Forget Password?</Link></Button>
+                    <Button variant="outline-secondary" type="button" onClick={gotoForgetPasswordPage} >Forget Password?</Button>
                     <Button variant="outline-info" type="button" onClick={ ( ) => clear( ) }> Clear </Button>
                 </ButtonGroup>
                 

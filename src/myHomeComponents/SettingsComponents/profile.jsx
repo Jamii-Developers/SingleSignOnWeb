@@ -5,6 +5,7 @@ import JsonNetworkAdapter from "../../configs/networkadapter";
 import Servererrormsg from "../../frequentlyUsedModals/servererrormsg";
 import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg'
 import Lock from "../../configs/encryption";
+import constants from "../../utils/constants";
 
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
@@ -104,33 +105,34 @@ const Profile =( )=> {
 			sessionKey
         };
 
+        console.log( cookieData)
 		let headers = { ...conn.CONTENT_TYPE.CONTENT_JSON , ...conn.SERVICE_HEADERS.FETCH_PROFILE};
 		const result = await JsonNetworkAdapter.post( conn.URL.USER_URL, cookieData, {  headers : headers } )
-        	.then((response) =>{ return response.data })
+        	.then((response) =>{ return response })
 			.catch((error) => { return error;});
 
-		if( result.status === 404 ){
+        console.log( result )
+
+		if( result.status !== 200 ){
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.status } } );
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.statusText  } } );
             setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.message } } );
             setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } );
             return;
         }
-		
-		var MSGTYPE = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE;
-		var ERRORCODE = process.env.REACT_APP_ERROR_CODE_0048;
-		if( result.MSGTYPE === MSGTYPE && result.ERROR_FIELD_CODE === ERRORCODE ){
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.ERROR_FIELD_CODE } } );
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.ERROR_FIELD_SUBJECT  } } );
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.ERROR_FIELD_MESSAGE } } );
+
+		if( result.data.ERROR_MSG_TYPE === constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE ){
+			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.data.ERROR_FIELD_CODE } } );
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.data.ERROR_FIELD_SUBJECT  } } );
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.data.ERROR_FIELD_MESSAGE } } );
             setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } );
 			setData( " " );
             return;
 		}
         
-		localStorage.setItem( 'cachedUserData',  Lock( "encrypt", JSON.stringify( result ),secretKey ) );
-	    setData( JSON.parse( JSON.stringify( result ) ) ) ;
-		SetFormData( result )
+		localStorage.setItem( 'cachedUserData',  Lock( "encrypt", JSON.stringify( result.data ),secretKey ) );
+	    setData( JSON.parse( JSON.stringify( result.data ) ) ) ;
+		SetFormData( result.data )
     }
 
 	
@@ -206,10 +208,10 @@ const Profile =( )=> {
 
 		let headers = { ...conn.CONTENT_TYPE.CONTENT_JSON , ...conn.SERVICE_HEADERS.EDIT_PROFILE};
 		const result = await JsonNetworkAdapter.post( conn.URL.USER_URL, postData, { headers: headers } )
-        	.then((response) =>{ return response.data })
+        	.then((response) =>{ return response })
 			.catch((error) => { return error;});
 
-		if( result.status === 404 ){
+		if( result.status !== 200 ){
 			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.status } } )
 			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.statusText  } } )
 			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.message } } )
@@ -217,11 +219,10 @@ const Profile =( )=> {
 			return;
 		}
 
-		var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
-        if( error_message_type === result.ERROR_MSG_TYPE ){
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.ERROR_FIELD_CODE } } )
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.ERROR_FIELD_SUBJECT  } } )
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.ERROR_FIELD_MESSAGE } } )
+        if( constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.MSG_TYPE ){
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.data.ERROR_FIELD_CODE } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.data.ERROR_FIELD_SUBJECT  } } )
+            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.data.ERROR_FIELD_MESSAGE } } )
             setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
 			setLoginButtonSpinner( false );
             return;
@@ -231,10 +232,9 @@ const Profile =( )=> {
 		let storeData = {firstname, middlename, lastname, address1, address2, city, state, province, country, zipcode, privacy}
 		localStorage.setItem( 'cachedUserData',  Lock( "encrypt", JSON.stringify( storeData ), secretKey ) );
 
-		let succMessageShow = process.env.REACT_APP_RESPONSE_TYPE_EDIT_USER_DATA
-		if( result.MSG_TYPE === succMessageShow ){
-			setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.UI_SUBJECT } } )
-            setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.UI_MESSAGE } } )
+		if( result.data.MSG_TYPE === constants.SUCCESS_MESSAGE.TYPE_EDIT_USER_DATA ){
+			setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.data.UI_SUBJECT } } )
+            setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.data.UI_MESSAGE } } )
             setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
 			Clear( );
 		}

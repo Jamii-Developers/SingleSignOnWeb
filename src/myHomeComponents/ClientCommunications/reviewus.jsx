@@ -16,6 +16,7 @@ import Collapse from 'react-bootstrap/Collapse';
 import Spinner from 'react-bootstrap/Spinner';
 import conn from "../../configs/conn";
 import {useCookies} from "react-cookie";
+import constants from "../../utils/constants";
 
 
 const Reviewus = ( ) => {
@@ -127,12 +128,12 @@ const Reviewus = ( ) => {
 
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON , ...conn.SERVICE_HEADERS.REVIEW_US };
             const result = await JsonNetworkAdapter.post( conn.URL.USER_URL, contactUsJSON, { headers : headers } )
-                .then((response) =>{ return response.data })
+                .then((response) =>{ return response })
                 .catch((error) => { return error;});
             
             setSubmitThoughtsButtonSpinner( false );
 
-            if( result.status === 404 ){
+            if( result.status !== 200 ){
                   setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.status } } )
                   setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.statusText  } } )
                   setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.message } } )
@@ -140,19 +141,17 @@ const Reviewus = ( ) => {
                   return;
             }
 
-            var error_message_type = process.env.REACT_APP_RESPONSE_TYPE_ERROR_MESSAGE
-            if( error_message_type === result.ERROR_MSG_TYPE ){
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.ERROR_FIELD_CODE } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.ERROR_FIELD_SUBJECT  } } )
-                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.ERROR_FIELD_MESSAGE } } )
+            if( constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE ){
+                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.data.ERROR_FIELD_CODE } } )
+                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.data.ERROR_FIELD_SUBJECT  } } )
+                  setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.data.ERROR_FIELD_MESSAGE } } )
                   setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
                   return;
             }
 
-            var succ_message_type = process.env.REACT_APP_RESPONSE_TYPE_CONTACTUS
-            if( succ_message_type === result.MSG_TYPE ){
-                  setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.UI_SUBJECT } } )
-                  setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.UI_MESSAGE } } )
+            if( constants.SUCCESS_MESSAGE.TYPE_REVIEWUS === result.data.MSG_TYPE ){
+                  setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.data.UI_SUBJECT } } )
+                  setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.data.UI_MESSAGE } } )
                   setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
                   clear( );
             }
