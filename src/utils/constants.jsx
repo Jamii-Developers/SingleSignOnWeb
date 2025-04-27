@@ -1,5 +1,3 @@
-import Conn from "../configs/conn";
-
 const Constants = {
 
     SUCCESS_MESSAGE : {
