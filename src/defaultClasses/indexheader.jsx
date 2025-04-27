@@ -1,49 +1,55 @@
 import '../sass/indexheader.sass';
+import React, { useEffect, useState } from 'react';
+import { Navbar, Container, Nav } from 'react-bootstrap';
+import { Outlet, Link } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
+import { useNavigate } from 'react-router-dom';
 
-import React from 'react';
+const Header = () => {
+    const [cookies] = useCookies('userSession');
+    const navigate = useNavigate();
 
-import Navbar  from 'react-bootstrap/esm/Navbar';
-import Container  from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import { useEffect } from "react";
-import { NavbarBrand }from 'react-bootstrap'
-import { Outlet, Link } from "react-router-dom";
-import { useCookies } from "react-cookie";
-import { useNavigate } from "react-router-dom";
+    // For mobile navbar toggle state
+    const [expanded, setExpanded] = useState(false);
 
-const Header = ( props ) => {
+    useEffect(() => {
+        CheckIfCookieExists();
+    }, [cookies]); // Make sure cookies are updated before running the check
 
-	const [ cookies, ] = useCookies( "userSession" );
-    const navigate = useNavigate( );
-
-    useEffect( ( ) => { CheckIfCoockieExists( ) } );
-
-
-    function CheckIfCoockieExists() {
-        if( cookies.userSession  ){
-            navigate("/myhome/dashboard");
-        } 
+    function CheckIfCookieExists() {
+        if (cookies.userSession) {
+            navigate('/myhome/dashboard');
+        }
     }
 
-
-
-    return(
-        <div id="IndexHeaderPage" on={CheckIfCoockieExists}>
+    return (
+        <div id="IndexHeaderPage">
             <div id="NavbarContent">
-                <Navbar bg="primary" data-bs-theme="dark" sticky="top" expand="lg" className="custom-navbar">
+                <Navbar
+                    sticky="top"
+                    className="custom-navbar"
+                    expanded={expanded} // Bind the expanded state
+                    onToggle={() => setExpanded(!expanded)} // Toggle the navbar on mobile
+                >
                     <Container>
-                        <NavbarBrand className="brand-text">JamiiX</NavbarBrand>
-                        <Navbar.Toggle aria-controls="basic-navbar-nav"/>
+                        <Navbar.Brand className="brand-text">JamiiX</Navbar.Brand>
+                        <Navbar.Toggle aria-controls="basic-navbar-nav" />
                         <Navbar.Collapse id="basic-navbar-nav">
                             <Nav className="ms-auto">
                                 <Nav.Link id="loginbutton" className="button_inactive">
-                                    <Link to="/" className="jamiibuttonlink">Login</Link>
+                                    <Link to="/" className="jamiibuttonlink">
+                                        Login
+                                    </Link>
                                 </Nav.Link>
                                 <Nav.Link id="createnewuserbutton" className="button_inactive">
-                                    <Link to="/signup" className="jamiibuttonlink">Sign Up</Link>
+                                    <Link to="/signup" className="jamiibuttonlink">
+                                        Sign Up
+                                    </Link>
                                 </Nav.Link>
                                 <Nav.Link id="aboutusbutton" className="button_inactive">
-                                    <Link to="/aboutus" className="jamiibuttonlink">About Us</Link>
+                                    <Link to="/aboutus" className="jamiibuttonlink">
+                                        About Us
+                                    </Link>
                                 </Nav.Link>
                             </Nav>
                         </Navbar.Collapse>
@@ -51,16 +57,15 @@ const Header = ( props ) => {
                 </Navbar>
             </div>
 
-            <div id="MainContent" class="container">
-                <div class="row">
-                    <div class="col-xs-4">
-                        <Outlet/>
+            <div id="MainContent" className="container">
+                <div className="row">
+                    <div className="col-xs-12">
+                        <Outlet />
                     </div>
                 </div>
             </div>
         </div>
-    )
-}
-
+    );
+};
 
 export default Header;

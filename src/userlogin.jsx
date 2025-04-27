@@ -7,7 +7,7 @@ import constants from "./utils/constants";
 
 import React from 'react';
 import { useState } from "react";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 
@@ -21,7 +21,7 @@ import Alert from '@mui/material/Alert';
 import Collapse from 'react-bootstrap/Collapse';
 
 
-const Userlogin = (props ) => {
+const Userlogin = ( props ) => {
 
     const navigate = useNavigate();
     const [ ,setCookie] = useCookies( "userSession" );
@@ -216,24 +216,24 @@ const Userlogin = (props ) => {
             
             <Form id = "UserLoginForm">
 
-                <h1 className='h1_defaults'>Single Sign-On Login</h1>
+                <h1 className='h1_defaults'>Login</h1>
 
-                <FloatingLabel label="Email address or Username" className="mb-3">
-                    <Form.Control type="text" placeholder="user@jamii.com or jamiidev30" 
+                <Form.Group className="mb-3">
+                    <Form.Control type="text" placeholder="Email address or Username"
                         onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , loginCredential : e.target.value } } ) }
                         onChange = { (e) => CheckLoginCredential( e.target.value ) } 
                     />
-                </FloatingLabel>
+                </Form.Group>
 
                 <ShowLoginCredentialError />
 
-                <FloatingLabel label="Password" className="mb-3">
+                <Form.Group className="mb-3">
                     <Form.Control type="password" placeholder="Login Password"  
                         onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , loginPassword : e.target.value } } ) }
                         onChange = { (e) => CheckLoginPassword( e.target.value ) }
                         onEnter={ ( ) => sendUserLogin( ) }
                     />
-                </FloatingLabel>
+                </Form.Group>
                 <ShowLoginPasswordError />
 
                 <Form.Check type="switch" id="custom-switch" label="Remember me on this device" className="mb-3" 

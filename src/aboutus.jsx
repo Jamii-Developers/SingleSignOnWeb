@@ -1,5 +1,6 @@
 import React from 'react';
 import { Alert } from '@mui/material'; // Import Alert component from MUI
+import './sass/aboutus.sass'
 
 const Aboutus = () => {
     const services = [

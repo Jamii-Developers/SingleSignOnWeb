@@ -1,5 +1,87 @@
-@import 'foundation'
+@import foundation
 
-#MainContent
-    #ProfileContent
-        padding: 10px
+/* Windows 11 Style - Form Container */
+#ProfileContent
+  background-color: $background-color
+  padding: 20px
+  border-radius: 12px
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1)  // Subtle shadow for depth
+  max-width: 900px
+  margin: 0 auto
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+
+/* Title */
+#ProfileContent h1
+  font-size: 2rem
+  font-weight: bold
+  color: $primary-color
+  margin-bottom: 20px
+
+/* Form Inputs */
+.form-control
+  border-radius: $form-input-border-radius
+  border: 1px solid $border-color
+  background-color: #fff
+  box-shadow: none
+  height: $form-input-height
+  padding: 10px
+  font-size: 1rem
+
+  &:focus
+    border-color: $primary-color
+    box-shadow: 0 0 5px rgba($primary-color, 0.5)  // Accent on focus
+
+/* Buttons */
+.btn-outline-primary, .btn-outline-info
+  border-radius: $button-radius
+  padding: 10px 20px
+  font-size: 1rem
+  text-transform: uppercase
+  letter-spacing: 0.5px
+  transition: all 0.3s ease
+
+  &:hover
+    transform: translateY(-2px)  // Slight lift on hover for interactivity
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)
+
+.btn-outline-primary
+  border-color: $primary-color
+  color: $primary-color
+
+  &:hover
+    background-color: $primary-color
+    color: #fff
+
+.btn-outline-info
+  border-color: #17a2b8
+  color: #17a2b8
+
+  &:hover
+    background-color: #17a2b8
+    color: #fff
+
+/* Switch for Privacy Setting */
+.form-check-input
+  border-radius: 50%
+
+.form-check-label
+  font-size: 1rem
+  font-weight: normal
+  color: #333
+
+/* Modal Styling for Error and Success */
+.modal-content
+  border-radius: 10px
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2)
+
+.modal-header
+  background-color: $primary-color
+  color: white
+
+.modal-body
+  font-size: 1.1rem
+  color: #333
+
+/* Spinner Styles */
+.spinner-border
+  color: $primary-color

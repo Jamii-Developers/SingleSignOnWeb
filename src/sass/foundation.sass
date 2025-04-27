@@ -1,123 +1,32 @@
-@import "bootstrap"
-/* Global Variables */
-$primary-color: #0078d4  // Windows 11 accent color
-$background-color: #f3f3f3  // Light background
-$button-radius: 12px  // Rounded button corners
+/* Global Styles */
+$primary-color: #481350
+// Accent color
+$background-color: #e4e4e4
+// Light background
+$button-radius: 10px  // Rounded button corners
+$form-input-border-radius: 8px  // Input border radius
+$form-input-height: 38px  // Adjust input field height for consistency
+$border-color: #ddd  // Light gray for borders
 
-/* Basic Shared Styles */
-%header_button_defaults
-  display: inline-block
-  font-family: 'Segoe UI', sans-serif
-  font-size: 14px
-  text-align: center
-  text-decoration: none
-  padding: 0.8rem 1.5rem
-  border-radius: $button-radius
+/* Custom Styles for Brand Logo */
+@keyframes fadeInLogo
+  0%
+    opacity: 0
+    transform: translateX(-50px) scale(0.8)
+  100%
+    opacity: 1
+    transform: translateX(0) scale(1)
+
+.brand-text
+  font-family: 'Roboto', 'Arial', sans-serif  // You can replace this with a custom font
+  font-weight: bold
+  font-size: 2.5rem  // Adjust this to the desired size for your logo
+  color: $primary-color  // Match the primary color for consistency
+  letter-spacing: 2px  // Add spacing between the letters for a more branded feel
+  animation: fadeInLogo 1s ease-out 0.5s forwards  // Animation that fades and scales the logo in
   transition: all 0.3s ease
-  border: none
-
-%button_defaults
-  font-family: 'Segoe UI', sans-serif
-  text-align: center
-  padding: 0.8rem 1.5rem
-  border-radius: $button-radius
-  transition: all 0.3s ease
-  border: none
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)
-
-%form_defaults
-  font-family: 'Segoe UI', sans-serif
-  padding: 1.5rem
-  border-radius: 10px
-  background-color: #ffffff
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1)
-
-%h1_defaults
-  font-family: 'Segoe UI', sans-serif
-  font-size: 2.5rem
-  margin-bottom: 1.5rem
-  font-weight: 600
-
-%h2_defaults
-  font-family: 'Segoe UI', sans-serif
-  font-size: 2rem
-  margin-bottom: 1rem
-  font-weight: 500
-
-%paragraph_defaults
-  font-family: 'Segoe UI', sans-serif
-  text-align: justify
-  margin-bottom: 1.5rem
-
-%ul_defaults
-  font-family: 'Segoe UI', sans-serif
-  list-style-type: none
-  padding: 0
-
-/* Button Styles for Windows 11 Look */
-.button_active
-  @extend %header_button_defaults
-  color: #ffffff
-  background: $primary-color
-  border-left-color: $primary-color
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1)
 
   &:hover
-    background: darken($primary-color, 10%)
-    cursor: pointer
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15)
-
-.button_inactive
-  @extend %header_button_defaults
-  color: #0078d4
-  border-left-color: $primary-color
-  box-shadow: none
-
-  &:hover
-    color: #005a9e
-    cursor: pointer
-
-/* Windows 11-like Link Button */
-%jamii_button_defaults
-  text-decoration: none
-  color: inherit
-  padding: 0.8rem 1.5rem
-  display: inline-block
-  font-size: 1rem
-  border-radius: $button-radius
-  transition: background-color 0.3s ease, color 0.3s ease
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1)
-
-.jamiibuttonlink
-  @extend %jamii_button_defaults
-  background: #ffffff
-  border: 1px solid #0078d4
-
-  &:hover
-    background: #0078d4
-    color: #ffffff
-    cursor: pointer
-
-/* Soft neumorphic shadow effects */
-.neumorphic-card
-  background: #ffffff
-  border-radius: 12px
-  padding: 5px
-  box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.1), -10px -10px 20px rgba(255, 255, 255, 0.1)
-
-.container
-  max-width: 1200px
-  margin: 0 auto
-  padding: 0 20px
-
-/* Mobile Styles */
-@media (max-width: 768px)
-  .container
-    padding: 0 10px
-  h1, h2
-    font-size: 1.5rem
-
-/* Scrollable Elements */
-.scrollable
-  overflow-y: auto
-  max-height: 400px
+    color: lighten($primary-color, 20%)  // Slightly lighten the color on hover for interactivity
+    transform: scale(1.1)  // Slightly scale up the logo on hover for added interactivity
+    text-decoration: none  // Remove any text decoration that may be present

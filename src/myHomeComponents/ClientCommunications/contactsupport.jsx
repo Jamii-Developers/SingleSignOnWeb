@@ -8,7 +8,6 @@ import { useState } from "react";
 import { useCookies } from "react-cookie";
 
 import Form from 'react-bootstrap/Form';
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Alert from '@mui/material/Alert';
@@ -165,19 +164,19 @@ const Contactsupport = ( ) => {
                         <h1>Contact Support</h1>
                         <p>If you are having issues with some functionalities at within JamiiX feel free to share your issue and we will get back to you within 24-48 hrs.</p>
 
-                        <FloatingLabel label = "Email Address" className="mb-2">
+                        <Form.Group label = "Email Address" className="mb-2">
                               <Form.Control  id = "email" type="text" value={ cookies.userSession.EMAIL_ADDRESS } disabled/>
-                        </FloatingLabel>
+                        </Form.Group>
 
-                        <FloatingLabel label = "Username" className="mb-3">
+                        <Form.Group label = "Username" className="mb-3">
                               <Form.Control  id = "username" type="text" value={ cookies.userSession.USERNAME } disabled/>
-                        </FloatingLabel>
+                        </Form.Group>
 
-                        <FloatingLabel label="Share your issue here" className="mb-3" >
+                        <Form.Group label="Share your issue here" className="mb-3" >
                               <Form.Control id = "thoughts" as="textarea" placeholder="Share your issue here" style={ { height: '100px' } }
                               onInput={(e) => setPageFields( prevState => { return { ...prevState , thoughts : e.target.value } } ) }
                               onChange={(e) => CheckThoughts( e.target.value ) }/>
-                        </FloatingLabel>
+                        </Form.Group>
                         <ShowThoughtsError />
 
                         <ButtonGroup size="md" className="mb-2">

@@ -17,13 +17,17 @@ const Friends = ( ) => {
 
 	const [ cookies ] = useCookies( "userSession" );
 	const [ data, setData ] = useState(null);
-	const [ loginButtonSpinner, setLoginButtonSpinner ] = useState( false );
+	const [ searchButtonSpinner, setSearchButtonSpinner ] = useState( false );
+
 	const secretKey = cookies.userSession.USER_KEY;
 	const sessionKey = cookies.userSession.SESSION_KEY;
+    const deviceKey = cookies.userSession.DEVICE_KEY;
 
 	return (
 			<div id="FriendsContent">
-				<h1> Friends </h1>
+				<h1 > Friends </h1>
+
+
 
 			</div>
 	);

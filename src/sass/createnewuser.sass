@@ -1,4 +1,62 @@
-@import 'foundation'
+@import foundation
 
 #CreateNewUserPage
-    padding:15px
+  padding: 3rem
+  max-width: 8.5in
+  margin: 2rem auto
+  background: #ffffff
+  font-family: 'Segoe UI', 'Calibri', 'Verdana', 'sans-serif'
+  color: #333
+  line-height: 1.6
+  font-size: 1.1rem
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1)
+  border: 1px solid #ddd
+  border-radius: 8px
+
+  h1
+    text-align: center
+    font-size: 2rem
+
+  // Form element styles (using Bootstrap form-control classes)
+  .form-label
+    font-weight: 600
+    margin-bottom: 1rem
+
+  .form-control
+    border-radius: 6px
+    border: 1px solid #ccc
+    padding: 0.75rem
+    font-size: 1rem
+    margin-bottom: 1.5rem
+    background-color: #f9f9f9
+
+  .form-check
+    margin-bottom: 1.5rem
+    label
+      font-size: 1rem
+
+  // Button group styles (using Bootstrap utility classes)
+  .btn-group
+    display: flex
+    flex-direction: column
+    gap: 10px
+
+  .btn
+    width: 100%
+    padding: 0.8rem
+
+  // Responsive adjustments
+  @media (max-width: 768px)
+    padding: 10px
+    h1
+      font-size: 1.8rem
+
+  @media (max-width: 480px)
+    padding: 5px
+    h1
+      font-size: 1.5rem
+    .mb-3
+      margin-bottom: 0.75rem
+    .btn
+      padding: 0.6rem
+

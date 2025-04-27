@@ -8,6 +8,7 @@ import constants from "./utils/constants";
 import React from 'react';
 import { useState } from 'react'
 import { useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 
 import Form from 'react-bootstrap/Form'
@@ -299,36 +300,38 @@ const Createnewuser = (props ) => {
     }
 
     return (
-          <div id = "CreateNewUserPage">
+        < >
+        <div id = "CreateNewUserPage">
 
                 <Form id = "createnewuserform">
-                    <h1>Single Sign-On Sign Up</h1>
 
-                    <FloatingLabel label="Email address" className="mb-3">
-                        <Form.Control id="email" type="email" placeholder="name@example.com" onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , email : e.target.value } } ) } onChange={ ( e ) => CheckEmail( e.target.value ) } />
-                    </FloatingLabel>
+                    <h1>Sign Up</h1>
+
+                    <Form.Group className="mb-3">
+                        <Form.Control id="email" type="email" placeholder="Email Address" onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , email : e.target.value } } ) } onChange={ ( e ) => CheckEmail( e.target.value ) } />
+                    </Form.Group>
 
                     < ShowEmailMessageError />
 
-                    <FloatingLabel label="Username" className="mb-3">
-                        <Form.Control id="username"  type="text" placeholder="jamiiadmin" onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , username : e.target.value } } ) }  onChange={ ( e ) => CheckUsername( e.target.value ) }  />
-                    </FloatingLabel>
+                    <Form.Group label="Username" className="mb-3">
+                        <Form.Control id="username"  type="text" placeholder="Username" onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , username : e.target.value } } ) }  onChange={ ( e ) => CheckUsername( e.target.value ) }  />
+                    </Form.Group>
 
                     <ShowUsernameError />
 
-                    <FloatingLabel  label="Password" className="mb-3">
-                        <Form.Control id = "password" type="password" placeholder="password" onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , password : e.target.value } } ) }  onChange={ ( e ) => checkPassword( e.target.value ) }/>
-                    </FloatingLabel>
+                    <Form.Group  label="Password" className="mb-3">
+                        <Form.Control id = "password" type="password" placeholder="Password" onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , password : e.target.value } } ) }  onChange={ ( e ) => checkPassword( e.target.value ) }/>
+                    </Form.Group>
 
                     <ShowPasswordError/>
 
-                    <FloatingLabel label="Re-type your password" className="mb-3">
-                        <Form.Control id="retypedpassword" type="password" placeholder="password" onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , retypedpassword : e.target.value } } ) } onChange = { ( e ) => checkRetypedPassword( e.target.value  ) }/>
-                    </FloatingLabel>
+                    <Form.Group label="Re-type your password" className="mb-3">
+                        <Form.Control id="retypedpassword" type="password" placeholder="Re-type your password" onInput={ ( e ) => setPageFields( prevState => { return { ...prevState , retypedpassword : e.target.value } } ) } onChange = { ( e ) => checkRetypedPassword( e.target.value  ) }/>
+                    </Form.Group>
 
                     <ShowRetypedMessageError />
 
-                    <ButtonGroup size="md" className="mb-2">
+                    <ButtonGroup size="md" className="mb-3">
                         <Button variant="outline-primary" type="button" onClick={ ( ) => signUp( ) }>
                             {createNewUserButtonSpinner && <Spinner as="span"animation="grow"size="sm" role="status" aria-hidden="false"/>}
                             Sign Up
@@ -353,6 +356,8 @@ const Createnewuser = (props ) => {
                 />
            
           </div>
+            <Outlet/>
+            </>
     )
 }
 
