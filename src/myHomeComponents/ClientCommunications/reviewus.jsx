@@ -165,19 +165,19 @@ const Reviewus = ( ) => {
                         <h1>Review Us</h1>
                         <p>At Jamii developers as we aim to improve and grow our solutions we appreciate any feedback in form of complements or complaints provided to us.</p>
 
-                        <FloatingLabel label = "Email Address" className="mb-2">
+                        <Form.Group label = "Email Address" className="mb-2">
                               <Form.Control  id = "email" type="text" value={ cookies.userSession.EMAIL_ADDRESS } disabled/>
-                        </FloatingLabel>
+                        </Form.Group>
 
-                        <FloatingLabel label = "Username" className="mb-3">
+                        <Form.Group label = "Username" className="mb-3">
                               <Form.Control  id = "username" type="text" value={ cookies.userSession.USERNAME } disabled/>
-                        </FloatingLabel>
+                        </Form.Group>
 
-                        <FloatingLabel label="Leave your thoughts here" className="mb-3" >
+                        <Form.Group label="Leave your thoughts here" className="mb-3" >
                               <Form.Control id = "thoughts" as="textarea" placeholder="Leave your thoughts here" style={ { height: '100px' } }
                               onInput={(e) => setPageFields( prevState => { return { ...prevState , thoughts : e.target.value } } ) }
                               onChange={(e) => CheckThoughts( e.target.value ) }/>
-                        </FloatingLabel>
+                        </Form.Group>
                         <ShowThoughtsError />
 
                         <ButtonGroup size="md" className="mb-2">
