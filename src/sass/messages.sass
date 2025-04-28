@@ -1,0 +1,107 @@
+@import './foundation'
+
+// Message Container
+.message-container
+    position: fixed
+    top: 20px
+    left: 50%
+    transform: translateX(-50%)
+    z-index: 9999
+    width: 90%
+    max-width: 500px
+    animation: slideDown 0.3s ease-out forwards
+
+// Success Message
+.success-message
+    background-color: $primary-color
+    color: white
+    padding: 1.5rem
+    border-radius: 12px
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1)
+    display: flex
+    align-items: center
+    gap: 1rem
+    transition: all 0.3s ease-in-out
+
+    &:hover
+        transform: translateY(-2px)
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15)
+
+    .icon
+        font-size: 1.5rem
+        color: white
+
+    .content
+        flex: 1
+
+        .subject
+            font-size: 1.2rem
+            font-weight: bold
+            margin-bottom: 0.5rem
+
+        .message
+            font-size: 1rem
+            opacity: 0.9
+
+// Error Message
+.error-message
+    background-color: #dc3545
+    color: white
+    padding: 1.5rem
+    border-radius: 12px
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1)
+    display: flex
+    align-items: center
+    gap: 1rem
+    transition: all 0.3s ease-in-out
+
+    &:hover
+        transform: translateY(-2px)
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15)
+
+    .icon
+        font-size: 1.5rem
+        color: white
+
+    .content
+        flex: 1
+
+        .subject
+            font-size: 1.2rem
+            font-weight: bold
+            margin-bottom: 0.5rem
+
+        .message
+            font-size: 1rem
+            opacity: 0.9
+
+// Animations
+@keyframes slideDown
+    from
+        transform: translate(-50%, -100%)
+        opacity: 0
+    to
+        transform: translate(-50%, 0)
+        opacity: 1
+
+@keyframes fadeOut
+    from
+        opacity: 1
+    to
+        opacity: 0
+
+// Responsive Styles
+@media (max-width: 768px)
+    .message-container
+        width: 95%
+        top: 10px
+
+    .success-message,
+    .error-message
+        padding: 1rem
+
+        .subject
+            font-size: 1.1rem
+
+        .message
+            font-size: 0.9rem 

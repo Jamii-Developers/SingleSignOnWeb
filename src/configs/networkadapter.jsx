@@ -1,20 +1,27 @@
 import axios from 'axios';
 
+const TIMEOUT_DURATION = 15000; // 10 seconds timeout
+
 // Create a new instance of Axios with a custom adapter
 const JsonNetworkAdapter = axios.create({
     adapter: (config) => {
         // Customize the config here if needed
         return new Promise((resolve, reject) => {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_DURATION);
+
             // Use your custom logic to send the request (e.g., fetch API)
             fetch(config.url, {
                 method: config.method.toUpperCase(),
                 mode: "cors",
                 headers: config.headers,
-                body: config.data
+                body: config.data,
+                signal: controller.signal
             })
-                .then( async (response) => {
+                .then(async (response) => {
+                    clearTimeout(timeoutId);
                     // Customize the response here if needed
-                    const responseData = await response.json().catch( ( ) => ( { } ) ); // Ensure JSON parsing doesn't fail
+                    const responseData = await response.json().catch(() => ({})); // Ensure JSON parsing doesn't fail
 
                     if (!response.ok) {
                         return reject({
@@ -34,14 +41,24 @@ const JsonNetworkAdapter = axios.create({
                     });
                 })
                 .catch((error) => {
+                    clearTimeout(timeoutId);
                     // Handle errors here
-                    reject(error)
-                    reject({
-                        message: "Something went wrong!",
-                        status: 404,
-                        statusText: "Oops!",
-                        config: config,
-                    });
+                    if (error.name === 'AbortError') {
+                        reject({
+                            message: "Request timeout",
+                            status: 408,
+                            statusText: "Request Timeout",
+                            config: config,
+                        });
+                    } else {
+                        reject(error);
+                        reject({
+                            message: "Something went wrong!",
+                            status: 404,
+                            statusText: "Oops!",
+                            config: config,
+                        });
+                    }
                 });
         });
     },

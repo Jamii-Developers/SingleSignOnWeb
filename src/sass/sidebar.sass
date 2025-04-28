@@ -1,0 +1,225 @@
+@import './foundation'
+
+#MyHomeHeaderPage
+    display: flex
+    min-height: 100vh
+    position: relative
+    width: 100%
+
+.sidebar-toggle
+    position: fixed
+    top: 1rem
+    left: 1rem
+    z-index: 1001
+    background: $primary-color
+    color: #fff
+    border: none
+    border-radius: 0.25rem
+    padding: 0.5rem
+    cursor: pointer
+    display: none
+    align-items: center
+    justify-content: center
+    width: 40px
+    height: 40px
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
+    transition: all 0.3s ease
+
+    &:hover
+        background: darken($primary-color, 5%)
+
+.sidebar-toggle-desktop
+    position: fixed
+    top: 1rem
+    left: 250px
+    z-index: 1001
+    background: $primary-color
+    color: #fff
+    border: none
+    border-radius: 0 0.25rem 0.25rem 0
+    padding: 0.5rem
+    cursor: pointer
+    display: none
+    align-items: center
+    justify-content: center
+    width: 24px
+    height: 40px
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1)
+    transition: all 0.3s ease-in-out
+
+    &:hover
+        background: darken($primary-color, 5%)
+
+    .sidebar.collapsed + &
+        left: 60px
+        width: 24px
+        border-radius: 0 0.25rem 0.25rem 0
+
+.sidebar
+    background-color: #fff
+    border-right: 1px solid $border-color
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1)
+    transition: all 0.3s ease-in-out
+    position: fixed
+    top: 0
+    left: 0
+    bottom: 0
+    z-index: 1000
+
+    &.collapsed
+        .brand-text
+            .full-text
+                display: none
+            .short-text
+                display: block
+
+    .sidebar-header
+        padding: 1rem
+        border-bottom: 1px solid $border-color
+        background-color: $primary-color
+        color: #fff
+        display: flex
+        justify-content: space-between
+        align-items: center
+
+        .brand-text
+            margin: 0
+            font-size: 1.5rem
+            font-weight: bold
+            color: #fff
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2)
+            letter-spacing: 1px
+            display: flex
+            align-items: center
+            justify-content: center
+            width: 100%
+
+            .full-text
+                display: block
+                transition: all 0.3s ease
+
+            .short-text
+                display: none
+                transition: all 0.3s ease
+
+        .close-sidebar
+            background: none
+            border: none
+            color: #fff
+            font-size: 1.25rem
+            cursor: pointer
+            padding: 0.25rem
+            display: none
+            align-items: center
+            justify-content: center
+            width: 32px
+            height: 32px
+            border-radius: 0.25rem
+            transition: all 0.3s ease
+
+            &:hover
+                background: rgba(255, 255, 255, 0.1)
+
+    // React Pro Sidebar styles
+    .ps-menu-button
+        &:hover
+            background-color: $background-color !important
+            color: lighten($primary-color, 20%) !important
+
+        &.ps-active
+            background-color: $primary-color !important
+            color: #fff !important
+
+    .ps-menu-icon
+        color: $primary-color
+        transition: all 0.3s ease
+
+    .ps-menu-label
+        color: $primary-color
+        transition: all 0.3s ease
+
+    .ps-submenu-content
+        background-color: transparent !important
+
+        .ps-menu-button
+            padding: 0.5rem 1rem !important
+            margin: 0.25rem 0.5rem !important
+            border-radius: 0.25rem !important
+
+            &:hover
+                background-color: $background-color !important
+                color: lighten($primary-color, 20%) !important
+                transform: translateX(5px)
+
+            &.ps-active
+                background-color: $primary-color !important
+                color: #fff !important
+
+.sidebar-overlay
+    position: fixed
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background: rgba(0, 0, 0, 0.5)
+    z-index: 999
+    opacity: 0
+    visibility: hidden
+    transition: all 0.3s ease
+
+    &.show
+        opacity: 1
+        visibility: visible
+
+.main-content
+    flex: 1
+    margin-left: 250px
+    padding: 2rem
+    background-color: $background-color
+    min-height: 100vh
+    transition: all 0.3s ease-in-out
+    width: calc(100% - 250px)
+    position: relative
+    left: 0
+
+    .sidebar.collapsed + &
+        margin-left: 0
+        width: 100%
+
+// Mobile styles
+@media (max-width: 991.98px)
+    .sidebar-toggle
+        display: flex
+        position: fixed
+        top: 1rem
+        left: 1rem
+        z-index: 1001
+
+    .sidebar-toggle-desktop
+        display: none
+
+    .sidebar
+        transform: translateX(-100%)
+
+        &.show
+            transform: translateX(0)
+
+        .sidebar-header
+            .close-sidebar
+                display: flex
+
+    .main-content
+        margin-left: 0
+        width: 100%
+        padding: 1rem
+        padding-top: 4rem
+
+// Desktop styles
+@media (min-width: 992px)
+    .main-content
+        margin-left: 0px
+        width: calc(100% - 250px)
+
+        .sidebar.collapsed + &
+            margin-left: 0
+            width: 100% 

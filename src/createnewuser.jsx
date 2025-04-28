@@ -10,7 +10,6 @@ import { useState } from 'react'
 import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 
-
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
@@ -20,282 +19,375 @@ import Alert from '@mui/material/Alert';
 import Collapse from 'react-bootstrap/Collapse';
 import { uniqueSort } from 'jquery';
 
+const Createnewuser = (props) => {
+    // Enhanced email validation regex
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const specialChars = /[`!@#$%^&*()_\-+=[\]{};':"|,.<>/?~ ]/;
 
-const Createnewuser = (props ) => {
+    const navigate = useNavigate();
 
-
-    const mailformat = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-    const specialChars =/[`!@#$%^&*()_\-+=[\]{};':"|,.<>/?~ ]/;
-
-    const navigate = useNavigate( );
-
-    const[ serverErrorResponse , setServerErrorResponse ] = useState({
-        serverErrorCode : "",
+    const [serverErrorResponse, setServerErrorResponse] = useState({
+        serverErrorCode: "",
         serverErrorSubject: "",
         serverErrorMessage: "",
-        errServMsgShow : false
-  	});
-
-  	const[ serverSuccessResponse, setServerSuccessResponse ] = useState({
-        ui_subject : "",
-        ui_message : "",
-        succServMsgShow: false
-  	})
-
-  const[ pageFields, setPageFields ] = useState({
-        email : "",
-        username : "",
-        password : "",
-		retypedpassword : ""
-  })
-
-    
-    const [errordata , setErrorData ] = useState({
-        emailErrorTrigger : false,
-        emailErrorMessage : "",
-        usernameErrorTrigger : false,
-        usernameErrorMessage : "",
-        passwordErrorTrigger : false,
-        passwordErrorMessage : "",
-        retypedPasswordErrorTrigger : false,
-        retypedPasswordErrorMessage : ""
-
+        errServMsgShow: false
     });
 
-    const [createNewUserButtonSpinner, setCreateNewUserButtonSpinner ] = useState( false );
+    const [serverSuccessResponse, setServerSuccessResponse] = useState({
+        ui_subject: "",
+        ui_message: "",
+        succServMsgShow: false
+    });
 
+    const [pageFields, setPageFields] = useState({
+        email: "",
+        username: "",
+        password: "",
+        retypedpassword: ""
+    });
 
-    function clear( ){
-        document.getElementById("createnewuserform").reset( ) 
-        setPageFields( prevState => { return { ...prevState , email : "" } } );
-        setPageFields( prevState => { return { ...prevState , username : "" } } );
-        setPageFields( prevState => { return { ...prevState , password : "" } } );
-        setPageFields( prevState => { return { ...prevState , retypedpassword : "" } } );
+    const [errordata, setErrorData] = useState({
+        emailErrorTrigger: false,
+        emailErrorMessage: "",
+        usernameErrorTrigger: false,
+        usernameErrorMessage: "",
+        passwordErrorTrigger: false,
+        passwordErrorMessage: "",
+        retypedPasswordErrorTrigger: false,
+        retypedPasswordErrorMessage: ""
+    });
+
+    const [createNewUserButtonSpinner, setCreateNewUserButtonSpinner] = useState(false);
+
+    function clear() {
+        document.getElementById("createnewuserform").reset();
+        setPageFields(prevState => ({ ...prevState, email: "" }));
+        setPageFields(prevState => ({ ...prevState, username: "" }));
+        setPageFields(prevState => ({ ...prevState, password: "" }));
+        setPageFields(prevState => ({ ...prevState, retypedpassword: "" }));
     }
 
-    async function signUp( ){
+    async function signUp() {
+        // Convert email and username to lowercase
+        setPageFields(prevState => ({ ...prevState, email: pageFields.email.toLowerCase() }));
+        setPageFields(prevState => ({ ...prevState, username: pageFields.username.toLowerCase() }));
 
-		setPageFields( prevState => { return { ...prevState , email : pageFields.email.toLowerCase( )} } )
-		setPageFields( prevState => { return { ...prevState , username : pageFields.username.toLowerCase( )} } )
-
-        if( pageFields.email === "" ){
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Email Input Error!"   } } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "No email address has been provided."} } )
-			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+        // Enhanced email validation
+        if (pageFields.email === "") {
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "Generated at CreateNewUserJS",
+                serverErrorSubject: "Email Input Error!",
+                serverErrorMessage: "No email address has been provided.",
+                errServMsgShow: true
+            }));
             return;
         }
 
-        if( !pageFields.email.match( mailformat ) ){
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Email Input Error!"   } } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "This is not a valid Email address. Please input the format 'user@jamii.com'."} } )
-			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+        if (!emailRegex.test(pageFields.email)) {
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "Generated at CreateNewUserJS",
+                serverErrorSubject: "Email Input Error!",
+                serverErrorMessage: "Please enter a valid email address (e.g., user@example.com).",
+                errServMsgShow: true
+            }));
             return;
         }
 
-        if( pageFields.username === "" ){
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Username Error!"   } } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "No username has been provided"} } )
-			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+        // Check for common disposable email domains
+        const disposableDomains = ['tempmail.com', 'throwawaymail.com', 'mailinator.com'];
+        const emailDomain = pageFields.email.split('@')[1];
+        if (disposableDomains.includes(emailDomain)) {
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "Generated at CreateNewUserJS",
+                serverErrorSubject: "Email Input Error!",
+                serverErrorMessage: "Please use a valid email address. Disposable email addresses are not allowed.",
+                errServMsgShow: true
+            }));
             return;
         }
 
-        if( pageFields.username.length < 5 ){
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Username Error!"   } } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "Your username cannot be less than 5 characters"} } )
-			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
-            return;
-        }
-        if( pageFields.username.match( specialChars ) ){
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Username Error!"   } } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "Your username cannot contain any special characters"} } )
-			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+        if (pageFields.username === "") {
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "Generated at CreateNewUserJS",
+                serverErrorSubject: "Username Error!",
+                serverErrorMessage: "No username has been provided",
+                errServMsgShow: true
+            }));
             return;
         }
 
-        if( pageFields.password === "" ){
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Password Input Error!"    } } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "No password address has been provided"} } )
-			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+        if (pageFields.username.length < 5) {
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "Generated at CreateNewUserJS",
+                serverErrorSubject: "Username Error!",
+                serverErrorMessage: "Your username cannot be less than 5 characters",
+                errServMsgShow: true
+            }));
+            return;
+        }
+        if (pageFields.username.match(specialChars)) {
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "Generated at CreateNewUserJS",
+                serverErrorSubject: "Username Error!",
+                serverErrorMessage: "Your username cannot contain any special characters",
+                errServMsgShow: true
+            }));
             return;
         }
 
-        if( pageFields.password.length < 8 ){
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Password Input Error!"    } } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "Your password cannot be less than 8 characters" } } )
-			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+        if (pageFields.password === "") {
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "Generated at CreateNewUserJS",
+                serverErrorSubject: "Password Input Error!",
+                serverErrorMessage: "No password address has been provided",
+                errServMsgShow: true
+            }));
             return;
         }
 
-        if( pageFields.retypedpassword === "" ){
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Retyped Password Input!"    } } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "No email address has been provided" } } )
-			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+        if (pageFields.password.length < 8) {
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "Generated at CreateNewUserJS",
+                serverErrorSubject: "Password Input Error!",
+                serverErrorMessage: "Your password cannot be less than 8 characters",
+                errServMsgShow: true
+            }));
             return;
         }
 
-        if( pageFields.password !== pageFields.retypedpassword ){
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : "Generated at CreateNewUserJS"} } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : "Password Error:"   } } )
-			setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : "The passwords do not match" } } )
-			setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
+        if (pageFields.retypedpassword === "") {
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "Generated at CreateNewUserJS",
+                serverErrorSubject: "Retyped Password Input!",
+                serverErrorMessage: "No email address has been provided",
+                errServMsgShow: true
+            }));
             return;
         }
 
-		let emailaddress = pageFields.email;
-		let username = pageFields.username;
-		let password = pageFields.password;
-        var createNewUserJson = { 
+        if (pageFields.password !== pageFields.retypedpassword) {
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "Generated at CreateNewUserJS",
+                serverErrorSubject: "Password Error:",
+                serverErrorMessage: "The passwords do not match",
+                errServMsgShow: true
+            }));
+            return;
+        }
+
+        let emailaddress = pageFields.email;
+        let username = pageFields.username;
+        let password = pageFields.password;
+        var createNewUserJson = {
             emailaddress,
             username,
-            password };
+            password
+        };
 
-        setCreateNewUserButtonSpinner( true )
+        setCreateNewUserButtonSpinner(true);
 
-        console.log(createNewUserJson);
-        const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON , ...conn.SERVICE_HEADERS.CREATE_NEW_USER };
-        const result = await JsonNetworkAdapter.post( conn.URL.PUBLIC_URL, createNewUserJson, { headers : headers} )
-            .then((response) =>{ return response })
-            .catch((error) => { return error;});
+        try {
+            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.CREATE_NEW_USER };
+            const result = await JsonNetworkAdapter.post(conn.URL.PUBLIC_URL, createNewUserJson, { headers: headers });
 
-        setCreateNewUserButtonSpinner( false );
+            if (result.status !== 200) {
+                setServerErrorResponse(prevState => ({
+                    ...prevState,
+                    serverErrorCode: result.status,
+                    serverErrorSubject: result.statusText,
+                    serverErrorMessage: result.message,
+                    errServMsgShow: true
+                }));
+                return;
+            }
 
-        console.log( result);
+            if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
+                setServerErrorResponse(prevState => ({
+                    ...prevState,
+                    serverErrorCode: result.data.ERROR_FIELD_CODE,
+                    serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
+                    serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
+                    errServMsgShow: true
+                }));
+                return;
+            }
 
-        if( result.status !== 200 ){
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.status } } )
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.statusText  } } )
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.message } } )
-            setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
-            return;
-        }
-
-		if( constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE ){
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorCode : result.data.ERROR_FIELD_CODE } } )
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorSubject : result.data.ERROR_FIELD_SUBJECT  } } )
-            setServerErrorResponse( prevState => { return { ...prevState , serverErrorMessage : result.data.ERROR_FIELD_MESSAGE } } )
-            setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : true } } )
-            return;
-		}
-
-		if( constants.SUCCESS_MESSAGE.TYPE_CREATE_NEW_USER === result.data.MSG_TYPE ){
-				setServerSuccessResponse( prevState => { return { ...prevState , ui_subject : result.data.UI_SUBJECT } } )
-				setServerSuccessResponse( prevState => { return { ...prevState , ui_message : result.data.UI_MESSAGE } } )
-				setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow: true } } );
-				document.getElementById("createnewuserform").reset( );
-				clear( );
+            if (constants.SUCCESS_MESSAGE.TYPE_CREATE_NEW_USER === result.data.MSG_TYPE) {
+                setServerSuccessResponse(prevState => ({
+                    ...prevState,
+                    ui_subject: result.data.UI_SUBJECT,
+                    ui_message: result.data.UI_MESSAGE,
+                    succServMsgShow: true
+                }));
+                document.getElementById("createnewuserform").reset();
+                clear();
                 await new Promise(r => setTimeout(r, 2000));
                 navigate("/");
-
-		}
-        setCreateNewUserButtonSpinner( false );
+            }
+        } catch (error) {
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "Network Error",
+                serverErrorSubject: "Connection Error",
+                serverErrorMessage: "Unable to connect to the server. Please try again later.",
+                errServMsgShow: true
+            }));
+        } finally {
+            setCreateNewUserButtonSpinner(false);
+        }
     }
-    
-    function CheckEmail( e ){
-        if( e === "" ){
-            setErrorData( prevState => { return { ...prevState ,emailErrorMessage : "Email address is empty" } } );
-            setErrorData( prevState => { return { ...prevState ,emailErrorTrigger : true } } );
+
+    function CheckEmail(e) {
+        if (e === "") {
+            setErrorData(prevState => ({
+                ...prevState,
+                emailErrorMessage: "Email address is required",
+                emailErrorTrigger: true
+            }));
             return;
         }
 
-        if( !e.match( mailformat ) ){
-            setErrorData( prevState => { return { ...prevState ,emailErrorMessage : "Email format should be [****]@[***].[***]" } } );
-            setErrorData( prevState => { return { ...prevState ,emailErrorTrigger : true } } );
+        if (!emailRegex.test(e)) {
+            setErrorData(prevState => ({
+                ...prevState,
+                emailErrorMessage: "Please enter a valid email address (e.g., user@example.com)",
+                emailErrorTrigger: true
+            }));
+            return;
+        }
+
+        // Check for common disposable email domains
+        const disposableDomains = ['tempmail.com', 'throwawaymail.com', 'mailinator.com'];
+        const emailDomain = e.split('@')[1];
+        if (disposableDomains.includes(emailDomain)) {
+            setErrorData(prevState => ({
+                ...prevState,
+                emailErrorMessage: "Please use a valid email address. Disposable email addresses are not allowed.",
+                emailErrorTrigger: true
+            }));
+            return;
+        }
+
+        setErrorData(prevState => ({
+            ...prevState,
+            emailErrorTrigger: false
+        }));
+    }
+
+    function CheckUsername(u) {
+        if (uniqueSort === "") {
+            setErrorData(prevState => ({
+                ...prevState,
+                usernameErrorMessage: "Username is empty",
+                usernameErrorTrigger: true
+            }));
+            return;
+        }
+
+        if (u.match(specialChars)) {
+            setErrorData(prevState => ({
+                ...prevState,
+                usernameErrorMessage: "Your username cannot contain any special characters",
+                usernameErrorTrigger: true
+            }));
+            return;
+        }
+
+        if (u.length < 5) {
+            setErrorData(prevState => ({
+                ...prevState,
+                usernameErrorMessage: "Username cannot be less than 5 characters",
+                usernameErrorTrigger: true
+            }));
+            return;
+        }
+
+        setErrorData(prevState => ({
+            ...prevState,
+            usernameErrorTrigger: false
+        }));
+    }
+
+    function checkPassword(e) {
+        if (e === "") {
+            setErrorData(prevState => ({
+                ...prevState,
+                passwordErrorMessage: "Password is empty!",
+                passwordErrorTrigger: true
+            }));
+            return;
+        }
+
+        if (e.length < 8) {
+            setErrorData(prevState => ({
+                ...prevState,
+                passwordErrorMessage: "The password cannot have less than 8 characters!",
+                passwordErrorTrigger: true
+            }));
             return;
         }
         
-        setErrorData( prevState => { return { ...prevState ,emailErrorTrigger : false } } );
-        
+        setErrorData(prevState => ({
+            ...prevState,
+            passwordErrorTrigger: false
+        }));
     }
 
-    function CheckUsername( u ){
-
-        if( uniqueSort === "" ){
-            setErrorData( prevState => { return { ...prevState ,usernameErrorMessage : "Username is empty" } } );
-            setErrorData( prevState => { return { ...prevState ,usernameErrorTrigger : true } } );
-            return;
-        }
-
-        if( u.match(specialChars ) ){
-            setErrorData( prevState => { return { ...prevState ,usernameErrorMessage : "Your username cannot contain any special characters" } } );
-            setErrorData( prevState => { return { ...prevState ,usernameErrorTrigger : true } } );
-            return;
-        }
-
-        if( u.length < 5  ){
-            setErrorData( prevState => { return { ...prevState ,usernameErrorMessage : "Username cannot be less than 5 characters" } } );
-            setErrorData( prevState => { return { ...prevState ,usernameErrorTrigger : true } } );
-            return;
-        }
-
-        setErrorData( prevState => { return { ...prevState ,usernameErrorTrigger : false } } );
-    }
-
-    function checkPassword( e ){
-        
-        if( e === "" ){
-            setErrorData( prevState => { return { ...prevState ,passwordErrorMessage : "Password is empty!" } } );
-            setErrorData( prevState => { return { ...prevState ,passwordErrorTrigger : true } } );
-            return;
-        }
-
-        if( e.length < 8 ){
-            setErrorData( prevState => { return { ...prevState ,passwordErrorMessage : "The password cannot have less than 8 characters!" } } );
-            setErrorData( prevState => { return { ...prevState ,passwordErrorTrigger : true } } );
+    function checkRetypedPassword(e) {
+        if (e !== pageFields.password) {
+            setErrorData(prevState => ({
+                ...prevState,
+                retypedPasswordErrorMessage: "Retyped password does not match!",
+                retypedPasswordErrorTrigger: true
+            }));
             return;
         }
         
-        setErrorData( prevState => { return { ...prevState , passwordErrorTrigger : false } } );
+        setErrorData(prevState => ({
+            ...prevState,
+            retypedPasswordErrorTrigger: false
+        }));
     }
 
-    function checkRetypedPassword( e ){
-
-        if( e !== pageFields.password ){
-            setErrorData( prevState => { return { ...prevState ,retypedPasswordErrorMessage : "Retyped password does not match!" } } );
-            setErrorData( prevState => { return { ...prevState ,retypedPasswordErrorTrigger : true } } );
-            return;
-        }
-        
-        setErrorData( prevState => { return { ...prevState ,retypedPasswordErrorTrigger : false } } );
-    }
-
-    function ShowEmailMessageError(  ){
-        return( 
-            <Collapse in ={ errordata.emailErrorTrigger } >
-                <Alert variant="filled" severity="warning" className='mb-3' >{ errordata.emailErrorMessage }</Alert>   
-            </Collapse>       
-
+    function ShowEmailMessageError() {
+        return (
+            <Collapse in={errordata.emailErrorTrigger}>
+                <Alert variant="filled" severity="warning" className='mb-3'>{errordata.emailErrorMessage}</Alert>
+            </Collapse>
         );
     }
 
-    function ShowUsernameError( ){
-        return( 
-            <Collapse in ={ errordata.usernameErrorTrigger }>
-                <Alert variant="filled" severity="warning" className='mb-3' >{ errordata.usernameErrorMessage }</Alert>   
-            </Collapse>                    
+    function ShowUsernameError() {
+        return (
+            <Collapse in={errordata.usernameErrorTrigger}>
+                <Alert variant="filled" severity="warning" className='mb-3'>{errordata.usernameErrorMessage}</Alert>
+            </Collapse>
         );
     }
 
-    function ShowPasswordError(  ){
-        return( 
-            <Collapse in ={ errordata.passwordErrorTrigger }>
-                <Alert variant="filled" severity="warning" className='mb-3' >{ errordata.passwordErrorMessage }</Alert>   
-            </Collapse>                    
+    function ShowPasswordError() {
+        return (
+            <Collapse in={errordata.passwordErrorTrigger}>
+                <Alert variant="filled" severity="warning" className='mb-3'>{errordata.passwordErrorMessage}</Alert>
+            </Collapse>
         );
     }
 
-    function ShowRetypedMessageError(  ){
-        return( 
-            <Collapse in ={ errordata.retypedPasswordErrorTrigger }>
-                <Alert variant="filled" severity="warning" className='mb-3' >{ errordata.retypedPasswordErrorMessage }</Alert>   
-            </Collapse>                    
+    function ShowRetypedMessageError() {
+        return (
+            <Collapse in={errordata.retypedPasswordErrorTrigger}>
+                <Alert variant="filled" severity="warning" className='mb-3'>{errordata.retypedPasswordErrorMessage}</Alert>
+            </Collapse>
         );
     }
 

@@ -29,7 +29,8 @@ const Conn = {
         FETCH_PROFILE:      {'Service-Header' : 'fetchprofile'},
         USER_LOGOFF:        {'Service-Header' : 'userlogoff'},
         REVIEW_US :         {'Service-Header' : 'reviewus' },
-        CONTACT_SUPPORT :   {'Service-Header' : 'contactsupport' }
+        CONTACT_SUPPORT :   {'Service-Header' : 'contactsupport' },
+        VALIDATE_SESSION :  {'Service-Header' : 'validate-session' }
     },
 };
 

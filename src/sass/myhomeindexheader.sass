@@ -1,94 +1,256 @@
 @import 'foundation'
 
-// Navbar Styling
+// Common Styles
 .custom-navbar
   background-color: $primary-color
   transition: background-color 0.3s ease, transform 0.3s ease, padding 0.3s ease
-
-  &.collapsed
-    background-color: darken($primary-color, 10%)  // Darker background on collapse
-    transform: scale(1.05)  // Slight scale effect when collapsed
-
-  .navbar-toggler
-    border: none
-    background-color: transparent
-
-  .navbar-toggler-icon
-    background-color: white
+  padding: 0.5rem 1rem
+  width: 100%
+  position: relative
+  z-index: 1000
 
   .navbar-brand
-    font-size: 2.5rem
+    font-size: 1.8rem
     color: white
     letter-spacing: 2px
     font-family: 'Roboto', sans-serif
     animation: fadeInLogo 1s ease-out 0.5s forwards
-
-    &:hover
-      color: lighten($primary-color, 20%)
-      transform: scale(1.1)
-
-  .navbar-collapse
-    transition: max-height 0.3s ease
-
-  .nav-link
-    color: white
-    font-size: 1.1rem
     margin-right: 1rem
-    font-weight: 500
+    display: inline-block
 
     &:hover
       color: lighten($primary-color, 20%)
-      transform: scale(1.05)
-      text-decoration: none
+      transform: scale(1)
 
-// Dropdown Menu
-.nav-item.dropdown
-  position: relative
+// Desktop Navigation Styles
+@media (min-width: 992px)
+  .custom-navbar
+    padding: 1.5rem
 
-  .dropdown-toggle
-    color: white
-    font-size: 1.1rem
-    font-weight: 500
-    &:hover
-      color: lighten($primary-color, 20%)
+    .navbar-brand
+      font-size: 2.5rem
 
-  .dropdown-menu
-    background-color: $background-color
-    border: none
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1)
-    padding: 1rem
-    display: none
-    transition: opacity 0.3s ease, visibility 0.3s ease
-
-    &.show
-      display: block
-      opacity: 1
-      visibility: visible
-
-  .dropdown-item
-    color: $primary-color
-    padding: 0.75rem 1.25rem
-    font-size: 1rem
-    border-radius: $button-radius
-    transition: background-color 0.2s ease
-
-    &:hover
-      background-color: lighten($primary-color, 40%)
+    .nav-link
       color: white
-      text-decoration: none
+      font-size: 1.1rem
+      margin-right: 1rem
+      padding: 0.5rem 1rem
+      transition: all 0.3s ease
+      display: flex
+      align-items: center
+      gap: 0.5rem
 
-// Navbar Hover Dropdown Interaction
-.nav-item.dropdown:hover .dropdown-menu
-  display: block
-  opacity: 1
-  visibility: visible
-  animation: fadeIn 0.3s ease-out
+      &:hover
+        color: lighten($primary-color, 20%)
+        transform: scale(1)
+        text-decoration: none
 
-// Hamburger Menu (Mobile)
-.navbar-toggler.collapsed
-  animation: slideIn 0.3s ease-out
+    .dropdown
+      position: relative
+
+      .dropdown-toggle
+        color: white
+        font-size: 1.1rem
+        font-weight: 500
+        padding: 0.5rem 1rem
+        transition: all 0.3s ease
+        display: flex
+        align-items: center
+        gap: 0.5rem
+        background: none
+        border: none
+        cursor: pointer
+
+        &:hover
+          color: lighten($primary-color, 20%)
+          transform: scale(1)
+
+      .dropdown-menu
+        background-color: $background-color
+        border: none
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1)
+        padding: 0.5rem
+        opacity: 0
+        visibility: hidden
+        transition: opacity 0.3s ease, visibility 0.3s ease
+        width: auto
+        min-width: 200px
+        margin-top: 0.25rem
+        border-radius: $button-radius
+        position: absolute
+        z-index: 1000
+
+        &.show
+          opacity: 1
+          visibility: visible
+
+      .dropdown-item
+        color: $primary-color
+        padding: 0.75rem 1.25rem
+        font-size: 1rem
+        border-radius: $button-radius
+        transition: background-color 0.2s ease
+        width: 100%
+        text-align: left
+        display: flex
+        align-items: center
+        gap: 0.5rem
+        text-decoration: none
+
+        &:hover
+          background-color: lighten($primary-color, 40%)
+          color: white
+          text-decoration: none
+          transform: scale(1)
+
+      &:hover .dropdown-menu
+        opacity: 1
+        visibility: visible
+        animation: fadeIn 0.3s ease-out
+
+// Mobile Navigation Styles
+@media (max-width: 991px)
+  .custom-navbar
+    padding: 1rem
+
+    .navbar-brand
+      font-size: 2rem
+
+    .navbar-toggler
+      border: none
+      background-color: transparent
+      padding: 0.25rem
+      margin-right: 0.25rem
+      color: white
+      transition: all 0.3s ease
+
+      &:focus
+        box-shadow: none
+        outline: none
+
+      &:hover
+        color: lighten($primary-color, 20%)
+
+  .mobile-menu
+    background-color: $primary-color
+    color: white
+    width: 300px !important
+    border-right: 1px solid rgba(255, 255, 255, 0.1)
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1)
+    left: 0 !important
+    right: auto !important
+
+    .offcanvas-header
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1)
+      padding: 1rem
+      display: flex
+      justify-content: space-between
+      align-items: center
+
+      .offcanvas-title
+        color: white
+        font-size: 1.5rem
+        font-weight: bold
+        margin: 0
+
+      .btn-close
+        color: white
+        filter: invert(1) grayscale(100%) brightness(200%)
+        margin: 0
+        padding: 0.5rem
+        order: 1
+
+    .offcanvas-body
+      padding: 1rem
+      overflow-y: auto
+      height: calc(100vh - 60px)
+
+      .nav
+        gap: 0.5rem
+        padding: 0.5rem 0
+
+      .nav-link
+        color: white
+        padding: 0.75rem 1rem
+        border-radius: $button-radius
+        transition: all 0.3s ease
+        display: flex
+        align-items: center
+        gap: 0.5rem
+
+        &:hover
+          background-color: rgba(255, 255, 255, 0.1)
+          color: white
+          transform: translateX(5px)
+
+  .mobile-dropdown
+    width: 100%
+    margin-bottom: 0.5rem
+    border-radius: $button-radius
+    overflow: hidden
+
+    .mobile-dropdown-header
+      color: white
+      padding: 0.75rem 1rem
+      border-radius: $button-radius
+      cursor: pointer
+      display: flex
+      align-items: center
+      gap: 0.5rem
+      transition: all 0.3s ease
+      background-color: rgba(255, 255, 255, 0.05)
+      border: none
+      width: 100%
+      text-align: left
+
+      &:hover
+        background-color: rgba(255, 255, 255, 0.1)
+
+    .mobile-dropdown-content
+      padding: 0.5rem 0
+      display: flex
+      flex-direction: column
+      gap: 0.25rem
+      background-color: rgba(255, 255, 255, 0.02)
+      border-radius: 0 0 $button-radius $button-radius
+
+      .dropdown-item
+        color: white
+        padding: 0.5rem 1rem
+        transition: all 0.3s ease
+        display: flex
+        align-items: center
+        gap: 0.5rem
+        margin: 0 0.5rem
+        border-radius: $button-radius
+        text-decoration: none
+
+        &:hover
+          background-color: rgba(255, 255, 255, 0.1)
+          color: white
+          text-decoration: none
+          transform: translateX(5px)
+
+// Animations
+@keyframes fadeInLogo
+  0%
+    opacity: 0
+    transform: translateX(-50px) scale(0.8)
+  100%
+    opacity: 1
+    transform: translateX(0) scale(1)
+
+@keyframes fadeIn
+  from
+    opacity: 0
+  to
+    opacity: 1
 
 // Main Content Area
 #MainContent
-  margin-top: 10px  // Adjust for fixed navbar height
+  margin-top: 10px
   padding: 2rem
+  width: 100%
+  max-width: 1200px
+  margin-left: auto
+  margin-right: auto
