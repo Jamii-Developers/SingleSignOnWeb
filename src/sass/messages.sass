@@ -1,7 +1,7 @@
 @import './foundation'
 
 // Message Container
-.message-container
+.server-message-container
     position: fixed
     top: 20px
     left: 50%
@@ -11,8 +11,16 @@
     max-width: 500px
     animation: slideDown 0.3s ease-out forwards
 
+// Show and Hide States
+.show
+    display: block
+    animation: slideDown 0.3s ease-out forwards
+
+.hide
+    display: none
+
 // Success Message
-.success-message
+.server-success-message
     background-color: $primary-color
     color: white
     padding: 1.5rem
@@ -44,7 +52,7 @@
             opacity: 0.9
 
 // Error Message
-.error-message
+.server-error-message
     background-color: #dc3545
     color: white
     padding: 1.5rem
@@ -92,7 +100,7 @@
 
 // Responsive Styles
 @media (max-width: 768px)
-    .message-container
+    .server-message-container
         width: 95%
         top: 10px
 
@@ -104,4 +112,4 @@
             font-size: 1.1rem
 
         .message
-            font-size: 0.9rem 
+            font-size: 0.9rem

@@ -3,9 +3,10 @@ import { FaCheckCircle } from 'react-icons/fa';
 import '../sass/messages.sass';
 
 function ServerSuccessMsg(props) {
+    
     return (
-        <div className={`message-container ${props.open ? 'show' : 'hide'}`}>
-            <div className="success-message">
+        <div className={`server-message-container ${props.open ? 'show' : 'hide'}`}>
+            <div className="server-success-message">
                 <FaCheckCircle className="icon" />
                 <div className="content">
                     <div className="subject">{props.ui_subject}</div>

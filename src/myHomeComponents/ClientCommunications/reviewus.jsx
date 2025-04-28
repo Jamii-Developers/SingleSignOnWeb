@@ -12,7 +12,7 @@ import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Alert from '@mui/material/Alert';
-import Collapse from 'react-bootstrap/Collapse';
+import Collapse from '@mui/material/Collapse';
 import Spinner from 'react-bootstrap/Spinner';
 import conn from "../../configs/conn";
 import {useCookies} from "react-cookie";
