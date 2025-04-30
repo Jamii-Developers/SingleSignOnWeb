@@ -2,7 +2,7 @@ import React from "react";
 
 import '../../sass/settings.sass';
 import JsonNetworkAdapter from "../../configs/networkadapter";
-import Servererrormsg from "../../frequentlyUsedModals/servererrormsg";
+import ServerErrorMsg from "../../frequentlyUsedModals/servererrormsg";
 import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg'
 import Lock from "../../configs/encryption";
 import constants from "../../utils/constants";

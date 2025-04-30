@@ -1,7 +1,7 @@
 import React from 'react';
 import JsonNetworkAdapter from "../../configs/networkadapter";
 import '../../sass/clientcommunication.sass';
-import Servererrormsg from '../../frequentlyUsedModals/servererrormsg';
+import ServerErrorMsg from '../../frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg';
 
 import { useState } from "react";
@@ -187,7 +187,7 @@ const Contactsupport = ( ) => {
                         </ButtonGroup>
                   </Form>
 
-                  <Servererrormsg
+                  <ServerErrorMsg
                         show={serverErrorResponse.errServMsgShow}
                         onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
                         subject={serverErrorResponse.serverErrorSubject}

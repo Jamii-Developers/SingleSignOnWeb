@@ -1,6 +1,6 @@
 import JsonNetworkAdapter from "../../configs/networkadapter";
 import '../../sass/clientcommunication.sass';
-import Servererrormsg from '../../frequentlyUsedModals/servererrormsg';
+import ServerErrorMsg from '../../frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg';
 
 import React from 'react';
@@ -8,7 +8,6 @@ import { useState } from "react";
 
 
 import Form from 'react-bootstrap/Form';
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Alert from '@mui/material/Alert';
@@ -188,7 +187,7 @@ const Reviewus = ( ) => {
                         </ButtonGroup>
                   </Form>
 
-                  <Servererrormsg
+                  <ServerErrorMsg
                         show={serverErrorResponse.errServMsgShow}
                         onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
                         subject={serverErrorResponse.serverErrorSubject}
