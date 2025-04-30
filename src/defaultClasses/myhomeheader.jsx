@@ -3,7 +3,7 @@ import '../sass/sidebar.sass';
 import React, { useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import { Navbar, Nav, Container, NavbarBrand, Button, Offcanvas, Collapse, Dropdown } from 'react-bootstrap';
+import { Navbar, Nav, Container, NavbarBrand, Button, Offcanvas, Collapse, NavDropdown } from 'react-bootstrap';
 import {
     FaHome, FaUsers, FaCog, FaFileAlt, FaInfoCircle, FaSignOutAlt, FaBars, FaUserFriends,
     FaCommentAlt, FaLock, FaUserCog, FaTrash, FaFolder, FaUserPlus, FaUserSlash, FaPhoneAlt, FaEnvelope,
@@ -37,28 +37,6 @@ const myHomeHeader = () => {
     const navigate = useNavigate();
     const [show, setShow] = useState(false);
     const [expanded, setExpanded] = useState(false);
-    const [openDropdowns, setOpenDropdowns] = useState({
-        social: false,
-        fileManagement: false,
-        settings: false,
-        help: false
-    });
-
-    // Security state
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [sessionTimeout, setSessionTimeout] = useState(null);
-
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-    const toggleExpand = () => setExpanded(!expanded);
-
-    const toggleDropdown = (dropdown) => {
-        setOpenDropdowns(prev => ({
-            ...prev,
-            [dropdown]: !prev[dropdown]
-        }));
-    };
-
     const [serverSuccessResponse, setServerSuccessResponse] = useState({
         ui_subject: "",
         ui_message: "",
@@ -71,6 +49,14 @@ const myHomeHeader = () => {
         serverErrorMessage: "",
         errServMsgShow: false
     });
+
+    // Security state
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [sessionTimeout, setSessionTimeout] = useState(null);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+    const toggleExpand = () => setExpanded(!expanded);
 
     // Session management
     useEffect(() => {
@@ -245,7 +231,7 @@ const myHomeHeader = () => {
         );
     };
 
-    // Initialize Bootstrap dropdowns
+    // Remove the useEffect for dropdown initialization
     useEffect(() => {
         // Initialize all dropdowns
         const dropdowns = document.querySelectorAll('.dropdown-toggle');
@@ -273,150 +259,83 @@ const myHomeHeader = () => {
     return (
         <ProtectedRoute>
             <div id="MyHomeHeaderPage">
-                {/* Mobile Toggle Button */}
-                <button 
-                    className="sidebar-toggle d-lg-none" 
-                    onClick={handleShow}
-                    aria-label="Toggle Sidebar"
-                >
-                    <FaBars />
-                </button>
+                <Navbar expand="lg" className="main-navbar">
+                    <Container fluid>
+                        <Navbar.Brand as={Link} to="/myhome/dashboard">JamiiX</Navbar.Brand>
+                        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                        <Navbar.Collapse id="basic-navbar-nav">
+                            <Nav className="me-auto">
+                                <Nav.Link as={Link} to="/myhome/dashboard">
+                                    <FaHome className="me-1" /> Home
+                                </Nav.Link>
 
-                {/* Sidebar Component */}
-                <Sidebar
-                    className={`sidebar ${show ? 'show' : ''} ${expanded ? 'expanded' : 'collapsed'}`}
-                    collapsed={!expanded}
-                    width="250px"
-                    collapsedWidth="60px"
-                >
-                    <div className="sidebar-header">
-                        <h3 className="brand-text">
-                            <span className="full-text">{expanded ? 'JamiiX' : 'JX'}</span>
-                        </h3>
-                        <div className="header-controls">
-                            <button 
-                                className="close-sidebar d-lg-none" 
-                                onClick={handleClose}
-                                aria-label="Menu X"
-                            >
-                                <FaTimes />
-                            </button>
-                        </div>
-                    </div>
-                    <Menu>
-                        <MenuItem
-                            icon={expanded ? <FaChevronLeft /> : <FaChevronRight />}
-                            onClick={toggleExpand}
-                        >
-                            {expanded ? 'Menu' : ''}
-                        </MenuItem>
+                                <NavDropdown 
+                                    title={<><FaUserFriends className="me-1" /> Social</>} 
+                                    id="social-nav-dropdown"
+                                >
+                                    <NavDropdown.Item as={Link} to="/myhome/social/friends">
+                                        <FaUserFriends className="me-1" /> Friends
+                                    </NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to="/myhome/social/followers">
+                                        <FaUserPlus className="me-1" /> Followers
+                                    </NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to="/myhome/social/blockedlist">
+                                        <FaUserSlash className="me-1" /> Blocked List
+                                    </NavDropdown.Item>
+                                </NavDropdown>
 
-                        <MenuItem
-                            icon={<FaHome />}
-                            component={<Link to="/myhome/dashboard" onClick={handleClose} />}
-                        >
-                            {expanded ? 'Home' : ''}
-                        </MenuItem>
+                                <NavDropdown 
+                                    title={<><FaFolder className="me-1" /> File Management</>} 
+                                    id="file-nav-dropdown"
+                                >
+                                    <NavDropdown.Item as={Link} to="/myhome/filemanagement/currentfiles">
+                                        <FaFileAlt className="me-1" /> Current Files
+                                    </NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to="/myhome/filemanagement/recyclebin">
+                                        <FaTrash className="me-1" /> Recycle Bin
+                                    </NavDropdown.Item>
+                                </NavDropdown>
 
-                        <SubMenu
-                            label="Social"
-                            icon={<FaUserFriends />}
-                        >
-                            <MenuItem
-                                icon={<FaUserFriends />}
-                                component={<Link to="/myhome/social/friends" onClick={handleClose} />}
-                            >
-                                 Friends
-                            </MenuItem>
-                            <MenuItem
-                                icon={<FaUserPlus />}
-                                component={<Link to="/myhome/social/followers" onClick={handleClose} />}
-                            >
-                                Followers
-                            </MenuItem>
-                            <MenuItem
-                                icon={<FaUserSlash />}
-                                component={<Link to="/myhome/social/blockedlist" onClick={handleClose} />}
-                            >
-                                Blocked List
-                            </MenuItem>
-                        </SubMenu>
+                                <NavDropdown 
+                                    title={<><FaCog className="me-1" /> Settings</>} 
+                                    id="settings-nav-dropdown"
+                                >
+                                    <NavDropdown.Item as={Link} to="/myhome/settings/profile">
+                                        <FaUserCog className="me-1" /> Profile
+                                    </NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to="/myhome/settings/permissions">
+                                        <FaLock className="me-1" /> Permissions
+                                    </NavDropdown.Item>
+                                </NavDropdown>
 
-                        <SubMenu
-                            label="File Management"
-                            icon={<FaFolder />}
-                        >
-                            <MenuItem
-                                icon={<FaFileAlt />}
-                                component={<Link to="/myhome/filemanagement/currentfiles" onClick={handleClose} />}
-                            >
-                                Current Files
-                            </MenuItem>
-                            <MenuItem
-                                icon={<FaTrash />}
-                                component={<Link to="/myhome/filemanagement/recyclebin" onClick={handleClose} />}
-                            >
-                                Recycle Bin
-                            </MenuItem>
-                        </SubMenu>
+                                <NavDropdown 
+                                    title={<><FaPhoneAlt className="me-1" /> Help</>} 
+                                    id="help-nav-dropdown"
+                                >
+                                    <NavDropdown.Item as={Link} to="/myhome/clientcommunication/reviewus">
+                                        <FaCommentAlt className="me-1" /> Review Us
+                                    </NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to="/myhome/clientcommunication/contactsupport">
+                                        <FaEnvelope className="me-1" /> Contact Support
+                                    </NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to="/myhome/aboutus">
+                                        <FaInfoCircle className="me-1" /> About Us
+                                    </NavDropdown.Item>
+                                </NavDropdown>
+                            </Nav>
+                            <Nav>
+                                <Nav.Link onClick={DestroyCookie}>
+                                    <FaSignOutAlt className="me-1" /> Logout
+                                </Nav.Link>
+                            </Nav>
+                        </Navbar.Collapse>
+                    </Container>
+                </Navbar>
 
-                        <SubMenu
-                            label="Settings"
-                            icon={<FaCog />}
-                        >
-                            <MenuItem
-                                icon={<FaUserCog />}
-                                component={<Link to="/myhome/settings/profile" onClick={handleClose} />}
-                            >
-                                Profile
-                            </MenuItem>
-                            <MenuItem
-                                icon={<FaLock />}
-                                component={<Link to="/myhome/settings/permissions" onClick={handleClose} />}
-                            >
-                                Permissions
-                            </MenuItem>
-                        </SubMenu>
-
-                        <SubMenu
-                            label="Help"
-                            icon={<FaPhoneAlt />}
-                        >
-                            <MenuItem
-                                icon={<FaCommentAlt />}
-                                component={<Link to="/myhome/clientcommunication/reviewus" onClick={handleClose} />}
-                            >
-                                Review Us
-                            </MenuItem>
-                            <MenuItem
-                                icon={<FaEnvelope />}
-                                component={<Link to="/myhome/clientcommunication/contactsupport" onClick={handleClose} />}
-                            >
-                                Contact Support
-                            </MenuItem>
-                            <MenuItem
-                                icon={<FaInfoCircle />}
-                                component={<Link to="/myhome/aboutus" onClick={handleClose} />}
-                            >
-                                About Us
-                            </MenuItem>
-                        </SubMenu>
-
-                        <MenuItem
-                            icon={<FaSignOutAlt />}
-                            onClick={() => { handleClose(); DestroyCookie(); }}
-                        >
-                            Log Out
-                        </MenuItem>
-                    </Menu>
-                </Sidebar>
-
-                {/* Overlay for mobile */}
-                <div className={`sidebar-overlay ${show ? 'show' : ''}`} onClick={handleClose}></div>
-
-                {/* Main Content */}
                 <div className="main-content">
-                    <Outlet />
+                    <Container fluid>
+                        <Outlet />
+                    </Container>
                 </div>
             </div>
         </ProtectedRoute>

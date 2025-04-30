@@ -1,9 +1,9 @@
 import './sass/createnewuser.sass';
-import Servererrormsg from './frequentlyUsedModals/servererrormsg';
-import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg';
 import JsonNetworkAdapter from './configs/networkadapter';
 import conn from './configs/conn';
 import constants from "./utils/constants";
+import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
+import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg';
 
 import React from 'react';
 import { useState } from 'react'
@@ -431,20 +431,19 @@ const Createnewuser = (props) => {
                     </ButtonGroup>
                 </Form>
 
-                < Servererrormsg
-                    open={serverErrorResponse.errServMsgShow}  
-                    onClose={ ( ) => setServerErrorResponse( prevState => { return { ...prevState , errServMsgShow : false } } ) }
-                    errorcode = {serverErrorResponse.serverErrorCode} 
-                    errorsubject = {serverErrorResponse.serverErrorSubject} 
-                    errormessage = {serverErrorResponse.serverErrorMessage}                             
-                />
+            <ServerErrorMsg
+            show={serverErrorResponse.errServMsgShow}
+            onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
+            subject={serverErrorResponse.serverErrorSubject}
+            message={serverErrorResponse.serverErrorMessage}
+            />
 
-                < ServerSuccessMsg 
-					open={serverSuccessResponse.succServMsgShow}  
-					onClose={ ( ) => setServerSuccessResponse( prevState => { return { ...prevState , succServMsgShow : false } } ) }
-					ui_subject = {serverSuccessResponse.ui_subject} 
-					ui_message = {serverSuccessResponse.ui_message}                             
-                />
+            <ServerSuccessMsg
+                show={serverSuccessResponse.succServMsgShow}
+                onClose={() => setServerSuccessResponse(prevState => ({ ...prevState, succServMsgShow: false }))}
+                subject={serverSuccessResponse.ui_subject}
+                message={serverSuccessResponse.ui_message}
+            />
            
           </div>
             <Outlet/>

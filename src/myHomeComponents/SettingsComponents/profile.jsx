@@ -563,20 +563,19 @@ const Profile = () => {
 				</Row>
 			</Form>
 
-			<Servererrormsg
-				open={serverErrorResponse.errServMsgShow}
-				onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
-				errorcode={serverErrorResponse.serverErrorCode}
-				errorsubject={serverErrorResponse.serverErrorSubject}
-				errormessage={serverErrorResponse.serverErrorMessage}
-			/>
+			<ServerErrorMsg
+                show={serverErrorResponse.errServMsgShow}
+                onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
+                subject={serverErrorResponse.serverErrorSubject}
+                message={serverErrorResponse.serverErrorMessage}
+            />
 
-			<ServerSuccessMsg
-				open={serverSuccessResponse.succServMsgShow}
-				onClose={() => setServerSuccessResponse(prevState => ({ ...prevState, succServMsgShow: false }))}
-				ui_subject={serverSuccessResponse.ui_subject}
-				ui_message={serverSuccessResponse.ui_message}
-			/>
+            <ServerSuccessMsg
+                show={serverSuccessResponse.succServMsgShow}
+                onClose={() => setServerSuccessResponse(prevState => ({ ...prevState, succServMsgShow: false }))}
+                subject={serverSuccessResponse.ui_subject}
+                message={serverSuccessResponse.ui_message}
+            />
 		</div>
 	);
 };

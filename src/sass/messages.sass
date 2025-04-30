@@ -9,15 +9,56 @@
     z-index: 9999
     width: 90%
     max-width: 500px
-    animation: slideDown 0.3s ease-out forwards
-
-// Show and Hide States
-.show
-    display: block
-    animation: slideDown 0.3s ease-out forwards
-
-.hide
     display: none
+
+    &.show
+        display: block
+        animation: slideDown 0.3s ease-out forwards
+
+    &.hide
+        display: none
+        animation: slideUp 0.3s ease-out forwards
+
+    .timer-bar
+        position: absolute
+        bottom: 0
+        left: 0
+        height: 4px
+        background-color: rgba(255, 255, 255, 0.3)
+        width: 100%
+        border-radius: 0 0 12px 12px
+        overflow: hidden
+
+        .timer-progress
+            height: 100%
+            background-color: white
+            width: 100%
+            animation: timerCountdown 5s linear forwards
+
+    .close-button
+        position: absolute
+        top: 10px
+        right: 10px
+        width: 24px
+        height: 24px
+        border-radius: 50%
+        background-color: rgba(255, 255, 255, 0.2)
+        border: none
+        color: white
+        display: flex
+        align-items: center
+        justify-content: center
+        cursor: pointer
+        transition: all 0.2s ease
+        padding: 0
+
+        &:hover
+            background-color: rgba(255, 255, 255, 0.3)
+            transform: scale(1.1)
+
+        .close-icon
+            font-size: 14px
+            line-height: 1
 
 // Success Message
 .server-success-message
@@ -30,6 +71,8 @@
     align-items: center
     gap: 1rem
     transition: all 0.3s ease-in-out
+    position: relative
+    overflow: hidden
 
     &:hover
         transform: translateY(-2px)
@@ -41,6 +84,7 @@
 
     .content
         flex: 1
+        padding-right: 20px
 
         .subject
             font-size: 1.2rem
@@ -62,6 +106,8 @@
     align-items: center
     gap: 1rem
     transition: all 0.3s ease-in-out
+    position: relative
+    overflow: hidden
 
     &:hover
         transform: translateY(-2px)
@@ -73,6 +119,7 @@
 
     .content
         flex: 1
+        padding-right: 20px
 
         .subject
             font-size: 1.2rem
@@ -92,11 +139,19 @@
         transform: translate(-50%, 0)
         opacity: 1
 
-@keyframes fadeOut
+@keyframes slideUp
     from
+        transform: translate(-50%, 0)
         opacity: 1
     to
+        transform: translate(-50%, -100%)
         opacity: 0
+
+@keyframes timerCountdown
+    from
+        width: 100%
+    to
+        width: 0%
 
 // Responsive Styles
 @media (max-width: 768px)
