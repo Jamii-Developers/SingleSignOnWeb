@@ -3,15 +3,14 @@ import '../sass/sidebar.sass';
 import React, { useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import { Navbar, Nav, Container, NavbarBrand, Button, Offcanvas, Collapse, NavDropdown } from 'react-bootstrap';
+import { Navbar, Nav, Container, Collapse, NavDropdown, Form, InputGroup, Badge } from 'react-bootstrap';
 import {
-    FaHome, FaUsers, FaCog, FaFileAlt, FaInfoCircle, FaSignOutAlt, FaBars, FaUserFriends,
+    FaHome, FaCog, FaFileAlt, FaInfoCircle, FaSignOutAlt, FaUserFriends,
     FaCommentAlt, FaLock, FaUserCog, FaTrash, FaFolder, FaUserPlus, FaUserSlash, FaPhoneAlt, FaEnvelope,
-    FaChevronDown, FaChevronUp, FaTimes, FaChevronLeft, FaChevronRight
+    FaChevronDown, FaChevronUp, FaBell
 } from 'react-icons/fa';
-import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
-import Servererrormsg from '../frequentlyUsedModals/servererrormsg';
-import ServerSuccessMsg from '../frequentlyUsedModals/serversuccessmsg';
+import Requests from '../myHomeComponents/SocialComponents/requests';
+
 import JsonNetworkAdapter from '../configs/networkadapter';
 import constants from "../utils/constants";
 import conn from "../configs/conn";
@@ -35,28 +34,12 @@ const generateCSRFToken = () => {
 const myHomeHeader = () => {
     const [cookies, setCookie, removeCookie] = useCookies(["userSession", "csrfToken"]);
     const navigate = useNavigate();
-    const [show, setShow] = useState(false);
-    const [expanded, setExpanded] = useState(false);
-    const [serverSuccessResponse, setServerSuccessResponse] = useState({
-        ui_subject: "",
-        ui_message: "",
-        succServMsgShow: false
-    });
-
-    const [serverErrorResponse, setServerErrorResponse] = useState({
-        serverErrorCode: "",
-        serverErrorSubject: "",
-        serverErrorMessage: "",
-        errServMsgShow: false
-    });
-
+    const [showRequests, setShowRequests] = useState(false);
+    const [totalRequests, setTotalRequests] = useState(0);
+   
     // Security state
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [sessionTimeout, setSessionTimeout] = useState(null);
-
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-    const toggleExpand = () => setExpanded(!expanded);
 
     // Session management
     useEffect(() => {
@@ -262,6 +245,19 @@ const myHomeHeader = () => {
                 <Navbar expand="lg" className="main-navbar">
                     <Container fluid>
                         <Navbar.Brand as={Link} to="/myhome/dashboard">JamiiX</Navbar.Brand>
+                        <Form className="d-flex mx-auto">
+                            <InputGroup>
+                                <Form.Control
+                                    type="search"
+                                    placeholder="Search..."
+                                    className="me-2"
+                                    aria-label="Search"
+                                />
+                                <InputGroup.Text>
+                                    <i className="bi bi-search"></i>
+                                </InputGroup.Text>
+                            </InputGroup>
+                        </Form>
                         <Navbar.Toggle aria-controls="basic-navbar-nav" />
                         <Navbar.Collapse id="basic-navbar-nav">
                             <Nav className="me-auto">
@@ -281,6 +277,15 @@ const myHomeHeader = () => {
                                     </NavDropdown.Item>
                                     <NavDropdown.Item as={Link} to="/myhome/social/blockedlist">
                                         <FaUserSlash className="me-1" /> Blocked List
+                                    </NavDropdown.Item>
+                                    <NavDropdown.Divider />
+                                    <NavDropdown.Item onClick={() => setShowRequests(true)}>
+                                        <FaBell className="me-1" /> Requests
+                                        {totalRequests > 0 && (
+                                            <Badge bg="primary" className="ms-2">
+                                                {totalRequests}
+                                            </Badge>
+                                        )}
                                     </NavDropdown.Item>
                                 </NavDropdown>
 
@@ -337,6 +342,11 @@ const myHomeHeader = () => {
                         <Outlet />
                     </Container>
                 </div>
+
+                <Requests 
+                    show={showRequests} 
+                    handleClose={() => setShowRequests(false)} 
+                />
             </div>
         </ProtectedRoute>
     );

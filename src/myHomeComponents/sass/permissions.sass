@@ -1,0 +1,162 @@
+#PermissionsContent
+    padding: 2rem 0
+    background-color: #f8f9fa
+    min-height: calc(100vh - 60px)
+
+    .page-header
+        text-align: center
+        margin-bottom: 2rem
+        padding: 1rem 0
+
+        h2
+            color: #2c3e50
+            font-weight: 600
+            margin-bottom: 0.5rem
+
+        p
+            color: #6c757d
+            font-size: 1.1rem
+
+    .permission-card
+        height: 100%
+        background: white
+        border: none
+        border-radius: 15px
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05)
+        transition: all 0.3s ease
+
+        &:hover
+            transform: translateY(-5px)
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1)
+
+        .card-header
+            background: white
+            border-bottom: 1px solid #e9ecef
+            padding: 1.25rem
+            border-radius: 15px 15px 0 0 !important
+
+            h3
+                color: #2c3e50
+                font-size: 1.25rem
+                font-weight: 600
+                margin: 0
+
+            svg
+                color: #007bff
+                font-size: 1.25rem
+
+        .card-body
+            padding: 1.5rem
+
+            .form-check
+                margin-bottom: 1rem
+                padding-left: 2.5rem
+
+                .form-check-input
+                    width: 2.5rem
+                    height: 1.25rem
+                    margin-left: -2.5rem
+                    background-color: #e9ecef
+                    border-color: #e9ecef
+                    cursor: pointer
+
+                    &:checked
+                        background-color: #007bff
+                        border-color: #007bff
+
+                    &:focus
+                        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25)
+
+                .form-check-label
+                    color: #495057
+                    font-size: 0.95rem
+                    cursor: pointer
+                    user-select: none
+
+    .permission-actions
+        text-align: center
+        padding: 1rem 0
+
+        .btn-group
+            .btn
+                padding: 0.75rem 1.5rem
+                font-weight: 500
+                display: flex
+                align-items: center
+                gap: 0.5rem
+
+                svg
+                    font-size: 1rem
+
+                &.btn-primary
+                    background: #007bff
+                    border-color: #007bff
+
+                    &:hover
+                        background: #0056b3
+                        border-color: #0056b3
+
+                &.btn-outline-secondary
+                    color: #6c757d
+                    border-color: #6c757d
+
+                    &:hover
+                        background: #6c757d
+                        color: white
+
+    .alert
+        border-radius: 10px
+        margin-bottom: 1.5rem
+
+        &.alert-success
+            background-color: #d4edda
+            border-color: #c3e6cb
+            color: #155724
+
+        &.alert-danger
+            background-color: #f8d7da
+            border-color: #f5c6cb
+            color: #721c24
+
+    @media (max-width: 768px)
+        padding: 1rem 0
+
+        .page-header
+            margin-bottom: 1.5rem
+            padding: 0.5rem 0
+
+            h2
+                font-size: 1.5rem
+
+            p
+                font-size: 1rem
+
+        .permission-card
+            margin-bottom: 1rem
+
+            .card-header
+                padding: 1rem
+
+                h3
+                    font-size: 1.1rem
+
+            .card-body
+                padding: 1rem
+
+                .form-check
+                    margin-bottom: 0.75rem
+                    padding-left: 2.25rem
+
+                    .form-check-input
+                        width: 2.25rem
+                        height: 1.1rem
+                        margin-left: -2.25rem
+
+                    .form-check-label
+                        font-size: 0.9rem
+
+        .permission-actions
+            .btn-group
+                .btn
+                    padding: 0.5rem 1rem
+                    font-size: 0.9rem 

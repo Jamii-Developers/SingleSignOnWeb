@@ -1,0 +1,55 @@
+.requests-container
+    .request-section
+        h5
+            color: #333
+            display: flex
+            align-items: center
+            
+            svg
+                color: rgb(93, 4, 107)
+
+        .request-item
+            border: 1px solid #e0e0e0
+            margin-bottom: 8px
+            border-radius: 8px
+            transition: all 0.2s ease-in-out
+
+            &:hover
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05)
+                transform: translateY(-1px)
+
+            .request-info
+                h6
+                    font-weight: 600
+                    color: #333
+
+                small
+                    font-size: 0.85rem
+
+            .request-actions
+                .btn
+                    padding: 0.4rem
+                    font-size: 0.9rem
+                    border-radius: 6px
+                    transition: all 0.2s ease-in-out
+
+                    &:hover
+                        transform: translateY(-1px)
+
+                    svg
+                        font-size: 1rem
+
+                    &.btn-outline-success
+                        &:hover
+                            background-color: #28a745
+                            border-color: #28a745
+
+                    &.btn-outline-danger
+                        &:hover
+                            background-color: #dc3545
+                            border-color: #dc3545
+
+    .badge
+        font-size: 0.8rem
+        padding: 0.35em 0.65em
+        background-color: rgb(93, 4, 107) !important 

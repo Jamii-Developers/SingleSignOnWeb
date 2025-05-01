@@ -1,0 +1,284 @@
+.upload-button
+    display: flex
+    align-items: center
+    gap: 0.5rem
+    padding: 0.5rem 1rem
+    font-weight: 500
+    transition: all 0.2s ease
+    background: #2c3e50
+    border: none
+    color: #fff
+
+    &:hover
+        transform: translateY(-1px)
+        background: #34495e
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2)
+
+.upload-modal
+    .modal-content
+        border: none
+        border-radius: 15px
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2)
+        background: #1a1a1a
+        color: #fff
+
+    .modal-header
+        border-bottom: 1px solid #2c3e50
+        padding: 1rem 1.5rem
+        background: #2c3e50
+
+        .modal-title
+            display: flex
+            align-items: center
+            gap: 0.5rem
+            color: #fff
+            font-weight: 600
+
+            svg
+                color: #3498db
+                font-size: 1.25rem
+
+        .btn-close
+            color: #fff
+            filter: invert(1) grayscale(100%) brightness(200%)
+
+    .modal-body
+        padding: 1.5rem
+        background: #1a1a1a
+
+    .upload-zone
+        background: #2c3e50
+        border: 2px dashed #3498db
+        border-radius: 15px
+        padding: 2rem
+        margin-bottom: 1.5rem
+        text-align: center
+        transition: all 0.3s ease
+        cursor: pointer
+
+        &:hover
+            border-color: #2980b9
+            background-color: #34495e
+
+        &.dragging
+            border-color: #2980b9
+            background-color: #2c3e50
+
+        .upload-content
+            .upload-icon
+                font-size: 3rem
+                color: #3498db
+                margin-bottom: 1rem
+
+            h4
+                color: #fff
+                font-weight: 600
+                margin-bottom: 0.5rem
+
+            p
+                color: #bdc3c7
+                margin-bottom: 1rem
+
+            .btn
+                padding: 0.5rem 1.5rem
+                font-weight: 500
+                background: #3498db
+                border: none
+                color: #fff
+
+                &:hover
+                    background: #2980b9
+
+    .selected-files
+        margin-top: 1.5rem
+
+        h5
+            color: #fff
+            font-weight: 600
+            margin-bottom: 1rem
+
+        .file-list
+            max-height: 200px
+            overflow-y: auto
+            border: 1px solid #2c3e50
+            border-radius: 8px
+            padding: 0.5rem
+            background: #2c3e50
+
+            &::-webkit-scrollbar
+                width: 8px
+
+            &::-webkit-scrollbar-track
+                background: #1a1a1a
+
+            &::-webkit-scrollbar-thumb
+                background: #3498db
+                border-radius: 4px
+
+            .file-item
+                display: flex
+                align-items: center
+                justify-content: space-between
+                padding: 0.75rem
+                border-bottom: 1px solid #34495e
+                transition: all 0.2s ease
+
+                &:last-child
+                    border-bottom: none
+
+                &:hover
+                    background-color: #34495e
+
+                .file-info
+                    display: flex
+                    align-items: center
+                    gap: 0.75rem
+                    flex: 1
+                    min-width: 0
+
+                    .file-icon
+                        color: #f1c40f
+                        font-size: 1.25rem
+
+                    .file-name
+                        color: #fff
+                        font-weight: 500
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+
+                    .file-size
+                        color: #bdc3c7
+                        font-size: 0.875rem
+
+                .remove-file
+                    color: #e74c3c
+                    padding: 0.25rem
+                    transition: all 0.2s ease
+
+                    &:hover
+                        color: #c0392b
+                        background-color: #34495e
+                        border-radius: 50%
+
+    .upload-progress
+        margin-top: 1.5rem
+
+        .progress-item
+            margin-bottom: 1rem
+
+            &:last-child
+                margin-bottom: 0
+
+            .progress-info
+                display: flex
+                justify-content: space-between
+                align-items: center
+                margin-bottom: 0.5rem
+
+                .file-name
+                    color: #fff
+                    font-weight: 500
+                    font-size: 0.9rem
+                    white-space: nowrap
+                    overflow: hidden
+                    text-overflow: ellipsis
+                    max-width: 80%
+
+                .progress-percentage
+                    color: #bdc3c7
+                    font-size: 0.9rem
+                    font-weight: 500
+
+            .progress
+                height: 6px
+                background-color: #34495e
+                border-radius: 3px
+                overflow: hidden
+
+                .progress-bar
+                    background-color: #3498db
+                    transition: width 0.3s ease
+
+    .modal-footer
+        border-top: 1px solid #2c3e50
+        padding: 1rem 1.5rem
+        background: #2c3e50
+
+        .btn
+            padding: 0.5rem 1.5rem
+            font-weight: 500
+
+            &.btn-primary
+                background: #3498db
+                border: none
+                color: #fff
+
+                &:hover
+                    background: #2980b9
+
+            &.btn-secondary
+                background: #34495e
+                border: none
+                color: #fff
+
+                &:hover
+                    background: #2c3e50
+
+            &:disabled
+                opacity: 0.65
+                cursor: not-allowed
+
+@media (max-width: 768px)
+    .upload-modal
+        .modal-body
+            padding: 1rem
+
+        .upload-zone
+            padding: 1.5rem
+
+            .upload-content
+                .upload-icon
+                    font-size: 2.5rem
+
+                h4
+                    font-size: 1.1rem
+
+                p
+                    font-size: 0.9rem
+
+        .selected-files
+            .file-list
+                max-height: 150px
+
+                .file-item
+                    padding: 0.5rem
+
+                    .file-info
+                        .file-icon
+                            font-size: 1.1rem
+
+                        .file-name
+                            font-size: 0.9rem
+
+                        .file-size
+                            font-size: 0.8rem
+
+        .upload-progress
+            .progress-item
+                .progress-info
+                    .file-name
+                        font-size: 0.85rem
+
+                    .progress-percentage
+                        font-size: 0.85rem
+
+                .progress
+                    height: 4px
+
+        .modal-footer
+            padding: 0.75rem 1rem
+
+            .btn
+                padding: 0.4rem 1rem
+                font-size: 0.9rem 
