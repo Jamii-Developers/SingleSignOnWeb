@@ -1,4 +1,5 @@
-@import foundation
+@use "sass:color"
+@import './foundation'
 
 /* General Styles for the Header */
 #IndexHeaderPage
@@ -30,7 +31,7 @@
     line-height: 1
 
     &:hover
-      color: lighten($primary-color, 20%)
+      color: color.adjust($primary-color, $lightness: 20%)
       transform: scale(1)
 
   .navbar-toggler
@@ -148,7 +149,7 @@
   border-bottom-color: white
 
   &:hover
-    background: darken($primary-color, 10%)
+    background: color.adjust($primary-color, $lightness: -10%)
     transform: scale(1)
 
 /* Main Content */

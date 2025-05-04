@@ -1,23 +1,16 @@
 import React from "react";
-
-import '../../sass/settings.sass';
-import JsonNetworkAdapter from "../../configs/networkadapter";
-import ServerErrorMsg from "../../frequentlyUsedModals/servererrormsg";
-import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg'
-import Lock from "../../configs/encryption";
-import constants from "../../utils/constants";
-
-import Col from 'react-bootstrap/Col';
-import Form from 'react-bootstrap/Form';
-import Row from 'react-bootstrap/Row';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
-import Button from 'react-bootstrap/Button';
-import Spinner from 'react-bootstrap/Spinner';
-
+import { Container, Row, Col, Card, Form, Button, ButtonGroup, Spinner } from 'react-bootstrap';
 import { useCookies } from "react-cookie";
 import { useEffect, useState } from "react";
+import { FaUser, FaEnvelope, FaLock, FaUnlock } from 'react-icons/fa';
+import JsonNetworkAdapter from "../../configs/networkadapter";
+import ServerErrorMsg from "../../frequentlyUsedModals/servererrormsg";
+import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg';
+import Lock from "../../configs/encryption";
+import constants from "../../utils/constants";
 import conn from "../../configs/conn";
-  
+import '../sass/profile.sass';
+
 // Validation constants
 const VALIDATION = {
 	NAME_MAX_LENGTH: 50,
@@ -355,229 +348,308 @@ const Profile = () => {
 
 	return (
 		<div id="ProfileContent">
-			<h1>Profile</h1>
+			<Container>
+				<h1>Profile Settings</h1>
 
-			<Form id="UserProfileForm">
-				<Row>
-					<Col>
-						<Form.Check type="switch" id="privacySwitch" label="Set Account Privacy" className="mb-3" checked={pageFields.privacy}
-							onChange={(e) => setPageFields(prevState => ({ ...prevState, privacy: e.target.checked }))}
-						/>
-					</Col>
-				</Row>
+				<Card className="mb-4">
+					<Card.Body>
+						<Form id="UserProfileForm">
+							<Row className="mb-4">
+								<Col>
+									<div className="d-flex align-items-center">
+										<FaUser className="me-2 text-primary" size={20} />
+										<h3 className="mb-0">Account Information</h3>
+									</div>
+								</Col>
+							</Row>
 
-				<Row>
-					<Col>
-						<Form.Group className="mb-3">
-							<Form.Label>Username</Form.Label>
-							<Form.Control type="text" placeholder={cookies.userSession.USERNAME} disabled />
-						</Form.Group>
-					</Col>
+							<Row>
+								<Col md={6}>
+									<Form.Group className="mb-3">
+										<Form.Label>Username</Form.Label>
+										<Form.Control 
+											type="text" 
+											placeholder={cookies.userSession.USERNAME} 
+											disabled 
+										/>
+									</Form.Group>
+								</Col>
 
-					<Col>
-						<Form.Group className="mb-3">
-							<Form.Label>Email address</Form.Label>
-							<Form.Control type="text" placeholder={cookies.userSession.EMAIL_ADDRESS} disabled />
-						</Form.Group>
-					</Col>
-				</Row>
+								<Col md={6}>
+									<Form.Group className="mb-3">
+										<Form.Label>Email address</Form.Label>
+										<Form.Control 
+											type="text" 
+											placeholder={cookies.userSession.EMAIL_ADDRESS} 
+											disabled 
+										/>
+									</Form.Group>
+								</Col>
+							</Row>
 
-				<Row>
-					<Col>
-						<Form.Group className="mb-3">
-							<Form.Label>First Name</Form.Label>
-							<Form.Control
-								type="text"
-								placeholder={CheckNullException(pageFields.firstname, "First Name")}
-								value={pageFields.firstname}
-								onChange={(e) => handleInputChange('firstname', e.target.value)}
-								isInvalid={validationErrors.firstname}
-							/>
-							<Form.Control.Feedback type="invalid">
-								Please enter a valid first name (letters, spaces, hyphens, and apostrophes only)
-							</Form.Control.Feedback>
-						</Form.Group>
-					</Col>
+							<Row className="mb-4">
+								<Col>
+									<div className="d-flex align-items-center">
+										<FaEnvelope className="me-2 text-primary" size={20} />
+										<h3 className="mb-0">Personal Information</h3>
+									</div>
+								</Col>
+							</Row>
 
-					<Col>
-						<Form.Group className="mb-3">
-							<Form.Label>Middle Name</Form.Label>
-							<Form.Control
-								type="text"
-								placeholder={CheckNullException(pageFields.middlename, "Middle Name")}
-								value={pageFields.middlename}
-								onChange={(e) => handleInputChange('middlename', e.target.value)}
-								isInvalid={validationErrors.middlename}
-							/>
-							<Form.Control.Feedback type="invalid">
-								Please enter a valid middle name (letters, spaces, hyphens, and apostrophes only)
-							</Form.Control.Feedback>
-						</Form.Group>
-					</Col>
+							<Row>
+								<Col md={4}>
+									<Form.Group className="mb-3">
+										<Form.Label>First Name</Form.Label>
+										<Form.Control
+											type="text"
+											placeholder={CheckNullException(pageFields.firstname, "First Name")}
+											value={pageFields.firstname}
+											onChange={(e) => handleInputChange('firstname', e.target.value)}
+											isInvalid={validationErrors.firstname}
+										/>
+										<Form.Control.Feedback type="invalid">
+											Please enter a valid first name
+										</Form.Control.Feedback>
+									</Form.Group>
+								</Col>
 
-					<Col>
-						<Form.Group className="mb-3">
-							<Form.Label>Last Name</Form.Label>
-							<Form.Control
-								type="text"
-								placeholder={CheckNullException(pageFields.lastname, "Last Name")}
-								value={pageFields.lastname}
-								onChange={(e) => handleInputChange('lastname', e.target.value)}
-								isInvalid={validationErrors.lastname}
-							/>
-							<Form.Control.Feedback type="invalid">
-								Please enter a valid last name (letters, spaces, hyphens, and apostrophes only)
-							</Form.Control.Feedback>
-						</Form.Group>
-					</Col>
-				</Row>
+								<Col md={4}>
+									<Form.Group className="mb-3">
+										<Form.Label>Middle Name</Form.Label>
+										<Form.Control
+											type="text"
+											placeholder={CheckNullException(pageFields.middlename, "Middle Name")}
+											value={pageFields.middlename}
+											onChange={(e) => handleInputChange('middlename', e.target.value)}
+											isInvalid={validationErrors.middlename}
+										/>
+										<Form.Control.Feedback type="invalid">
+											Please enter a valid middle name
+										</Form.Control.Feedback>
+									</Form.Group>
+								</Col>
 
-				<Row>
-					<Col>
-						<Form.Group className="mb-3">
-							<Form.Label>Address 1</Form.Label>
-							<Form.Control
-								type="text"
-								placeholder={CheckNullException(pageFields.address1, "Address 1")}
-								value={pageFields.address1}
-								onChange={(e) => handleInputChange('address1', e.target.value)}
-								isInvalid={validationErrors.address1}
-							/>
-							<Form.Control.Feedback type="invalid">
-								Please enter a valid address (letters, numbers, spaces, and basic punctuation only)
-							</Form.Control.Feedback>
-						</Form.Group>
-					</Col>
+								<Col md={4}>
+									<Form.Group className="mb-3">
+										<Form.Label>Last Name</Form.Label>
+										<Form.Control
+											type="text"
+											placeholder={CheckNullException(pageFields.lastname, "Last Name")}
+											value={pageFields.lastname}
+											onChange={(e) => handleInputChange('lastname', e.target.value)}
+											isInvalid={validationErrors.lastname}
+										/>
+										<Form.Control.Feedback type="invalid">
+											Please enter a valid last name
+										</Form.Control.Feedback>
+									</Form.Group>
+								</Col>
+							</Row>
 
-					<Col>
-						<Form.Group className="mb-3">
-							<Form.Label>Address 2</Form.Label>
-							<Form.Control
-								type="text"
-								placeholder={CheckNullException(pageFields.address2, "Address 2")}
-								value={pageFields.address2}
-								onChange={(e) => handleInputChange('address2', e.target.value)}
-								isInvalid={validationErrors.address2}
-							/>
-							<Form.Control.Feedback type="invalid">
-								Please enter a valid address (letters, numbers, spaces, and basic punctuation only)
-							</Form.Control.Feedback>
-						</Form.Group>
-					</Col>
-				</Row>
+							<Row className="mb-4">
+								<Col>
+									<div className="d-flex align-items-center">
+										<FaEnvelope className="me-2 text-primary" size={20} />
+										<h3 className="mb-0">Address Information</h3>
+									</div>
+								</Col>
+							</Row>
 
-				<Row>
-					<Col>
-						<Form.Group className="mb-3">
-							<Form.Label>City</Form.Label>
-							<Form.Control
-								type="text"
-								placeholder={CheckNullException(pageFields.city, "City")}
-								value={pageFields.city}
-								onChange={(e) => handleInputChange('city', e.target.value)}
-								isInvalid={validationErrors.city}
-							/>
-							<Form.Control.Feedback type="invalid">
-								Please enter a valid city name (letters, spaces, hyphens, and apostrophes only)
-							</Form.Control.Feedback>
-						</Form.Group>
-					</Col>
+							<Row>
+								<Col md={6}>
+									<Form.Group className="mb-3">
+										<Form.Label>Address 1</Form.Label>
+										<Form.Control
+											type="text"
+											placeholder={CheckNullException(pageFields.address1, "Address 1")}
+											value={pageFields.address1}
+											onChange={(e) => handleInputChange('address1', e.target.value)}
+											isInvalid={validationErrors.address1}
+										/>
+										<Form.Control.Feedback type="invalid">
+											Please enter a valid address
+										</Form.Control.Feedback>
+									</Form.Group>
+								</Col>
 
-					<Col>
-						<Form.Group className="mb-3">
-							<Form.Label>State</Form.Label>
-							<Form.Control
-								type="text"
-								placeholder={CheckNullException(pageFields.state, "State")}
-								value={pageFields.state}
-								onChange={(e) => handleInputChange('state', e.target.value)}
-								isInvalid={validationErrors.state}
-							/>
-							<Form.Control.Feedback type="invalid">
-								Please enter a valid state name (letters, spaces, hyphens, and apostrophes only)
-							</Form.Control.Feedback>
-						</Form.Group>
-					</Col>
+								<Col md={6}>
+									<Form.Group className="mb-3">
+										<Form.Label>Address 2</Form.Label>
+										<Form.Control
+											type="text"
+											placeholder={CheckNullException(pageFields.address2, "Address 2")}
+											value={pageFields.address2}
+											onChange={(e) => handleInputChange('address2', e.target.value)}
+											isInvalid={validationErrors.address2}
+										/>
+										<Form.Control.Feedback type="invalid">
+											Please enter a valid address
+										</Form.Control.Feedback>
+									</Form.Group>
+								</Col>
+							</Row>
 
-					<Col>
-						<Form.Group className="mb-3">
-							<Form.Label>Province</Form.Label>
-							<Form.Control
-								type="text"
-								placeholder={CheckNullException(pageFields.province, "Province")}
-								value={pageFields.province}
-								onChange={(e) => handleInputChange('province', e.target.value)}
-								isInvalid={validationErrors.province}
-							/>
-							<Form.Control.Feedback type="invalid">
-								Please enter a valid province name (letters, spaces, hyphens, and apostrophes only)
-							</Form.Control.Feedback>
-						</Form.Group>
-					</Col>
-				</Row>
+							<Row>
+								<Col md={4}>
+									<Form.Group className="mb-3">
+										<Form.Label>City</Form.Label>
+										<Form.Control
+											type="text"
+											placeholder={CheckNullException(pageFields.city, "City")}
+											value={pageFields.city}
+											onChange={(e) => handleInputChange('city', e.target.value)}
+											isInvalid={validationErrors.city}
+										/>
+										<Form.Control.Feedback type="invalid">
+											Please enter a valid city
+										</Form.Control.Feedback>
+									</Form.Group>
+								</Col>
 
-				<Row>
-					<Col>
-						<Form.Group className="mb-3">
-							<Form.Label>Zip code</Form.Label>
-							<Form.Control
-								type="text"
-								placeholder={CheckNullException(pageFields.zipcode, "Zip Code")}
-								value={pageFields.zipcode}
-								onChange={(e) => handleInputChange('zipcode', e.target.value)}
-								isInvalid={validationErrors.zipcode}
-							/>
-							<Form.Control.Feedback type="invalid">
-								Please enter a valid zip code (letters, numbers, spaces, and hyphens only)
-							</Form.Control.Feedback>
-						</Form.Group>
-					</Col>
+								<Col md={4}>
+									<Form.Group className="mb-3">
+										<Form.Label>State</Form.Label>
+										<Form.Control
+											type="text"
+											placeholder={CheckNullException(pageFields.state, "State")}
+											value={pageFields.state}
+											onChange={(e) => handleInputChange('state', e.target.value)}
+											isInvalid={validationErrors.state}
+										/>
+										<Form.Control.Feedback type="invalid">
+											Please enter a valid state
+										</Form.Control.Feedback>
+									</Form.Group>
+								</Col>
 
-					<Col>
-						<Form.Group className="mb-3">
-							<Form.Label>Country</Form.Label>
-							<Form.Control
-								type="text"
-								placeholder={CheckNullException(pageFields.country, "Country")}
-								value={pageFields.country}
-								onChange={(e) => handleInputChange('country', e.target.value)}
-								isInvalid={validationErrors.country}
-							/>
-							<Form.Control.Feedback type="invalid">
-								Please enter a valid country name (letters, spaces, hyphens, and apostrophes only)
-							</Form.Control.Feedback>
-						</Form.Group>
-					</Col>
-				</Row>
+								<Col md={4}>
+									<Form.Group className="mb-3">
+										<Form.Label>Province</Form.Label>
+										<Form.Control
+											type="text"
+											placeholder={CheckNullException(pageFields.province, "Province")}
+											value={pageFields.province}
+											onChange={(e) => handleInputChange('province', e.target.value)}
+											isInvalid={validationErrors.province}
+										/>
+										<Form.Control.Feedback type="invalid">
+											Please enter a valid province
+										</Form.Control.Feedback>
+									</Form.Group>
+								</Col>
+							</Row>
 
-				<Row>
-					<Col>
-						<ButtonGroup size="md" className="mb-2">
-							<Button variant="outline-primary" type="button" onClick={() => Update()}>
-								{loginButtonSpinner && <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="false" />}
-								Update
-							</Button>
-							<Button variant="outline-info" type="button" onClick={() => Clear()}>Clear</Button>
-						</ButtonGroup>
-					</Col>
-				</Row>
-			</Form>
+							<Row>
+								<Col md={6}>
+									<Form.Group className="mb-3">
+										<Form.Label>Zip code</Form.Label>
+										<Form.Control
+											type="text"
+											placeholder={CheckNullException(pageFields.zipcode, "Zip Code")}
+											value={pageFields.zipcode}
+											onChange={(e) => handleInputChange('zipcode', e.target.value)}
+											isInvalid={validationErrors.zipcode}
+										/>
+										<Form.Control.Feedback type="invalid">
+											Please enter a valid zip code
+										</Form.Control.Feedback>
+									</Form.Group>
+								</Col>
+
+								<Col md={6}>
+									<Form.Group className="mb-3">
+										<Form.Label>Country</Form.Label>
+										<Form.Control
+											type="text"
+											placeholder={CheckNullException(pageFields.country, "Country")}
+											value={pageFields.country}
+											onChange={(e) => handleInputChange('country', e.target.value)}
+											isInvalid={validationErrors.country}
+										/>
+										<Form.Control.Feedback type="invalid">
+											Please enter a valid country
+										</Form.Control.Feedback>
+									</Form.Group>
+								</Col>
+							</Row>
+
+							<Row className="mb-4">
+								<Col>
+									<div className="d-flex align-items-center">
+										{pageFields.privacy ? (
+											<FaLock className="me-2 text-primary" size={20} />
+										) : (
+											<FaUnlock className="me-2 text-primary" size={20} />
+										)}
+										<h3 className="mb-0">Privacy Settings</h3>
+									</div>
+								</Col>
+							</Row>
+
+							<Row>
+								<Col>
+									<Form.Check 
+										type="switch" 
+										id="privacySwitch" 
+										label="Set Account Privacy" 
+										className="mb-3" 
+										checked={pageFields.privacy}
+										onChange={(e) => setPageFields(prevState => ({ ...prevState, privacy: e.target.checked }))}
+									/>
+								</Col>
+							</Row>
+
+							<Row>
+								<Col>
+									<ButtonGroup size="md" className="mb-2">
+										<Button 
+											variant="outline-primary" 
+											type="button" 
+											onClick={() => Update()}
+											disabled={loginButtonSpinner}
+										>
+											{loginButtonSpinner && (
+												<Spinner 
+													as="span" 
+													animation="grow" 
+													size="sm" 
+													role="status" 
+													aria-hidden="false" 
+													className="me-2"
+												/>
+											)}
+											Update Profile
+										</Button>
+										<Button 
+											variant="outline-info" 
+											type="button" 
+											onClick={() => Clear()}
+										>
+											Clear Changes
+										</Button>
+									</ButtonGroup>
+								</Col>
+							</Row>
+						</Form>
+					</Card.Body>
+				</Card>
+			</Container>
 
 			<ServerErrorMsg
-                show={serverErrorResponse.errServMsgShow}
-                onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
-                subject={serverErrorResponse.serverErrorSubject}
-                message={serverErrorResponse.serverErrorMessage}
-            />
+				show={serverErrorResponse.errServMsgShow}
+				onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
+				subject={serverErrorResponse.serverErrorSubject}
+				message={serverErrorResponse.serverErrorMessage}
+			/>
 
-            <ServerSuccessMsg
-                show={serverSuccessResponse.succServMsgShow}
-                onClose={() => setServerSuccessResponse(prevState => ({ ...prevState, succServMsgShow: false }))}
-                subject={serverSuccessResponse.ui_subject}
-                message={serverSuccessResponse.ui_message}
-            />
+			<ServerSuccessMsg
+				show={serverSuccessResponse.succServMsgShow}
+				onClose={() => setServerSuccessResponse(prevState => ({ ...prevState, succServMsgShow: false }))}
+				subject={serverSuccessResponse.ui_subject}
+				message={serverSuccessResponse.ui_message}
+			/>
 		</div>
 	);
 };
-  
+
 export default Profile;

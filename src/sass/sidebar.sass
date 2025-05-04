@@ -1,4 +1,5 @@
-@import './foundation'
+@use "sass:color"
+@use './foundation' as *
 
 #MyHomeHeaderPage
     display: flex
@@ -26,7 +27,7 @@
     transition: all 0.3s ease
 
     &:hover
-        background: darken($primary-color, 5%)
+        background: color.adjust($primary-color, $lightness: -5%)
 
 .sidebar-toggle-desktop
     position: fixed
@@ -48,7 +49,7 @@
     transition: all 0.3s ease-in-out
 
     &:hover
-        background: darken($primary-color, 5%)
+        background: color.adjust($primary-color, $lightness: -5%)
 
     .sidebar.collapsed + &
         left: 60px
@@ -56,148 +57,69 @@
         border-radius: 0 0.25rem 0.25rem 0
 
 .sidebar
-    background-color: #fff
-    border-right: 1px solid $border-color
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1)
-    transition: all 0.3s ease-in-out
+    background-color: $primary-color
+    height: 100vh
     position: fixed
-    top: 0
     left: 0
-    bottom: 0
+    top: 0
+    width: 250px
+    transition: all 0.3s ease
     z-index: 1000
-
-    &.collapsed
-        .brand-text
-            .full-text
-                display: none
-            .short-text
-                display: block
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1)
 
     .sidebar-header
         padding: 1rem
-        border-bottom: 1px solid $border-color
-        background-color: $primary-color
-        color: #fff
-        display: flex
-        justify-content: space-between
-        align-items: center
+        text-align: center
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1)
 
-        .brand-text
+        h3
+            color: white
             margin: 0
             font-size: 1.5rem
-            font-weight: bold
-            color: #fff
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2)
-            letter-spacing: 1px
+
+    .sidebar-menu
+        padding: 1rem 0
+
+        .menu-item
+            padding: 0.75rem 1.5rem
+            color: white
             display: flex
             align-items: center
-            justify-content: center
-            width: 100%
-
-            .full-text
-                display: block
-                transition: all 0.3s ease
-
-            .short-text
-                display: none
-                transition: all 0.3s ease
-
-        .close-sidebar
-            background: none
-            border: none
-            color: #fff
-            font-size: 1.25rem
-            cursor: pointer
-            padding: 0.25rem
-            display: none
-            align-items: center
-            justify-content: center
-            width: 32px
-            height: 32px
-            border-radius: 0.25rem
+            gap: 0.75rem
+            text-decoration: none
             transition: all 0.3s ease
 
             &:hover
-                background: rgba(255, 255, 255, 0.1)
+                background-color: color.adjust($primary-color, $lightness: 20%)
+                color: white
 
-    // React Pro Sidebar styles
-    .ps-menu-button
-        &:hover
-            background-color: $background-color !important
-            color: lighten($primary-color, 20%) !important
+            &.active
+                background-color: color.adjust($primary-color, $lightness: 20%)
+                color: white
+                font-weight: bold
 
-        &.ps-active
-            background-color: $primary-color !important
-            color: #fff !important
+            i
+                font-size: 1.2rem
 
-    .ps-menu-icon
-        color: $primary-color
-        transition: all 0.3s ease
+    &.collapsed
+        width: 60px
 
-    .ps-menu-label
-        color: $primary-color
-        transition: all 0.3s ease
+        .sidebar-header
+            h3
+                display: none
 
-    .ps-submenu-content
-        background-color: transparent !important
+        .menu-item
+            padding: 0.75rem
+            justify-content: center
 
-        .ps-menu-button
-            padding: 0.5rem 1rem !important
-            margin: 0.25rem 0.5rem !important
-            border-radius: 0.25rem !important
+            span
+                display: none
 
-            &:hover
-                background-color: $background-color !important
-                color: lighten($primary-color, 20%) !important
-                transform: translateX(5px)
+            i
+                margin: 0
 
-            &.ps-active
-                background-color: $primary-color !important
-                color: #fff !important
-
-.sidebar-overlay
-    position: fixed
-    top: 0
-    left: 0
-    right: 0
-    bottom: 0
-    background: rgba(0, 0, 0, 0.5)
-    z-index: 999
-    opacity: 0
-    visibility: hidden
-    transition: all 0.3s ease
-
-    &.show
-        opacity: 1
-        visibility: visible
-
-.main-content
-    flex: 1
-    margin-left: 250px
-    padding: 2rem
-    background-color: $background-color
-    min-height: 100vh
-    transition: all 0.3s ease-in-out
-    width: calc(100% - 250px)
-    position: relative
-    left: 0
-
-    .sidebar.collapsed + &
-        margin-left: 0
-        width: 100%
-
-// Mobile styles
-@media (max-width: 991.98px)
-    .sidebar-toggle
-        display: flex
-        position: fixed
-        top: 1rem
-        left: 1rem
-        z-index: 1001
-
-    .sidebar-toggle-desktop
-        display: none
-
+// Mobile Styles
+@media (max-width: 768px)
     .sidebar
         transform: translateX(-100%)
 
@@ -205,14 +127,15 @@
             transform: translateX(0)
 
         .sidebar-header
-            .close-sidebar
-                display: flex
+            h3
+                font-size: 1.2rem
 
-    .main-content
-        margin-left: 0
-        width: 100%
-        padding: 1rem
-        padding-top: 4rem
+        .menu-item
+            padding: 0.5rem 1rem
+            font-size: 0.9rem
+
+            i
+                font-size: 1rem
 
 // Desktop styles
 @media (min-width: 992px)

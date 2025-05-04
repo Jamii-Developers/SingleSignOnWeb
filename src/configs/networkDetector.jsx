@@ -37,7 +37,9 @@ const NetworkDetector = async () => {
             const isConnected = await testServerConnection(url);
             if (isConnected) {
                 Conn.setServer(url);
-                console.log(`✅ Using cached server: ${url}`);
+                if(url !== "http://localhost:8080/api/"){
+                    console.log(`✅ Using cached server: ${url}`);
+                }
                 return;
             }
             // If cached server fails, remove it from cache
@@ -57,7 +59,9 @@ const NetworkDetector = async () => {
             localStorage.setItem(SERVER_CACHE_KEY, JSON.stringify(serverCache));
             
             Conn.setServer(baseUrl);
-            console.log(`✅ Connected to server: ${baseUrl}`);
+            if(baseUrl !== "http://localhost:8080/api/"){
+                console.log(`✅ Connected to server: ${baseUrl}`);
+            }
             return;
         }
     }

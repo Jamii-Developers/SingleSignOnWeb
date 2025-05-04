@@ -3,17 +3,20 @@ import '../sass/sidebar.sass';
 import React, { useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import { Navbar, Nav, Container, Collapse, NavDropdown, Form, InputGroup, Badge } from 'react-bootstrap';
+import { Navbar, Nav, Container, NavDropdown, Badge } from 'react-bootstrap';
 import {
     FaHome, FaCog, FaFileAlt, FaInfoCircle, FaSignOutAlt, FaUserFriends,
     FaCommentAlt, FaLock, FaUserCog, FaTrash, FaFolder, FaUserPlus, FaUserSlash, FaPhoneAlt, FaEnvelope,
-    FaChevronDown, FaChevronUp, FaBell
+    FaBell, FaQuestionCircle, FaCodeBranch, FaRoad
 } from 'react-icons/fa';
-import Requests from '../myHomeComponents/SocialComponents/requests';
+
+import GlobalSearch from './GlobalSearch';
 
 import JsonNetworkAdapter from '../configs/networkadapter';
 import constants from "../utils/constants";
 import conn from "../configs/conn";
+import ServerErrorMsg from '../frequentlyUsedModals/ServerErrorMsg';
+import ServerSuccessMsg from '../frequentlyUsedModals/ServerSuccessMsg';
 
 // Security utility functions
 const validateSession = (cookies) => {
@@ -37,6 +40,20 @@ const myHomeHeader = () => {
     const [showRequests, setShowRequests] = useState(false);
     const [totalRequests, setTotalRequests] = useState(0);
    
+
+    const [serverErrorResponse, setServerErrorResponse] = useState({
+        serverErrorCode: "",
+        serverErrorSubject: "",
+        serverErrorMessage: "",
+        errServMsgShow: false
+    });
+
+    const [serverSuccessResponse, setServerSuccessResponse] = useState({
+        ui_subject: "",
+        ui_message: "",
+        succServMsgShow: false
+    });
+
     // Security state
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [sessionTimeout, setSessionTimeout] = useState(null);
@@ -182,38 +199,6 @@ const myHomeHeader = () => {
         return children;
     };
 
-    const NavLink = ({ to, icon, children, onClick }) => (
-        <Link to={to} className="nav-link" onClick={onClick}>
-            {icon} {sanitizeInput(children)}
-        </Link>
-    );
-
-    const DropdownItem = ({ to, icon, children, onClick }) => (
-        <Link className="dropdown-item" to={to} onClick={onClick}>
-            {icon} {sanitizeInput(children)}
-        </Link>
-    );
-
-    const MobileDropdown = ({ title, icon, children, dropdownKey }) => {
-        const isOpen = openDropdowns[dropdownKey];
-        return (
-            <div className="mobile-dropdown">
-                <div 
-                    className="mobile-dropdown-header"
-                    onClick={() => toggleDropdown(dropdownKey)}
-                >
-                    {icon} {sanitizeInput(title)}
-                    {isOpen ? <FaChevronUp className="ms-auto" /> : <FaChevronDown className="ms-auto" />}
-                </div>
-                <Collapse in={isOpen}>
-                    <div className="mobile-dropdown-content">
-                        {children}
-                    </div>
-                </Collapse>
-            </div>
-        );
-    };
-
     // Remove the useEffect for dropdown initialization
     useEffect(() => {
         // Initialize all dropdowns
@@ -245,19 +230,7 @@ const myHomeHeader = () => {
                 <Navbar expand="lg" className="main-navbar">
                     <Container fluid>
                         <Navbar.Brand as={Link} to="/myhome/dashboard">JamiiX</Navbar.Brand>
-                        <Form className="d-flex mx-auto">
-                            <InputGroup>
-                                <Form.Control
-                                    type="search"
-                                    placeholder="Search..."
-                                    className="me-2"
-                                    aria-label="Search"
-                                />
-                                <InputGroup.Text>
-                                    <i className="bi bi-search"></i>
-                                </InputGroup.Text>
-                            </InputGroup>
-                        </Form>
+                        <GlobalSearch />
                         <Navbar.Toggle aria-controls="basic-navbar-nav" />
                         <Navbar.Collapse id="basic-navbar-nav">
                             <Nav className="me-auto">
@@ -279,7 +252,8 @@ const myHomeHeader = () => {
                                         <FaUserSlash className="me-1" /> Blocked List
                                     </NavDropdown.Item>
                                     <NavDropdown.Divider />
-                                    <NavDropdown.Item onClick={() => setShowRequests(true)}>
+
+                                    <NavDropdown.Item as={Link} to="/myhome/social/requests">
                                         <FaBell className="me-1" /> Requests
                                         {totalRequests > 0 && (
                                             <Badge bg="primary" className="ms-2">
@@ -323,9 +297,18 @@ const myHomeHeader = () => {
                                     <NavDropdown.Item as={Link} to="/myhome/clientcommunication/contactsupport">
                                         <FaEnvelope className="me-1" /> Contact Support
                                     </NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to="/myhome/clientcommunication/changelog">
+                                        <FaCodeBranch className="me-1" /> Changelog
+                                    </NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to="/myhome/clientcommunication/roadmap">
+                                        <FaRoad className="me-1" /> Roadmap
+                                    </NavDropdown.Item>
                                     <NavDropdown.Item as={Link} to="/myhome/aboutus">
                                         <FaInfoCircle className="me-1" /> About Us
                                     </NavDropdown.Item>
+                                    {/* <NavDropdown.Item as={Link} to="/myhome/help">
+                                        <FaQuestionCircle className="me-1" /> Help
+                                    </NavDropdown.Item> */}
                                 </NavDropdown>
                             </Nav>
                             <Nav>
@@ -343,9 +326,18 @@ const myHomeHeader = () => {
                     </Container>
                 </div>
 
-                <Requests 
-                    show={showRequests} 
-                    handleClose={() => setShowRequests(false)} 
+                <ServerErrorMsg
+                    show={serverErrorResponse.errServMsgShow}
+                    onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
+                    subject={serverErrorResponse.serverErrorSubject}
+                    message={serverErrorResponse.serverErrorMessage}
+                />
+
+                <ServerSuccessMsg
+                    show={serverSuccessResponse.succServMsgShow}
+                    onClose={() => setServerSuccessResponse(prevState => ({ ...prevState, succServMsgShow: false }))}
+                    subject={serverSuccessResponse.ui_subject}
+                    message={serverSuccessResponse.ui_message}
                 />
             </div>
         </ProtectedRoute>

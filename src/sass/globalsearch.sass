@@ -1,0 +1,203 @@
+@use "foundation" as *
+
+.global-search-container
+    position: relative
+    width: 100%
+    max-width: 600px
+
+    .input-group
+        background: rgba(255, 255, 255, 0.1)
+        border-radius: 8px
+        overflow: hidden
+        border: 1px solid rgba(255, 255, 255, 0.2)
+        transition: all 0.3s ease
+
+        &:focus-within
+            background: rgba(255, 255, 255, 0.15)
+            border-color: rgba(255, 255, 255, 0.3)
+
+        .input-group-text
+            background: transparent
+            border: none
+            color: rgba(255, 255, 255, 0.8)
+            padding: 0.5rem 1rem
+
+        .form-control
+            background: transparent
+            border: none
+            color: #fff
+            padding: 0.5rem 1rem
+            font-size: 0.95rem
+
+            &::placeholder
+                color: rgba(255, 255, 255, 0.6)
+
+            &:focus
+                box-shadow: none
+                background: transparent
+
+    .search-results
+        position: absolute
+        top: 100%
+        left: 0
+        right: 0
+        background: #fff
+        border-radius: 8px
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15)
+        margin-top: 0.5rem
+        max-height: 400px
+        overflow-y: auto
+        z-index: 1000
+
+        &::-webkit-scrollbar
+            width: 6px
+
+        &::-webkit-scrollbar-track
+            background: #f1f1f1
+            border-radius: 3px
+
+        &::-webkit-scrollbar-thumb
+            background: #888
+            border-radius: 3px
+
+            &:hover
+                background: #666
+
+        .loading-state
+            display: flex
+            align-items: center
+            gap: 0.75rem
+            padding: 1rem
+            color: #666
+
+            .spinner-border
+                width: 1rem
+                height: 1rem
+                border-width: 2px
+
+        .search-result-item
+            display: flex
+            align-items: center
+            justify-content: space-between
+            gap: 1rem
+            padding: 0.75rem 1rem
+            border-bottom: 1px solid #f0f0f0
+
+            &:last-child
+                border-bottom: none
+
+            &:hover
+                background: #f8f9fa
+
+            .result-content
+                display: flex
+                align-items: center
+                gap: 1rem
+                flex: 1
+                cursor: pointer
+                min-width: 0
+
+            .result-icon
+                font-size: 1.25rem
+                width: 40px
+                height: 40px
+                display: flex
+                align-items: center
+                justify-content: center
+                background: #f8f9fa
+                border-radius: 50%
+                color: $primary-color
+                flex-shrink: 0
+
+            .result-info
+                flex: 1
+                min-width: 0
+
+                .result-name
+                    color: #2c3e50
+                    font-weight: 500
+                    margin-bottom: 0.25rem
+                    display: flex
+                    align-items: center
+                    gap: 0.5rem
+
+                    .username
+                        color: #6c757d
+                        font-size: 0.9rem
+                        font-weight: normal
+
+                .result-type
+                    display: flex
+                    gap: 0.5rem
+                    align-items: center
+                    flex-wrap: wrap
+
+                    .status-badge
+                        font-size: 0.75rem
+                        padding: 0.25rem 0.5rem
+                        border-radius: 12px
+                        font-weight: 500
+
+                        &.online
+                            background: #e8f5e9
+                            color: #2e7d32
+
+                        &.friend
+                            background: #e8f5e9
+                            color: #2e7d32
+
+                        &.not-friend
+                            background: #fff3e0
+                            color: #ef6c00
+
+                        &.pending-friend
+                            background: #fff8e1
+                            color: #ff8f00
+
+                        &.not-following
+                            background: #e3f2fd
+                            color: #1565c0
+
+                        &.following
+                            background: #e8f5e9
+                            color: #2e7d32
+
+                        &.pending-follow
+                            background: #e3f2fd
+                            color: #0d47a1
+
+            .result-actions
+                display: flex
+                gap: 0.5rem
+                flex-shrink: 0
+
+                .action-button
+                    display: flex
+                    align-items: center
+                    gap: 0.5rem
+                    padding: 0.25rem 0.75rem
+                    font-size: 0.875rem
+                    min-width: 120px
+                    justify-content: center
+
+                    &:disabled
+                        cursor: not-allowed
+                        opacity: 0.8
+
+                    svg
+                        font-size: 0.875rem
+
+                    .spinner-border
+                        width: 0.875rem
+                        height: 0.875rem
+                        border-width: 2px
+                        margin-right: 0.25rem
+
+                    .ms-2
+                        margin-left: 0.5rem
+
+        .no-results
+            padding: 1rem
+            text-align: center
+            color: #6c757d
+            font-style: italic 

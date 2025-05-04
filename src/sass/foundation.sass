@@ -1,12 +1,49 @@
+@use "sass:color"
+
 /* Global Styles */
-$primary-color:rgb(93, 4, 107)
-// Accent color
+$primary-color: rgb(93, 4, 107)
 $background-color: #e4e4e4
-// Light background
+$light-bg: #f8f9fa  // Light background for disabled states and subtle backgrounds
+
+/* Border Styles */
 $button-radius: 10px  // Rounded button corners
 $form-input-border-radius: 8px  // Input border radius
-$form-input-height: 38px  // Adjust input field height for consistency
+$border-radius: 8px  // Default border radius for components
 $border-color: #ddd  // Light gray for borders
+
+/* Form Elements */
+$form-input-height: 38px  // Adjust input field height for consistency
+
+/* Text Colors */
+$text-color: #333333
+$text-muted: #6c757d
+$text-light: #ffffff
+
+/* Status Colors */
+$warning-color: #ffc107  // Warning color for alerts and notifications
+$info-color: #17a2b8    // Info color for buttons and highlights
+$success-color: #28a745  // Success color for positive states
+$success-message-color: #1e5631  // Deep green for success messages
+$danger-color: #dc3545   // Danger color for errors and destructive actions
+$error-message-color: #8b0000    // Deep red for error messages
+
+/* Spacing */
+$spacing-xs: 0.25rem
+$spacing-sm: 0.5rem
+$spacing-md: 1rem
+$spacing-lg: 1.5rem
+$spacing-xl: 2rem
+
+/* Shadows */
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1)
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1)
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1)
+$box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15)  // Default box shadow for components
+
+/* Transitions */
+$transition-base: all 0.2s ease-in-out
+$transition-fast: all 0.1s ease-in-out
+$transition-slow: all 0.3s ease-in-out
 
 /* Custom Styles for Brand Logo */
 @keyframes fadeInLogo
@@ -18,15 +55,15 @@ $border-color: #ddd  // Light gray for borders
     transform: translateX(0) scale(1)
 
 .brand-text
-  font-family: 'Roboto', 'Arial', sans-serif  // You can replace this with a custom font
+  font-family: 'Roboto', 'Arial', sans-serif
   font-weight: bold
-  font-size: 2.5rem  // Adjust this to the desired size for your logo
-  color: $primary-color  // Match the primary color for consistency
-  letter-spacing: 2px  // Add spacing between the letters for a more branded feel
-  animation: fadeInLogo 1s ease-out 0.5s forwards  // Animation that fades and scales the logo in
+  font-size: 2.5rem
+  color: $primary-color
+  letter-spacing: 2px
+  animation: fadeInLogo 1s ease-out 0.5s forwards
   transition: all 0.3s ease
 
   &:hover
-    color: lighten($primary-color, 20%)  // Slightly lighten the color on hover for interactivity
-    transform: scale(1.1)  // Slightly scale up the logo on hover for added interactivity
-    text-decoration: none  // Remove any text decoration that may be present
+    color: color.adjust($primary-color, $lightness: 20%)
+    transform: scale(1.1)
+    text-decoration: none

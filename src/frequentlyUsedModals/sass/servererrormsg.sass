@@ -1,0 +1,68 @@
+@import '../../sass/foundation'
+
+.modal-content
+  border: none !important
+  border-radius: $button-radius !important
+  box-shadow: $shadow-md !important
+
+  .error-header
+    background-color: $error-message-color !important
+    color: $text-light !important
+    border-top-left-radius: $button-radius !important
+    border-top-right-radius: $button-radius !important
+    padding: $spacing-md $spacing-lg !important
+    position: relative !important
+    border-bottom: none !important
+    display: flex !important
+    justify-content: space-between !important
+    align-items: center !important
+
+    .error-title
+      font-weight: 600 !important
+      font-size: 1.25rem !important
+      color: $text-light !important
+      margin: 0 !important
+
+    .btn-close
+      color: $text-light !important
+      opacity: 0.8 !important
+      transition: $transition-base !important
+      filter: brightness(0) invert(1) !important
+      margin: 0 !important
+      padding: 0.5rem !important
+      margin-left: auto !important
+
+      &:hover
+        opacity: 1 !important
+
+    .error-timer-bar
+      position: absolute !important
+      bottom: 0 !important
+      left: 0 !important
+      width: 100% !important
+      height: 3px !important
+      background-color: rgba($text-light, 0.2) !important
+
+      .error-timer-progress
+        height: 100% !important
+        background-color: $text-light !important
+        transition: width 0.1s linear !important
+
+  .error-body
+    padding: $spacing-lg !important
+    font-size: 1rem !important
+    line-height: 1.5 !important
+    color: $text-color !important
+
+  .error-footer
+    padding: $spacing-md $spacing-lg !important
+    border-top: 1px solid $border-color !important
+
+    .error-close-btn
+      color: $error-message-color !important
+      border-color: $error-message-color !important
+      transition: $transition-base !important
+
+      &:hover
+        background-color: $error-message-color !important
+        color: $text-light !important 

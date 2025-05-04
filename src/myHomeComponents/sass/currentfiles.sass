@@ -1,3 +1,6 @@
+@use "sass:color"
+@import '../../sass/foundation'
+
 #CurrentFilesContent
     padding: 2rem 0
     background-color: #ffffff
@@ -23,8 +26,8 @@
 
         .action-btn
             padding: 0.75rem
-            color: rgb(93, 4, 107)
-            border-color: rgb(93, 4, 107)
+            color: $primary-color
+            border-color: $primary-color
             background: transparent
             transition: all 0.2s ease
             display: flex
@@ -34,7 +37,7 @@
             height: 42px
 
             &:hover
-                background: rgb(93, 4, 107)
+                background: $primary-color
                 color: #fff
                 transform: translateY(-2px)
 
@@ -69,13 +72,13 @@
 
             .btn
                 padding: 0.75rem 1.5rem
-                background: rgb(93, 4, 107)
+                background: $primary-color
                 border: none
                 color: #ffffff
                 font-weight: 500
 
                 &:hover
-                    background: lighten(rgb(93, 4, 107), 10%)
+                    background: color.adjust($primary-color, $lightness: 10%)
                     color: #ffffff
 
     .folders-grid
@@ -101,23 +104,23 @@
             &:hover
                 transform: translateY(-2px)
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1)
-                border-color: rgb(93, 4, 107)
+                border-color: $primary-color
 
             &.active
                 background: #ffffff
-                border-color: rgb(93, 4, 107)
+                border-color: $primary-color
 
                 .folder-icon
-                    color: rgb(93, 4, 107)
-                    background: rgba(93, 4, 107, 0.1)
+                    color: $primary-color
+                    background: rgba($primary-color, 0.1)
 
                 h3, p
-                    color: rgb(93, 4, 107)
+                    color: $primary-color
 
             .folder-icon
                 font-size: 1.75rem
-                color: rgb(93, 4, 107)
-                background: rgba(93, 4, 107, 0.1)
+                color: $primary-color
+                background: rgba($primary-color, 0.1)
                 padding: 0.75rem
                 border-radius: 8px
                 width: 50px
@@ -154,7 +157,7 @@
             &:hover
                 transform: translateY(-2px)
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1)
-                border-color: rgb(93, 4, 107)
+                border-color: $primary-color
 
             .card-body
                 padding: 1.25rem
@@ -169,8 +172,8 @@
 
                     .file-icon
                         font-size: 2.5rem
-                        color: rgb(93, 4, 107)
-                        background: rgba(93, 4, 107, 0.1)
+                        color: $primary-color
+                        background: rgba($primary-color, 0.1)
                         padding: 0.75rem
                         border-radius: 8px
                         width: 64px
@@ -206,14 +209,14 @@
 
                         .btn
                             padding: 0.75rem
-                            color: rgb(93, 4, 107)
-                            border: 1px solid rgb(93, 4, 107)
+                            color: $primary-color
+                            border: 1px solid $primary-color
                             background: transparent
                             transition: all 0.2s ease
                             border-radius: 8px
 
                             &:hover
-                                background: rgb(93, 4, 107)
+                                background: $primary-color
                                 color: #fff
                                 transform: translateY(-2px)
 
@@ -260,14 +263,14 @@
                 gap: 0.5rem
 
                 .control-btn
-                    color: rgb(93, 4, 107)
+                    color: $primary-color
                     padding: 0.5rem
                     font-size: 1.25rem
                     transition: all 0.2s ease
 
                     &:hover
                         color: #fff
-                        background-color: rgb(93, 4, 107)
+                        background-color: $primary-color
                         border-radius: 50%
 
         .preview-body
@@ -286,7 +289,7 @@
                     position: absolute
                     top: 50%
                     transform: translateY(-50%)
-                    color: rgb(93, 4, 107)
+                    color: $primary-color
                     font-size: 2rem
                     padding: 1rem
                     z-index: 1
@@ -295,7 +298,7 @@
 
                     &:hover
                         opacity: 1
-                        background-color: rgb(93, 4, 107)
+                        background-color: $primary-color
                         color: #fff
                         border-radius: 50%
 
@@ -332,20 +335,20 @@
 
                 &.btn-secondary
                     background-color: transparent
-                    border-color: rgb(93, 4, 107)
-                    color: rgb(93, 4, 107)
+                    border-color: $primary-color
+                    color: $primary-color
 
                     &:hover
-                        background-color: rgb(93, 4, 107)
+                        background-color: $primary-color
                         color: #fff
 
                 &.btn-primary
-                    background-color: rgb(93, 4, 107)
-                    border-color: rgb(93, 4, 107)
+                    background-color: $primary-color
+                    border-color: $primary-color
 
                     &:hover
-                        background-color: lighten(rgb(93, 4, 107), 10%)
-                        border-color: lighten(rgb(93, 4, 107), 10%)
+                        background-color: color.adjust($primary-color, $lightness: 10%)
+                        border-color: color.adjust($primary-color, $lightness: 10%)
 
     @media (max-width: 768px)
         padding: 1rem 0

@@ -57,6 +57,7 @@
         border-radius: 15px
         box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05)
         transition: all 0.3s ease
+        margin-bottom: 1rem
 
         &:hover
             transform: translateY(-5px)
@@ -75,6 +76,7 @@
                 width: 80px
                 height: 80px
                 margin-right: 1rem
+                flex-shrink: 0
 
                 .profile-image
                     width: 100%
@@ -102,16 +104,23 @@
 
             .profile-info
                 flex: 1
+                min-width: 0 // Prevents text overflow
 
                 .card-title
                     font-size: 1.1rem
                     font-weight: 600
                     color: #2c3e50
                     margin-bottom: 0.25rem
+                    white-space: nowrap
+                    overflow: hidden
+                    text-overflow: ellipsis
 
                 .card-subtitle
                     font-size: 0.9rem
                     color: #6c757d
+                    white-space: nowrap
+                    overflow: hidden
+                    text-overflow: ellipsis
 
         .profile-actions
             .btn-group
@@ -184,4 +193,7 @@
 
         .search-container
             margin-bottom: 1rem
-            padding: 0 0.5rem 
+            padding: 0 0.5rem
+
+        .follower-card
+            margin-bottom: 0.5rem 

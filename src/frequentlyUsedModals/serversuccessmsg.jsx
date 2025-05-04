@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { FaCheckCircle, FaTimes } from 'react-icons/fa';
-import '../sass/messages.sass';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import './sass/serversuccessmsg.sass';
 
-const ServerSuccessMsg = ({ subject, message, show, onClose }) => {
-    const [isVisible, setIsVisible] = useState(show);
+const ServerSuccessMsg = ({ show, onClose, subject, message }) => {
     const [timer, setTimer] = useState(5);
 
     useEffect(() => {
         if (show) {
-            setIsVisible(true);
             setTimer(5);
             const countdown = setInterval(() => {
                 setTimer((prev) => {
                     if (prev <= 1) {
                         clearInterval(countdown);
-                        handleClose();
+                        onClose();
                         return 0;
                     }
                     return prev - 1;
@@ -23,38 +22,29 @@ const ServerSuccessMsg = ({ subject, message, show, onClose }) => {
 
             return () => clearInterval(countdown);
         }
-    }, [show]);
-
-    const handleClose = () => {
-        setIsVisible(false);
-        onClose();
-    };
-
-    if (!isVisible) return null;
+    }, [show, onClose]);
 
     return (
-        <div className={`server-message-container ${isVisible ? 'show' : 'hide'}`}>
-            <div className="server-success-message">
-                <div className="icon">
-                    <FaCheckCircle />
-                </div>
-                <div className="content">
-                    <div className="subject">{subject}</div>
-                    <div className="message">{message}</div>
-                </div>
-                <button className="close-button" onClick={handleClose}>
-                    <FaTimes className="close-icon" />
-                </button>
-                <div className="timer-bar">
-                    <div 
-                        className="timer-progress" 
-                        style={{ 
-                            animation: `timerCountdown ${timer}s linear forwards`,
-                            width: `${(timer / 5) * 100}%`
-                        }}
-                    />
-                </div>
-            </div>
+        <div >
+            <Modal show={show} onHide={onClose} centered dialogClassName="success-dialog">
+                <Modal.Header className="success-header" closeButton>
+                    <Modal.Title className="success-title">{subject}</Modal.Title>
+                    <div className="success-timer-bar">
+                        <div 
+                            className="success-timer-progress" 
+                            style={{ width: `${(timer / 5) * 100}%` }}
+                        />
+                    </div>
+                </Modal.Header>
+                <Modal.Body className="success-body">
+                    <p>{message}</p>
+                </Modal.Body>
+                <Modal.Footer className="success-footer">
+                    <Button variant="outline-success" className="success-close-btn" onClick={onClose}>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };

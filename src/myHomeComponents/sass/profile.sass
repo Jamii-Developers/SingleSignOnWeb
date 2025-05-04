@@ -1,0 +1,91 @@
+@import '../../sass/foundation'
+
+#ProfileContent
+    padding: 2rem
+    max-width: 1200px
+    margin: 0 auto
+
+    h1
+        color: #2c3e50
+        font-size: 2rem
+        font-weight: 600
+        margin-bottom: 2rem
+        padding-bottom: 1rem
+        border-bottom: 2px solid $primary-color
+
+    .form-label
+        color: #2c3e50
+        font-weight: 500
+        margin-bottom: 0.5rem
+
+    .form-control
+        border: 2px solid #e0e0e0
+        border-radius: 8px
+        padding: 0.75rem 1rem
+        transition: all 0.2s ease
+
+        &:focus
+            border-color: $primary-color
+            box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25)
+
+        &:disabled
+            background-color: #f8f9fa
+            cursor: not-allowed
+
+    .form-check
+        margin-bottom: 1.5rem
+
+        .form-check-input
+            &:checked
+                background-color: $primary-color
+                border-color: $primary-color
+
+        .form-check-label
+            color: #2c3e50
+            font-weight: 500
+
+    .btn-group
+        .btn
+            padding: 0.75rem 1.5rem
+            font-weight: 500
+            border-width: 2px
+            transition: all 0.2s ease
+
+            &:hover
+                transform: translateY(-2px)
+
+            &.btn-outline-primary
+                color: $primary-color
+                border-color: $primary-color
+
+                &:hover
+                    background-color: $primary-color
+                    color: white
+
+            &.btn-outline-info
+                color: #17a2b8
+                border-color: #17a2b8
+
+                &:hover
+                    background-color: #17a2b8
+                    color: white
+
+            .spinner-border
+                margin-right: 0.5rem
+
+    .row
+        margin-bottom: 1rem
+
+    .col
+        margin-bottom: 1rem
+
+    @media (max-width: 768px)
+        padding: 1rem
+
+        h1
+            font-size: 1.75rem
+            margin-bottom: 1.5rem
+
+        .btn-group
+            .btn
+                padding: 0.5rem 1rem 

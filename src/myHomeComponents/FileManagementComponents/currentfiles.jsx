@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Button, ButtonGroup, Form, InputGroup, Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { FaFile, FaFilePdf, FaFileWord, FaFileImage, FaFolder, FaSearch, FaDownload, FaShare, FaTrash, FaEye, FaChevronLeft, FaChevronRight, FaExpand, FaCompress, FaTimes, FaUpload, FaFileAlt } from 'react-icons/fa';
+import { FaFile, FaFilePdf, FaFileWord, FaFileImage, FaFolder, FaSearch, FaDownload, FaShare, FaTrash, FaEye, FaChevronLeft, FaChevronRight, FaExpand, FaCompress, FaTimes, FaUpload, FaFileAlt, FaPlus } from 'react-icons/fa';
 import UploadModal from './UploadModal';
+import TextEditorModal from './TextEditorModal';
 import '../sass/currentfiles.sass';
 
 const Currentfiles = () => {
@@ -13,6 +14,8 @@ const Currentfiles = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [showTextEditor, setShowTextEditor] = useState(false);
+    const [currentDoc, setCurrentDoc] = useState(null);
 
     // Mock data for folders
     const [folders] = useState([
@@ -173,6 +176,43 @@ const Currentfiles = () => {
         </Card>
     );
 
+    const handleCreateDocx = () => {
+        setCurrentDoc({
+            name: 'New Document.docx',
+            content: '',
+            type: 'docx'
+        });
+        setShowTextEditor(true);
+    };
+
+    const handleSaveDocx = async (content) => {
+        try {
+            // TODO: Replace with actual API endpoint
+            const response = await fetch('/api/files/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: currentDoc.name,
+                    content: content,
+                    type: 'docx'
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save document');
+            }
+
+            // Refresh the files list
+            fetchFiles();
+            setShowTextEditor(false);
+        } catch (error) {
+            console.error('Error saving document:', error);
+            // TODO: Add error handling/notification
+        }
+    };
+
     if (loading) {
         return (
             <div className="text-center p-5">
@@ -212,7 +252,11 @@ const Currentfiles = () => {
                                         placement="top"
                                         overlay={<Tooltip>Create Document</Tooltip>}
                                     >
-                                        <Button variant="outline-primary" className="action-btn">
+                                        <Button 
+                                            variant="outline-primary" 
+                                            className="action-btn"
+                                            onClick={handleCreateDocx}
+                                        >
                                             <FaFileAlt />
                                         </Button>
                                     </OverlayTrigger>
@@ -346,6 +390,13 @@ const Currentfiles = () => {
                         </Button>
                     </Modal.Footer>
                 </Modal>
+
+                <TextEditorModal
+                    show={showTextEditor}
+                    onHide={() => setShowTextEditor(false)}
+                    document={currentDoc}
+                    onSave={handleSaveDocx}
+                />
             </Container>
         </div>
     );
