@@ -67,8 +67,9 @@ const Friends = () => {
 				const formattedFriends = result.data.results.map(friend => ({
 					id: friend.userKey,
 					username: friend.username,
-					firstName: friend.firstname === 'N/A' ? '' : friend.firstname,
-					lastName: friend.lastname === 'N/A' ? '' : friend.lastname
+					name: friend.firstname === 'N/A' || friend.lastname === 'N/A' 
+                        ? friend.username 
+                        : `${friend.firstname} ${friend.lastname}`.trim()
 				}));
 				setFriends(formattedFriends);
 				setFilteredFriends(formattedFriends);
@@ -212,7 +213,7 @@ const Friends = () => {
 					</div>
 					<div className="profile-info">
 						<Card.Title>
-							{friend.firstName} {friend.lastName}
+							{friend.name}
 						</Card.Title>
 						<Card.Subtitle>
 							@{friend.username}

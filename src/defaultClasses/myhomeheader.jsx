@@ -7,7 +7,7 @@ import { Navbar, Nav, Container, NavDropdown, Badge } from 'react-bootstrap';
 import {
     FaHome, FaCog, FaFileAlt, FaInfoCircle, FaSignOutAlt, FaUserFriends,
     FaCommentAlt, FaLock, FaUserCog, FaTrash, FaFolder, FaUserPlus, FaUserSlash, FaPhoneAlt, FaEnvelope,
-    FaBell, FaCodeBranch, FaRoad
+    FaBell, FaCodeBranch, FaRoad, FaUser
 } from 'react-icons/fa';
 
 import GlobalSearch from './GlobalSearch';
@@ -246,11 +246,12 @@ const myHomeHeader = () => {
                                         <FaUserFriends className="me-1" /> Friends
                                     </NavDropdown.Item>
                                     <NavDropdown.Item as={Link} to="/myhome/social/followers">
-                                        <FaUserPlus className="me-1" /> Followers
+                                        <FaUserPlus className="me-1" /> Follows
                                     </NavDropdown.Item>
                                     <NavDropdown.Item as={Link} to="/myhome/social/blockedlist">
                                         <FaUserSlash className="me-1" /> Blocked List
                                     </NavDropdown.Item>
+
                                     <NavDropdown.Divider />
 
                                     <NavDropdown.Item as={Link} to="/myhome/social/requests">
@@ -312,6 +313,10 @@ const myHomeHeader = () => {
                                 </NavDropdown>
                             </Nav>
                             <Nav>
+                                <Nav.Link className="text-white">
+                                    <FaUser className="me-1" />
+                                    {cookies.userSession?.USERNAME || 'User'}
+                                </Nav.Link>
                                 <Nav.Link onClick={DestroyCookie}>
                                     <FaSignOutAlt className="me-1" /> Logout
                                 </Nav.Link>

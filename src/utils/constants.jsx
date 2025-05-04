@@ -1,3 +1,5 @@
+import { deprecatedPropType } from "@mui/material";
+
 const Constants = {
 
     SUCCESS_MESSAGE : {
@@ -20,7 +22,9 @@ const Constants = {
         TYPE_GET_FRIEND_REQUEST_LIST_REQUEST : "SUC|017",
         TYPE_GET_FOLLOW_REQUEST_LIST_REQUEST : "SUC|018",
         TYPE_BLOCK_USER_REQUEST : "SUC|019",
+        /** @deprecated Use TYPE_REJECT_FRIEND_REQUEST instead */
         TYPE_REMOVE_FRIEND_REQUEST : "SUC|020",
+        /** @deprecated Use TYPE_REJECT_FOLLOW_REQUEST instead */
         TYPE_REMOVE_FOLLOW_REQUEST : "SUC|021",
         TYPE_GET_BLOCK_USER_LIST_REQUEST : "SUC|022",
         TYPE_FETCH_USER_DATA :  "SUC|023",

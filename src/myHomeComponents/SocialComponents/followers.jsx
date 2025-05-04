@@ -1,10 +1,8 @@
-import React from "react";
-import { Container, Row, Col, Card, Button, ButtonGroup, Form, InputGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { useCookies } from "react-cookie";
-import { useEffect, useState } from "react";
-import { FaUser, FaEnvelope, FaUserMinus, FaBan, FaSearch, FaUserPlus } from 'react-icons/fa';
-import BlankProfilePic from '../../img/blankprofile.png';
-import '../sass/followers.sass';
+import React, { useState, useEffect } from 'react';
+import { ListGroup, Button, Container, Row, Col, Nav, Tab, ButtonGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { FaArrowLeft, FaUserPlus, FaUserMinus, FaUser, FaEnvelope, FaBan } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
 import JsonNetworkAdapter from '../../configs/networkadapter';
 import conn from '../../configs/conn';
 import constants from '../../utils/constants';
@@ -13,10 +11,12 @@ import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg';
 
 const Followers = () => {
     const [cookies] = useCookies("userSession");
+    const navigate = useNavigate();
     const [followers, setFollowers] = useState([]);
-    const [filteredFollowers, setFilteredFollowers] = useState([]);
+    const [following, setFollowing] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [processingFollow, setProcessingFollow] = useState(new Set());
+    const [processingUnfollow, setProcessingUnfollow] = useState(new Set());
 
     const [serverErrorResponse, setServerErrorResponse] = useState({
         serverErrorCode: "",
@@ -31,7 +31,7 @@ const Followers = () => {
         succServMsgShow: false
     });
 
-    const fetchFollowers = async () => {
+    const fetchFollows = async ( ) => {
         try {
             const requestData = {
                 deviceKey: cookies.userSession.DEVICE_KEY,
@@ -39,10 +39,13 @@ const Followers = () => {
                 sessionKey: cookies.userSession.SESSION_KEY
             };
 
-            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.GET_FOLLOWER_LIST };
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
-            console.log('Followers Response:', result.data);
+            const headers = { 
+                ...conn.CONTENT_TYPE.CONTENT_JSON, 
+                ...conn.SERVICE_HEADERS.GET_FOLLOW_LIST,
+            };
 
+            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
+            console.log(result);
             if (result.status === 200) {
                 if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
                     setServerErrorResponse(prevState => ({
@@ -52,84 +55,104 @@ const Followers = () => {
                         serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
                         errServMsgShow: true
                     }));
-                    return;
-                }
-
-                if (constants.SUCCESS_MESSAGE.TYPE_GET_FOLLOW_LIST_REQUEST === result.data.MSG_TYPE) {
-                    setServerSuccessResponse(prevState => ({
-                        ...prevState,
-                        ui_subject: result.data.UI_SUBJECT,
-                        ui_message: result.data.UI_MESSAGE,
-                        succServMsgShow: true   
+                } else {
+                    const formattedUsers = result.data.results.map(user => ({
+                        id: user.userKey,
+                        username: user.username,
+                        firstName: user.firstname === 'N/A' ? '' : user.firstname,
+                        lastName: user.lastname === 'N/A' ? '' : user.lastname,
+                        typeOfFollow: user.typeOfFollow // This will come from the API response
                     }));
-                }
+                    console.log(formattedUsers);
+                    // Split the results based on typeOfFollow
+                    const followers = formattedUsers.filter(user => user.typeOfFollow === 'follower');
+                    const following = formattedUsers.filter(user => user.typeOfFollow === 'following');
 
-                const formattedFollowers = result.data.results.map(follower => ({
-                    id: follower.userKey,
-                    username: follower.username,
-                    firstName: follower.firstname === 'N/A' ? '' : follower.firstname,
-                    lastName: follower.lastname === 'N/A' ? '' : follower.lastname
-                }));
-                setFollowers(formattedFollowers);
-                setFilteredFollowers(formattedFollowers);
-            } else {
-                setFollowers([]);
-                setFilteredFollowers([]);
+                    setFollowers(followers);
+                    setFollowing(following);
+                }
             }
         } catch (error) {
-            console.error('Error fetching followers:', error);
-            setFollowers([]);
-            setFilteredFollowers([]);
+            console.error('Error fetching connections:', error);
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "ERR|001",
+                serverErrorSubject: "Error",
+                serverErrorMessage: "Failed to fetch connections",
+                errServMsgShow: true
+            }));
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchFollowers();
-    }, []);
-
-    const handleSearch = () => {
-        if (!searchQuery.trim()) {
-            setFilteredFollowers(followers);
-            return;
-        }
-
-        const query = searchQuery.toLowerCase().trim();
-        const filtered = followers.filter(follower => {
-            const fullName = `${follower.firstName} ${follower.lastName}`.toLowerCase();
-            const username = follower.username.toLowerCase();
-            return fullName.includes(query) || username.includes(query);
-        });
-        setFilteredFollowers(filtered);
-    };
-
-    useEffect(() => {
-        handleSearch();
-    }, [searchQuery]);
-
-    const handleViewProfile = (followerId) => {
-        // Implement view profile functionality
-        console.log('View profile:', followerId);
-    };
-
-    const handleMessage = (followerId) => {
-        // Implement message functionality
-        console.log('Message follower:', followerId);
-    };
-
-    const handleRemoveFollow = async (followerId) => {
+    const handleFollow = async (userId) => {
         try {
+            setProcessingFollow(prev => new Set([...prev, userId]));
             const requestData = {
                 deviceKey: cookies.userSession.DEVICE_KEY,
                 userKey: cookies.userSession.USER_KEY,
                 sessionKey: cookies.userSession.SESSION_KEY,
-                targetUserKey: followerId
+                targetUserKey: userId
+            };
+
+            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.SEND_FOLLOW_REQUEST };
+            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
+
+            if (result.status === 200) {
+                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
+                    setServerErrorResponse(prevState => ({
+                        ...prevState,
+                        serverErrorCode: result.data.ERROR_FIELD_CODE,
+                        serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
+                        serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
+                        errServMsgShow: true
+                    }));
+                    return;
+                }
+
+                setServerSuccessResponse(prevState => ({
+                    ...prevState,
+                    ui_subject: result.data.UI_SUBJECT,
+                    ui_message: result.data.UI_MESSAGE,
+                    succServMsgShow: true
+                }));
+
+                // Update the followers list to show the user is now following
+                setFollowers(prev => prev.map(user => 
+                    user.id === userId ? { ...user, isFollowing: true } : user
+                ));
+            }
+        } catch (error) {
+            console.error('Error following user:', error);
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "ERR|001",
+                serverErrorSubject: "Error",
+                serverErrorMessage: "Failed to follow user",
+                errServMsgShow: true
+            }));
+        } finally {
+            setProcessingFollow(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(userId);
+                return newSet;
+            });
+        }
+    };
+
+    const handleUnfollow = async (userId) => {
+        try {
+            setProcessingUnfollow(prev => new Set([...prev, userId]));
+            const requestData = {
+                deviceKey: cookies.userSession.DEVICE_KEY,
+                userKey: cookies.userSession.USER_KEY,
+                sessionKey: cookies.userSession.SESSION_KEY,
+                targetUserKey: userId
             };
 
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.REJECT_FOLLOW_REQUEST };
             const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
-            console.log('Remove Follow Response:', result.data);
 
             if (result.status === 200) {
                 if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
@@ -143,227 +166,221 @@ const Followers = () => {
                     return;
                 }
 
-                if (constants.SUCCESS_MESSAGE.TYPE_REJECT_FOLLOW_REQUEST === result.data.MSG_TYPE) {
-                    setServerSuccessResponse(prevState => ({
-                        ...prevState,
-                        ui_subject: result.data.UI_SUBJECT,
-                        ui_message: result.data.UI_MESSAGE,
-                        succServMsgShow: true
-                    }));
-                    // Remove the follower from the list
-                    setFollowers(prev => prev.filter(f => f.id !== followerId));
-                }
+                setServerSuccessResponse(prevState => ({
+                    ...prevState,
+                    ui_subject: result.data.UI_SUBJECT,
+                    ui_message: result.data.UI_MESSAGE,
+                    succServMsgShow: true
+                }));
+
+                setFollowing(prev => prev.filter(user => user.id !== userId));
             }
         } catch (error) {
-            console.error('Error removing follower:', error);
+            console.error('Error unfollowing user:', error);
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "ERR|001",
+                serverErrorSubject: "Error",
+                serverErrorMessage: "Failed to unfollow user",
+                errServMsgShow: true
+            }));
+        } finally {
+            setProcessingUnfollow(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(userId);
+                return newSet;
+            });
         }
     };
 
-    const handleBlock = async (followerId) => {
-        try {
-            const requestData = {
-                deviceKey: cookies.userSession.DEVICE_KEY,
-                userKey: cookies.userSession.USER_KEY,
-                sessionKey: cookies.userSession.SESSION_KEY,
-                targetUserKey: followerId
-            };
-
-            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.BLOCK_USER };
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
-            console.log('Block Response:', result.data);
-
-            if (result.status === 200) {
-                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
-                    setServerErrorResponse(prevState => ({
-                        ...prevState,
-                        serverErrorCode: result.data.ERROR_FIELD_CODE,
-                        serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
-                        serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
-                        errServMsgShow: true
-                    }));
-                    return;
-                }
-
-                if (constants.SUCCESS_MESSAGE.TYPE_BLOCK_USER === result.data.MSG_TYPE) {
-                    setServerSuccessResponse(prevState => ({
-                        ...prevState,
-                        ui_subject: result.data.UI_SUBJECT,
-                        ui_message: result.data.UI_MESSAGE,
-                        succServMsgShow: true
-                    }));
-                    // Remove the blocked follower from the list
-                    setFollowers(prev => prev.filter(f => f.id !== followerId));
-                }
-            }
-        } catch (error) {
-            console.error('Error blocking follower:', error);
-        }
+    const handleBlock = (userId) => {
+        // Implementation of handleBlock function
     };
 
-    const FollowerCard = ({ follower }) => (
-        <Card className="follower-card">
-            <Card.Body>
-                <div className="profile-header">
-                    <div className="profile-image-container">
-                        <img src={BlankProfilePic} alt="Profile" className="profile-image" />
-                        <div className="follower-badge">
-                            <FaUserPlus />
-                        </div>
-                    </div>
-                    <div className="profile-info">
-                        <Card.Title>
-                            {follower.firstName} {follower.lastName}
-                        </Card.Title>
-                        <Card.Subtitle>
-                            @{follower.username}
-                        </Card.Subtitle>
-                    </div>
-                </div>
-                <div className="profile-actions">
-                    <ButtonGroup className="w-100">
-                        <OverlayTrigger
-                            placement="top"
-                            overlay={<Tooltip>View Profile</Tooltip>}
-                        >
-                            <Button 
-                                variant="outline-primary" 
-                                size="sm"
-                                onClick={() => handleViewProfile(follower.id)}
-                            >
-                                <FaUser />
-                            </Button>
-                        </OverlayTrigger>
-                        <OverlayTrigger
-                            placement="top"
-                            overlay={<Tooltip>Message</Tooltip>}
-                        >
-                            <Button 
-                                variant="outline-info" 
-                                size="sm"
-                                onClick={() => handleMessage(follower.id)}
-                            >
-                                <FaEnvelope />
-                            </Button>
-                        </OverlayTrigger>
-                        <OverlayTrigger
-                            placement="top"
-                            overlay={<Tooltip>Remove Follow</Tooltip>}
-                        >
-                            <Button 
-                                variant="outline-warning" 
-                                size="sm"
-                                onClick={() => handleRemoveFollow(follower.id)}
-                            >
-                                <FaUserMinus />
-                            </Button>
-                        </OverlayTrigger>
-                        <OverlayTrigger
-                            placement="top"
-                            overlay={<Tooltip>Block</Tooltip>}
-                        >
-                            <Button 
-                                variant="outline-danger" 
-                                size="sm"
-                                onClick={() => handleBlock(follower.id)}
-                            >
-                                <FaBan />
-                            </Button>
-                        </OverlayTrigger>
-                    </ButtonGroup>
-                </div>
-            </Card.Body>
-        </Card>
-    );
+    useEffect(() => {
+        fetchFollows( );
+    }, []);
 
-    if (loading) {
-        return (
-            <div className="text-center p-5">
-                <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div id="FollowersContent">
-            <Container fluid>
-                <Row>
-                    <Col>
-                        <div className="page-header">
-                            <h2>Followers</h2>
-                            <p className="text-muted">Manage your followers list</p>
-                        </div>
-                        <div className="search-container">
-                            <InputGroup>
-                                <InputGroup.Text>
-                                    <FaSearch />
-                                </InputGroup.Text>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Search followers..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
-                                <Button 
-                                    variant="primary" 
-                                    onClick={handleSearch}
-                                >
-                                    Search
-                                </Button>
-                            </InputGroup>
-                        </div>
-                    </Col>
-                </Row>
-                
-                {/* Desktop Grid View */}
-                <Row className="d-none d-lg-flex">
-                    {filteredFollowers.map((follower) => (
-                        <Col key={follower.id} xs={12} md={6} lg={4} xl={3} className="mb-4">
-                            <FollowerCard follower={follower} />
+    const UserList = ({ users, type }) => (
+        <Row xs={1} sm={2} md={3} lg={4} className="g-4">
+            {loading ? (
+                <Col xs={12} className="text-center p-4">
+                    <div className="spinner-border" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                </Col>
+            ) : (
+                <>
+                    {users.map(user => (
+                        <Col key={user.id}>
+                            <div className="user-card p-3 border rounded h-100">
+                                <div className="d-flex flex-column h-100">
+                                    <div className="mb-3">
+                                        <h6 className="mb-1">
+                                            {user.firstName && user.lastName 
+                                                ? `${user.firstName} ${user.lastName}`.trim()
+                                                : user.username}
+                                        </h6>
+                                        <small className="text-muted">@{user.username}</small>
+                                    </div>
+                                    <div className="mt-auto">
+                                        <ButtonGroup className="w-100">
+                                            <OverlayTrigger
+                                                placement="top"
+                                                overlay={<Tooltip>View Profile</Tooltip>}
+                                            >
+                                                <Button
+                                                    variant="outline-primary"
+                                                    size="sm"
+                                                    onClick={() => navigate(`/profile/${user.id}`)}
+                                                >
+                                                    <FaUser />
+                                                </Button>
+                                            </OverlayTrigger>
+                                            {type === 'followers' ? (
+                                                <>
+                                                    <OverlayTrigger
+                                                        placement="top"
+                                                        overlay={<Tooltip>{user.isFollowing ? 'Unfollow' : 'Follow'}</Tooltip>}
+                                                    >
+                                                        <Button
+                                                            variant={user.isFollowing ? "outline-secondary" : "outline-primary"}
+                                                            size="sm"
+                                                            onClick={() => user.isFollowing ? handleUnfollow(user.id) : handleFollow(user.id)}
+                                                            disabled={processingFollow.has(user.id) || processingUnfollow.has(user.id)}
+                                                        >
+                                                            {processingFollow.has(user.id) || processingUnfollow.has(user.id) ? (
+                                                                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                                                            ) : user.isFollowing ? (
+                                                                <FaUserMinus />
+                                                            ) : (
+                                                                <FaUserPlus />
+                                                            )}
+                                                        </Button>
+                                                    </OverlayTrigger>
+                                                    <OverlayTrigger
+                                                        placement="top"
+                                                        overlay={<Tooltip>Block User</Tooltip>}
+                                                    >
+                                                        <Button
+                                                            variant="outline-danger"
+                                                            size="sm"
+                                                            onClick={() => handleBlock(user.id)}
+                                                        >
+                                                            <FaBan />
+                                                        </Button>
+                                                    </OverlayTrigger>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <OverlayTrigger
+                                                        placement="top"
+                                                        overlay={<Tooltip>Send Message</Tooltip>}
+                                                    >
+                                                        <Button
+                                                            variant="outline-info"
+                                                            size="sm"
+                                                            onClick={() => navigate(`/messages/${user.id}`)}
+                                                        >
+                                                            <FaEnvelope />
+                                                        </Button>
+                                                    </OverlayTrigger>
+                                                    <OverlayTrigger
+                                                        placement="top"
+                                                        overlay={<Tooltip>Unfollow</Tooltip>}
+                                                    >
+                                                        <Button
+                                                            variant="outline-danger"
+                                                            size="sm"
+                                                            onClick={() => handleUnfollow(user.id)}
+                                                            disabled={processingUnfollow.has(user.id)}
+                                                        >
+                                                            {processingUnfollow.has(user.id) ? (
+                                                                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                                                            ) : (
+                                                                <FaUserMinus />
+                                                            )}
+                                                        </Button>
+                                                    </OverlayTrigger>
+                                                </>
+                                            )}
+                                        </ButtonGroup>
+                                    </div>
+                                </div>
+                            </div>
                         </Col>
                     ))}
-                </Row>
-
-                {/* Mobile List View */}
-                <Row className="d-lg-none">
-                    <Col>
-                        <div className="mobile-followers-list">
-                            {filteredFollowers.map((follower) => (
-                                <div key={follower.id} className="mobile-follower-item">
-                                    <FollowerCard follower={follower} />
-                                </div>
-                            ))}
-                        </div>
-                    </Col>
-                </Row>
-
-                {/* Show message when no results found */}
-                {!loading && filteredFollowers.length === 0 && (
-                    <Row>
-                        <Col className="text-center">
-                            <p className="text-muted mt-4">
-                                {searchQuery ? 'No followers found matching your search.' : 'No followers found.'}
-                            </p>
+                    {users.length === 0 && (
+                        <Col xs={12}>
+                            <div className="text-center text-muted p-4 border rounded">
+                                No {type} found
+                            </div>
                         </Col>
-                    </Row>
-                )}
+                    )}
+                </>
+            )}
+        </Row>
+    );
 
-                <ServerErrorMsg
-                    show={serverErrorResponse.errServMsgShow}
-                    onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
-                    subject={serverErrorResponse.serverErrorSubject}
-                    message={serverErrorResponse.serverErrorMessage}
-                />
+    return (
+        <Container fluid className="followers-page">
+            <Row className="mb-4">
+                <Col>
+                    <div className="d-flex align-items-center">
+                        <Button 
+                            variant="link" 
+                            className="back-button me-3" 
+                            onClick={() => navigate(-1)}
+                        >
+                            <FaArrowLeft />
+                        </Button>
+                        <h2 className="mb-0">Follows</h2>
+                    </div>
+                </Col>
+            </Row>
 
-                <ServerSuccessMsg
-                    show={serverSuccessResponse.succServMsgShow}
-                    onClose={() => setServerSuccessResponse(prevState => ({ ...prevState, succServMsgShow: false }))}
-                    subject={serverSuccessResponse.ui_subject}
-                    message={serverSuccessResponse.ui_message}
-                />
-            </Container>
-        </div>
+            <Row>
+                <Col>
+                    <Tab.Container defaultActiveKey="followers">
+                        <Nav variant="tabs" className="mb-3">
+                            <Nav.Item>
+                                <Nav.Link eventKey="followers">
+                                    Followers ({followers.length})
+                                </Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link eventKey="following">
+                                    Following ({following.length})
+                                </Nav.Link>
+                            </Nav.Item>
+                        </Nav>
+
+                        <Tab.Content>
+                            <Tab.Pane eventKey="followers">
+                                <UserList users={followers} type="followers" />
+                            </Tab.Pane>
+                            <Tab.Pane eventKey="following">
+                                <UserList users={following} type="following" />
+                            </Tab.Pane>
+                        </Tab.Content>
+                    </Tab.Container>
+                </Col>
+            </Row>
+
+            <ServerErrorMsg
+                show={serverErrorResponse.errServMsgShow}
+                onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
+                subject={serverErrorResponse.serverErrorSubject}
+                message={serverErrorResponse.serverErrorMessage}
+            />
+
+            <ServerSuccessMsg
+                show={serverSuccessResponse.succServMsgShow}
+                onClose={() => setServerSuccessResponse(prevState => ({ ...prevState, succServMsgShow: false }))}
+                subject={serverSuccessResponse.ui_subject}
+                message={serverSuccessResponse.ui_message}
+            />
+        </Container>
     );
 };
 

@@ -38,7 +38,7 @@ const Conn = {
         DEACTIVATE_USER:    {'Service-Header' : 'deactivateuser'},
         SEND_FRIEND_REQUEST: {'Service-Header' : 'sendfriendrequest'},
         GET_FRIEND_REQUEST_LIST: {'Service-Header' : 'getfriendrequestlist'},
-        GET_FOLLOWER_LIST: {'Service-Header' : 'getfollowerlist'},
+        GET_FOLLOW_LIST: {'Service-Header' : 'getfollowerlist'},
         GET_FOLLOWER_REQUEST_LIST: {'Service-Header' : 'getfollowerrequestlist'},
         SEND_FOLLOW_REQUEST: {'Service-Header' : 'sendfollowrequest'},
         ACCEPT_FRIEND_REQUEST: {'Service-Header' : 'acceptfriendrequest'},

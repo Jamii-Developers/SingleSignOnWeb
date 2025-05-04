@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Button, ListGroup, Badge, OverlayTrigger, Tooltip, Container, Row, Col } from 'react-bootstrap';
-import { FaUserPlus, FaUserCheck, FaUserTimes, FaUserFriends, FaArrowLeft } from 'react-icons/fa';
+import { Button, ListGroup, Badge, OverlayTrigger, Tooltip, Container, Row, Col, Nav, Tab, ButtonGroup } from 'react-bootstrap';
+import { FaUserPlus, FaUserCheck, FaUserTimes, FaUserFriends, FaArrowLeft, FaUser, FaBan } from 'react-icons/fa';
 import { useCookies } from "react-cookie";
 import { useNavigate } from 'react-router-dom';
 import '../sass/requests.sass';
@@ -34,7 +34,7 @@ const Requests = () => {
     const [loading, setLoading] = useState(true);
     const [processingRequests, setProcessingRequests] = useState(new Set());
 
-    const fetchFriendRequests = async () => {
+    const fetchRequests = async () => {
         try {
             const requestData = {
                 deviceKey: cookies.userSession.DEVICE_KEY,
@@ -42,85 +42,64 @@ const Requests = () => {
                 sessionKey: cookies.userSession.SESSION_KEY
             };
 
-            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.GET_FRIEND_REQUEST_LIST };
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
-            console.log(result.data);
+            // Fetch friend requests first
+            const friendHeaders = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.GET_FRIEND_REQUEST_LIST };
+            const friendResult = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers: friendHeaders });
 
-            if (result.status === 200 ) {
+            if (friendResult.status === 200) {
+                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE !== friendResult.data.ERROR_MSG_TYPE) {
+                    if (constants.SUCCESS_MESSAGE.TYPE_GET_FRIEND_REQUEST_LIST_REQUEST === friendResult.data.MSG_TYPE) {
+                        setServerSuccessResponse(prevState => ({
+                            ...prevState,
+                            ui_subject: friendResult.data.UI_SUBJECT,
+                            ui_message: friendResult.data.UI_MESSAGE,
+                            succServMsgShow: true   
+                        }));
+                    }
 
-                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
-                    return;
-                }
-                
-                if (constants.SUCCESS_MESSAGE.TYPE_GET_FRIEND_REQUEST_LIST_REQUEST === result.data.MSG_TYPE) {
-                    setServerSuccessResponse(prevState => ({
-                        ...prevState,
-                        ui_subject: result.data.UI_SUBJECT,
-                        ui_message: result.data.UI_MESSAGE,
-                        succServMsgShow: true   
+                    const formattedFriendRequests = friendResult.data.results.map(request => ({
+                        id: request.userKey,
+                        username: request.username,
+                        name: request.firstname === 'N/A' || request.lastname === 'N/A' 
+                            ? request.username 
+                            : `${request.firstname} ${request.lastname}`.trim(),
+                        type: 'friend'
                     }));
+                    setRequests(prev => ({ ...prev, friendRequests: formattedFriendRequests }));
                 }
+            }
 
-                const formattedRequests = result.data.results.map(request => ({
-                    id: request.userKey,
-                    username: request.username,
-                    name: request.firstname === 'N/A' || request.lastname === 'N/A' 
-                        ? request.username 
-                        : `${request.firstname} ${request.lastname}`.trim(),
-                    type: 'friend'
-                }));
-                setRequests(prev => ({ ...prev, friendRequests: formattedRequests }));
-            } else {
-                setRequests(prev => ({ ...prev, friendRequests: [] }));
+            // Then fetch follower requests
+            const followerHeaders = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.GET_FOLLOWER_REQUEST_LIST };
+            const followerResult = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers: followerHeaders });
+
+            if (followerResult.status === 200) {
+                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE !== followerResult.data.ERROR_MSG_TYPE) {
+                    const formattedFollowerRequests = followerResult.data.results.map(request => ({
+                        id: request.userKey,
+                        username: request.username,
+                        name: request.firstname === 'N/A' || request.lastname === 'N/A' 
+                            ? request.username 
+                            : `${request.firstname} ${request.lastname}`.trim(),
+                        type: 'follower'
+                    }));
+                    setRequests(prev => ({ ...prev, followerRequests: formattedFollowerRequests }));
+                }
             }
         } catch (error) {
-            console.error('Error fetching friend requests:', error);
-            setRequests(prev => ({ ...prev, friendRequests: [] }));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchFollowRequests = async () => {
-        try {
-            const requestData = {
-                deviceKey: cookies.userSession.DEVICE_KEY,
-                userKey: cookies.userSession.USER_KEY,
-                sessionKey: cookies.userSession.SESSION_KEY
-            };
-
-            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.GET_FOLLOWER_REQUEST_LIST };
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
-
-            if (result.status === 200 ) {
-
-                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
-                    return;
-                }
-
-                const formattedRequests = result.data.results.map(request => ({
-                    id: request.userKey,
-                    username: request.username,
-                    name: request.firstname === 'N/A' || request.lastname === 'N/A' 
-                        ? request.username 
-                        : `${request.firstname} ${request.lastname}`.trim(),
-                    type: 'follower'
-                }));
-                setRequests(prev => ({ ...prev, followerRequests: formattedRequests }));
-            } else {
-                setRequests(prev => ({ ...prev, followerRequests: [] }));
-            }
-        } catch (error) {
-            console.error('Error fetching follow requests:', error);
-            setRequests(prev => ({ ...prev, followerRequests: [] }));
+            console.error('Error fetching requests:', error);
+            setRequests(prev => ({ 
+                ...prev, 
+                friendRequests: [], 
+                followerRequests: [] 
+            }));
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchFriendRequests();
-        fetchFollowRequests();
+        fetchRequests();
     }, []);
 
     const handleAccept = async (request) => {
@@ -139,12 +118,10 @@ const Requests = () => {
             } else {
                 headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.ACCEPT_FOLLOW_REQUEST };
             }
-            console.log(requestData);
+
             const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
-            console.log(result);
 
             if (result.status === 200) {
-
                 if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
                     setServerErrorResponse(prevState => ({
                         ...prevState,
@@ -155,24 +132,13 @@ const Requests = () => {
                     }));
                     return;
                 }
-                
-                if (constants.SUCCESS_MESSAGE.TYPE_ACCEPT_FOLLOW_REQUEST === result.data.MSG_TYPE) {
-                    setServerSuccessResponse(prevState => ({
-                        ...prevState,
-                        ui_subject: result.data.UI_SUBJECT,
-                        ui_message: result.data.UI_MESSAGE,
-                        succServMsgShow: true
-                    }));
-                } 
 
-                if (constants.SUCCESS_MESSAGE.TYPE_ACCEPT_FRIEND_REQUEST === result.data.MSG_TYPE) {
-                    setServerSuccessResponse(prevState => ({
-                        ...prevState,
-                        ui_subject: result.data.UI_SUBJECT,
-                        ui_message: result.data.UI_MESSAGE,
-                        succServMsgShow: true
-                    }));
-                }
+                setServerSuccessResponse(prevState => ({
+                    ...prevState,
+                    ui_subject: result.data.UI_SUBJECT,
+                    ui_message: result.data.UI_MESSAGE,
+                    succServMsgShow: true
+                }));
 
                 if (request.type === 'friend') {
                     setRequests(prev => ({
@@ -185,11 +151,16 @@ const Requests = () => {
                         followerRequests: prev.followerRequests.filter(req => req.id !== request.id)
                     }));
                 }
-            } else {
-                console.error('Failed to accept request:', result.data);
             }
         } catch (error) {
             console.error('Error accepting request:', error);
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "ERR|001",
+                serverErrorSubject: "Error",
+                serverErrorMessage: "Failed to accept request",
+                errServMsgShow: true
+            }));
         } finally {
             setProcessingRequests(prev => {
                 const newSet = new Set(prev);
@@ -217,10 +188,8 @@ const Requests = () => {
             }
 
             const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
-            console.log(result);
 
             if (result.status === 200) {
-
                 if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
                     setServerErrorResponse(prevState => ({
                         ...prevState,
@@ -230,37 +199,36 @@ const Requests = () => {
                         errServMsgShow: true
                     }));
                     return;
-                }   
-
-                if (constants.SUCCESS_MESSAGE.TYPE_REJECT_FRIEND_REQUEST === result.data.MSG_TYPE) {
-                    setServerSuccessResponse(prevState => ({
-                        ...prevState,
-                        ui_subject: result.data.UI_SUBJECT,
-                        ui_message: result.data.UI_MESSAGE,
-                        succServMsgShow: true
-                    }));
                 }
 
-                if (constants.SUCCESS_MESSAGE.TYPE_REJECT_FOLLOW_REQUEST === result.data.MSG_TYPE) {
-                    setServerSuccessResponse(prevState => ({
-                        ...prevState,
-                        ui_subject: result.data.UI_SUBJECT,
-                        ui_message: result.data.UI_MESSAGE,
-                        succServMsgShow: true
-                    }));
+                setServerSuccessResponse(prevState => ({
+                    ...prevState,
+                    ui_subject: result.data.UI_SUBJECT,
+                    ui_message: result.data.UI_MESSAGE,
+                    succServMsgShow: true
+                }));
 
-                    
+                if (request.type === 'friend') {
+                    setRequests(prev => ({
+                        ...prev,
+                        friendRequests: prev.friendRequests.filter(req => req.id !== request.id)
+                    }));
                 } else {
                     setRequests(prev => ({
                         ...prev,
                         followerRequests: prev.followerRequests.filter(req => req.id !== request.id)
                     }));
                 }
-            } else {
-                console.error('Failed to decline request:', result.data);
             }
         } catch (error) {
             console.error('Error declining request:', error);
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "ERR|001",
+                serverErrorSubject: "Error",
+                serverErrorMessage: "Failed to decline request",
+                errServMsgShow: true
+            }));
         } finally {
             setProcessingRequests(prev => {
                 const newSet = new Set(prev);
@@ -270,57 +238,103 @@ const Requests = () => {
         }
     };
 
-    const RequestItem = ({ request }) => {
-        const isProcessing = processingRequests.has(request.id);
-        
-        return (
-            <ListGroup.Item className="request-item">
-                <div className="d-flex justify-content-between align-items-center">
-                    <div className="request-info">
-                        <h6 className="mb-0">{request.name}</h6>
-                        <small className="text-muted">@{request.username}</small>
+    const RequestList = ({ requests, type }) => (
+        <Row xs={1} sm={2} md={3} lg={4} className="g-4">
+            {loading ? (
+                <Col xs={12} className="text-center p-4">
+                    <div className="spinner-border" role="status">
+                        <span className="visually-hidden">Loading...</span>
                     </div>
-                    <div className="request-actions">
-                        <OverlayTrigger
-                            placement="top"
-                            overlay={<Tooltip>Accept</Tooltip>}
-                        >
-                            <Button
-                                variant="outline-success"
-                                size="sm"
-                                className="me-2"
-                                onClick={() => handleAccept(request)}
-                                disabled={isProcessing}
-                            >
-                                {isProcessing ? (
-                                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-                                ) : (
-                                    <FaUserCheck />
-                                )}
-                            </Button>
-                        </OverlayTrigger>
-                        <OverlayTrigger
-                            placement="top"
-                            overlay={<Tooltip>Decline</Tooltip>}
-                        >
-                            <Button
-                                variant="outline-danger"
-                                size="sm"
-                                onClick={() => handleDecline(request)}
-                                disabled={isProcessing}
-                            >
-                                {isProcessing ? (
-                                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-                                ) : (
-                                    <FaUserTimes />
-                                )}
-                            </Button>
-                        </OverlayTrigger>
-                    </div>
-                </div>
-            </ListGroup.Item>
-        );
-    };
+                </Col>
+            ) : (
+                <>
+                    {requests.map(request => (
+                        <Col key={request.id}>
+                            <div className="user-card p-3 border rounded h-100">
+                                <div className="d-flex flex-column h-100">
+                                    <div className="mb-3">
+                                        <h6 className="mb-1">
+                                            {request.name}
+                                        </h6>
+                                        <small className="text-muted">@{request.username}</small>
+                                    </div>
+                                    <div className="mt-auto">
+                                        <ButtonGroup className="w-100">
+                                            <OverlayTrigger
+                                                placement="top"
+                                                overlay={<Tooltip>View Profile</Tooltip>}
+                                            >
+                                                <Button
+                                                    variant="outline-primary"
+                                                    size="sm"
+                                                    onClick={() => navigate(`/profile/${request.id}`)}
+                                                >
+                                                    <FaUser />
+                                                </Button>
+                                            </OverlayTrigger>
+                                            <OverlayTrigger
+                                                placement="top"
+                                                overlay={<Tooltip>Accept Request</Tooltip>}
+                                            >
+                                                <Button
+                                                    variant="outline-success"
+                                                    size="sm"
+                                                    onClick={() => handleAccept(request)}
+                                                    disabled={processingRequests.has(request.id)}
+                                                >
+                                                    {processingRequests.has(request.id) ? (
+                                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                                                    ) : (
+                                                        <FaUserCheck />
+                                                    )}
+                                                </Button>
+                                            </OverlayTrigger>
+                                            <OverlayTrigger
+                                                placement="top"
+                                                overlay={<Tooltip>Decline Request</Tooltip>}
+                                            >
+                                                <Button
+                                                    variant="outline-danger"
+                                                    size="sm"
+                                                    onClick={() => handleDecline(request)}
+                                                    disabled={processingRequests.has(request.id)}
+                                                >
+                                                    {processingRequests.has(request.id) ? (
+                                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                                                    ) : (
+                                                        <FaUserTimes />
+                                                    )}
+                                                </Button>
+                                            </OverlayTrigger>
+                                            <OverlayTrigger
+                                                placement="top"
+                                                overlay={<Tooltip>Block User</Tooltip>}
+                                            >
+                                                <Button
+                                                    variant="outline-danger"
+                                                    size="sm"
+                                                    onClick={() => handleBlock(request.id)}
+                                                >
+                                                    <FaBan />
+                                                </Button>
+                                            </OverlayTrigger>
+                                        </ButtonGroup>
+                                    </div>
+                                </div>
+                            </div>
+                        </Col>
+                    ))}
+                    {requests.length === 0 && (
+                        <Col xs={12}>
+                            <div className="text-center text-muted p-4 border rounded">
+                                No {type} requests found
+                            </div>
+                        </Col>
+                    )}
+                </>
+            )}
+        </Row>
+    );
 
     return (
         <Container fluid className="requests-page">
@@ -340,68 +354,38 @@ const Requests = () => {
             </Row>
 
             <Row>
-                <Col md={6} className="mb-4">
-                    <div className="request-section">
-                        <h5 className="mb-3">
-                            <FaUserFriends className="me-2" />
-                            Friend Requests
-                            <Badge bg="primary" className="ms-2">
-                                {requests.friendRequests.length}
-                            </Badge>
-                        </h5>
-                        <ListGroup>
-                            {loading ? (
-                                <div className="text-center p-4">
-                                    <div className="spinner-border" role="status">
-                                        <span className="visually-hidden">Loading...</span>
-                                    </div>
-                                </div>
-                            ) : (
-                                <>
-                                    {requests.friendRequests.map(request => (
-                                        <RequestItem key={request.id} request={request} />
-                                    ))}
-                                    {requests.friendRequests.length === 0 && (
-                                        <ListGroup.Item className="text-center text-muted">
-                                            No friend requests
-                                        </ListGroup.Item>
-                                    )}
-                                </>
-                            )}
-                        </ListGroup>
-                    </div>
-                </Col>
+                <Col>
+                    <Tab.Container defaultActiveKey="friend-requests">
+                        <Nav variant="tabs" className="mb-3">
+                            <Nav.Item>
+                                <Nav.Link eventKey="friend-requests">
+                                    <FaUserFriends className="me-2" />
+                                    Friend Requests
+                                    <Badge bg="primary" className="ms-2">
+                                        {requests.friendRequests.length}
+                                    </Badge>
+                                </Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link eventKey="follower-requests">
+                                    <FaUserPlus className="me-2" />
+                                    Follower Requests
+                                    <Badge bg="primary" className="ms-2">
+                                        {requests.followerRequests.length}
+                                    </Badge>
+                                </Nav.Link>
+                            </Nav.Item>
+                        </Nav>
 
-                <Col md={6} className="mb-4">
-                    <div className="request-section">
-                        <h5 className="mb-3">
-                            <FaUserPlus className="me-2" />
-                            Follower Requests
-                            <Badge bg="primary" className="ms-2">
-                                {requests.followerRequests.length}
-                            </Badge>
-                        </h5>
-                        <ListGroup>
-                            {loading ? (
-                                <div className="text-center p-4">
-                                    <div className="spinner-border" role="status">
-                                        <span className="visually-hidden">Loading...</span>
-                                    </div>
-                                </div>
-                            ) : (
-                                <>
-                                    {requests.followerRequests.map(request => (
-                                        <RequestItem key={request.id} request={request} />
-                                    ))}
-                                    {requests.followerRequests.length === 0 && (
-                                        <ListGroup.Item className="text-center text-muted">
-                                            No follower requests
-                                        </ListGroup.Item>
-                                    )}
-                                </>
-                            )}
-                        </ListGroup>
-                    </div>
+                        <Tab.Content>
+                            <Tab.Pane eventKey="friend-requests">
+                                <RequestList requests={requests.friendRequests} type="friend" />
+                            </Tab.Pane>
+                            <Tab.Pane eventKey="follower-requests">
+                                <RequestList requests={requests.followerRequests} type="follower" />
+                            </Tab.Pane>
+                        </Tab.Content>
+                    </Tab.Container>
                 </Col>
             </Row>
 
