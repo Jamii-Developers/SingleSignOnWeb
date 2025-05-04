@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const TIMEOUT_DURATION = 15000; // 10 seconds timeout
+const TIMEOUT_DURATION = 30000; // 30 seconds timeout
 
 // Create a new instance of Axios with a custom adapter
 const JsonNetworkAdapter = axios.create({

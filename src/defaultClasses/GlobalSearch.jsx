@@ -215,13 +215,13 @@ const GlobalSearch = () => {
         setShowResults(true);
 
         // Debounce search
-        if (searchTimeout.current) {
-            clearTimeout(searchTimeout.current);
-        }
+        // if (searchTimeout.current) {
+        //     clearTimeout(searchTimeout.current);
+        // }
 
-        searchTimeout.current = setTimeout(() => {
-            handleSearch(query);
-        }, 300);
+        // searchTimeout.current = setTimeout(() => {
+        //     handleSearch(query);
+        // }, 300);
     };
 
     const handleResultClick = (result) => {
