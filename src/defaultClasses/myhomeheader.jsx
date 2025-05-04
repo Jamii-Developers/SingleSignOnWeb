@@ -7,7 +7,7 @@ import { Navbar, Nav, Container, NavDropdown, Badge } from 'react-bootstrap';
 import {
     FaHome, FaCog, FaFileAlt, FaInfoCircle, FaSignOutAlt, FaUserFriends,
     FaCommentAlt, FaLock, FaUserCog, FaTrash, FaFolder, FaUserPlus, FaUserSlash, FaPhoneAlt, FaEnvelope,
-    FaBell, FaQuestionCircle, FaCodeBranch, FaRoad
+    FaBell, FaCodeBranch, FaRoad
 } from 'react-icons/fa';
 
 import GlobalSearch from './GlobalSearch';
