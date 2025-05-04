@@ -7,8 +7,8 @@ import '../sass/requests.sass';
 import JsonNetworkAdapter from '../../configs/networkadapter';
 import conn from '../../configs/conn';
 import constants from '../../utils/constants';
-import ServerErrorMsg from '../../frequentlyUsedModals/ServerErrorMsg';
-import ServerSuccessMsg from '../../frequentlyUsedModals/ServerSuccessMsg';
+import ServerErrorMsg from '../../frequentlyUsedModals/servererrormsg';
+import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg';
 
 const Requests = () => {
     const [cookies] = useCookies("userSession");
