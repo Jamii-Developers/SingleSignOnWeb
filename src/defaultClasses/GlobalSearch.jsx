@@ -7,10 +7,8 @@ import JsonNetworkAdapter from '../configs/networkadapter';
 import conn from '../configs/conn';
 import '../sass/globalsearch.sass';
 import constants from '../utils/constants';
-import ServerErrorMsg from '../frequentlyUsedModals/ServerErrorMsg';
-import ServerSuccessMsg from '../frequentlyUsedModals/ServerSuccessMsg';
-import { hasData } from 'jquery';
-
+import ServerErrorMsg from '../frequentlyUsedModals/servererrormsg';
+import ServerSuccessMsg from '../frequentlyUsedModals/serversuccessmsg';
 
 const GlobalSearch = () => {
     const [cookies] = useCookies("userSession");

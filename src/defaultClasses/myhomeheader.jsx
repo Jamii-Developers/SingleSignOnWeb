@@ -15,8 +15,8 @@ import GlobalSearch from './GlobalSearch';
 import JsonNetworkAdapter from '../configs/networkadapter';
 import constants from "../utils/constants";
 import conn from "../configs/conn";
-import ServerErrorMsg from '../frequentlyUsedModals/ServerErrorMsg';
-import ServerSuccessMsg from '../frequentlyUsedModals/ServerSuccessMsg';
+import ServerErrorMsg from '../frequentlyUsedModals/servererrormsg';
+import ServerSuccessMsg from '../frequentlyUsedModals/serversuccessmsg';
 
 // Security utility functions
 const validateSession = (cookies) => {
