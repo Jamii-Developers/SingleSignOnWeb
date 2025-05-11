@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ListGroup, Button, Container, Row, Col, Nav, Tab, ButtonGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { FaArrowLeft, FaUserPlus, FaUserMinus, FaUser, FaEnvelope, FaBan } from 'react-icons/fa';
+import { FaArrowLeft, FaUserPlus, FaUserMinus, FaUser, FaEnvelope, FaBan, FaUserSlash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import JsonNetworkAdapter from '../../configs/networkadapter';
@@ -17,6 +17,8 @@ const Followers = () => {
     const [loading, setLoading] = useState(true);
     const [processingFollow, setProcessingFollow] = useState(new Set());
     const [processingUnfollow, setProcessingUnfollow] = useState(new Set());
+    const [processingRemoveFollower, setProcessingRemoveFollower] = useState(new Set());
+    const [processingBlock, setProcessingBlock] = useState(new Set());
 
     const [serverErrorResponse, setServerErrorResponse] = useState({
         serverErrorCode: "",
@@ -31,8 +33,18 @@ const Followers = () => {
         succServMsgShow: false
     });
 
-    const fetchFollows = async ( ) => {
+    const fetchFollows = async () => {
         try {
+            // First, try to get cached data from localStorage
+            const cachedData = localStorage.getItem('follows');
+            if (cachedData) {
+                const parsedData = JSON.parse(cachedData);
+                setFollowers(parsedData.followers);
+                setFollowing(parsedData.following);
+                setLoading(false);
+            }
+
+            // Then make the server request in the background
             const requestData = {
                 deviceKey: cookies.userSession.DEVICE_KEY,
                 userKey: cookies.userSession.USER_KEY,
@@ -68,12 +80,30 @@ const Followers = () => {
                     const followers = formattedUsers.filter(user => user.typeOfFollow === 'follower');
                     const following = formattedUsers.filter(user => user.typeOfFollow === 'following');
 
+                    // Update localStorage with new data
+                    localStorage.setItem('follows', JSON.stringify({
+                        followers,
+                        following
+                    }));
+
+                    // Update state with new data
                     setFollowers(followers);
                     setFollowing(following);
+                }
+            } else {
+                // If server request fails and we don't have cached data, clear the lists
+                if (!cachedData) {
+                    setFollowers([]);
+                    setFollowing([]);
                 }
             }
         } catch (error) {
             console.error('Error fetching connections:', error);
+            // Only clear lists if we don't have cached data
+            if (!localStorage.getItem('follows')) {
+                setFollowers([]);
+                setFollowing([]);
+            }
             setServerErrorResponse(prevState => ({
                 ...prevState,
                 serverErrorCode: "ERR|001",
@@ -93,7 +123,7 @@ const Followers = () => {
                 deviceKey: cookies.userSession.DEVICE_KEY,
                 userKey: cookies.userSession.USER_KEY,
                 sessionKey: cookies.userSession.SESSION_KEY,
-                targetUserKey: userId
+                followKey: userId
             };
 
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.SEND_FOLLOW_REQUEST };
@@ -110,7 +140,7 @@ const Followers = () => {
                     }));
                     return;
                 }
-
+                
                 setServerSuccessResponse(prevState => ({
                     ...prevState,
                     ui_subject: result.data.UI_SUBJECT,
@@ -119,9 +149,23 @@ const Followers = () => {
                 }));
 
                 // Update the followers list to show the user is now following
-                setFollowers(prev => prev.map(user => 
-                    user.id === userId ? { ...user, isFollowing: true } : user
-                ));
+                if( result.data.followType === true ){
+                    setFollowing(prev => {
+                        const newFollowers = prev.map(user => 
+                            user.id === userId ? { ...user, isFollowing: true } : user
+                        );
+                        // Update localStorage
+                        const cachedData = localStorage.getItem('follows');
+                        if (cachedData) {
+                            const parsedData = JSON.parse(cachedData);
+                            localStorage.setItem('follows', JSON.stringify({
+                                ...parsedData,
+                                followers: newFollowers
+                            }));
+                        }
+                        return newFollowers;
+                    });
+                }
             }
         } catch (error) {
             console.error('Error following user:', error);
@@ -151,7 +195,7 @@ const Followers = () => {
                 targetUserKey: userId
             };
 
-            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.REJECT_FOLLOW_REQUEST };
+            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.UN_FOLLOW };
             const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
 
             if (result.status === 200) {
@@ -173,7 +217,19 @@ const Followers = () => {
                     succServMsgShow: true
                 }));
 
-                setFollowing(prev => prev.filter(user => user.id !== userId));
+                setFollowing(prev => {
+                    const newFollowing = prev.filter(user => user.id !== userId);
+                    // Update localStorage
+                    const cachedData = localStorage.getItem('follows');
+                    if (cachedData) {
+                        const parsedData = JSON.parse(cachedData);
+                        localStorage.setItem('follows', JSON.stringify({
+                            ...parsedData,
+                            following: newFollowing
+                        }));
+                    }
+                    return newFollowing;
+                });
             }
         } catch (error) {
             console.error('Error unfollowing user:', error);
@@ -193,8 +249,153 @@ const Followers = () => {
         }
     };
 
-    const handleBlock = (userId) => {
-        // Implementation of handleBlock function
+    const handleBlock = async (userId) => {
+        try {
+            setProcessingBlock(prev => new Set([...prev, userId]));
+            const requestData = {
+                deviceKey: cookies.userSession.DEVICE_KEY,
+                userKey: cookies.userSession.USER_KEY,
+                sessionKey: cookies.userSession.SESSION_KEY,
+                targetUserKey: userId
+            };
+
+            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.BLOCK_USER };
+            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
+            console.log('Block Response:', result.data);
+
+            if (result.status === 200) {
+                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
+                    setServerErrorResponse(prevState => ({
+                        ...prevState,
+                        serverErrorCode: result.data.ERROR_FIELD_CODE,
+                        serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
+                        serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
+                        errServMsgShow: true
+                    }));
+                    return;
+                }
+
+                if (constants.SUCCESS_MESSAGE.TYPE_BLOCK_USER_REQUEST === result.data.MSG_TYPE) {
+                    setServerSuccessResponse(prevState => ({
+                        ...prevState,
+                        ui_subject: result.data.UI_SUBJECT,
+                        ui_message: result.data.UI_MESSAGE,
+                        succServMsgShow: true
+                    }));
+
+                    // Update both followers and following lists
+                    setFollowers(prev => {
+                        const newFollowers = prev.filter(user => user.id !== userId);
+                        // Update localStorage
+                        const cachedData = localStorage.getItem('follows');
+                        if (cachedData) {
+                            const parsedData = JSON.parse(cachedData);
+                            localStorage.setItem('follows', JSON.stringify({
+                                ...parsedData,
+                                followers: newFollowers
+                            }));
+                        }
+                        return newFollowers;
+                    });
+
+                    setFollowing(prev => {
+                        const newFollowing = prev.filter(user => user.id !== userId);
+                        // Update localStorage
+                        const cachedData = localStorage.getItem('follows');
+                        if (cachedData) {
+                            const parsedData = JSON.parse(cachedData);
+                            localStorage.setItem('follows', JSON.stringify({
+                                ...parsedData,
+                                following: newFollowing
+                            }));
+                        }
+                        return newFollowing;
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error blocking user:', error);
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "ERR|001",
+                serverErrorSubject: "Error",
+                serverErrorMessage: "Failed to block user",
+                errServMsgShow: true
+            }));
+        } finally {
+            setProcessingBlock(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(userId);
+                return newSet;
+            });
+        }
+    };
+
+    const handleRemoveFollower = async (userId) => {
+        try {
+            setProcessingRemoveFollower(prev => new Set([...prev, userId]));
+            const requestData = {
+                deviceKey: cookies.userSession.DEVICE_KEY,
+                userKey: cookies.userSession.USER_KEY,
+                sessionKey: cookies.userSession.SESSION_KEY,
+                targetUserKey: userId
+            };
+
+            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.REMOVE_FOLLOWER };
+            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
+            console.log('Remove Follower Response:', result.data);
+
+            if (result.status === 200) {
+                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
+                    setServerErrorResponse(prevState => ({
+                        ...prevState,
+                        serverErrorCode: result.data.ERROR_FIELD_CODE,
+                        serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
+                        serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
+                        errServMsgShow: true
+                    }));
+                    return;
+                }
+
+                if (constants.SUCCESS_MESSAGE.TYPE_REMOVE_FOLLOWER === result.data.MSG_TYPE) {
+                    setServerSuccessResponse(prevState => ({
+                        ...prevState,
+                        ui_subject: result.data.UI_SUBJECT,
+                        ui_message: result.data.UI_MESSAGE,
+                        succServMsgShow: true
+                    }));
+                    // Remove the follower from the list and update localStorage
+                    setFollowers(prev => {
+                        const newFollowers = prev.filter(user => user.id !== userId);
+                        // Update localStorage
+                        const cachedData = localStorage.getItem('follows');
+                        if (cachedData) {
+                            const parsedData = JSON.parse(cachedData);
+                            localStorage.setItem('follows', JSON.stringify({
+                                ...parsedData,
+                                followers: newFollowers
+                            }));
+                        }
+                        return newFollowers;
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error removing follower:', error);
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "ERR|001",
+                serverErrorSubject: "Error",
+                serverErrorMessage: "Failed to remove follower",
+                errServMsgShow: true
+            }));
+        } finally {
+            setProcessingRemoveFollower(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(userId);
+                return newSet;
+            });
+        }
     };
 
     useEffect(() => {
@@ -233,6 +434,7 @@ const Followers = () => {
                                                     variant="outline-primary"
                                                     size="sm"
                                                     onClick={() => navigate(`/profile/${user.id}`)}
+                                                    disabled={processingRemoveFollower.has(user.id)}
                                                 >
                                                     <FaUser />
                                                 </Button>
@@ -247,7 +449,7 @@ const Followers = () => {
                                                             variant={user.isFollowing ? "outline-secondary" : "outline-primary"}
                                                             size="sm"
                                                             onClick={() => user.isFollowing ? handleUnfollow(user.id) : handleFollow(user.id)}
-                                                            disabled={processingFollow.has(user.id) || processingUnfollow.has(user.id)}
+                                                            disabled={processingFollow.has(user.id) || processingUnfollow.has(user.id) || processingRemoveFollower.has(user.id)}
                                                         >
                                                             {processingFollow.has(user.id) || processingUnfollow.has(user.id) ? (
                                                                 <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
@@ -260,12 +462,30 @@ const Followers = () => {
                                                     </OverlayTrigger>
                                                     <OverlayTrigger
                                                         placement="top"
+                                                        overlay={<Tooltip>Remove Follower</Tooltip>}
+                                                    >
+                                                        <Button
+                                                            variant="outline-secondary"
+                                                            size="sm"
+                                                            onClick={() => handleRemoveFollower(user.id)}
+                                                            disabled={processingFollow.has(user.id) || processingUnfollow.has(user.id) || processingRemoveFollower.has(user.id)}
+                                                        >
+                                                            {processingRemoveFollower.has(user.id) ? (
+                                                                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                                                            ) : (
+                                                                <FaUserSlash />
+                                                            )}
+                                                        </Button>
+                                                    </OverlayTrigger>
+                                                    <OverlayTrigger
+                                                        placement="top"
                                                         overlay={<Tooltip>Block User</Tooltip>}
                                                     >
                                                         <Button
                                                             variant="outline-danger"
                                                             size="sm"
                                                             onClick={() => handleBlock(user.id)}
+                                                            disabled={processingFollow.has(user.id) || processingUnfollow.has(user.id) || processingRemoveFollower.has(user.id)}
                                                         >
                                                             <FaBan />
                                                         </Button>

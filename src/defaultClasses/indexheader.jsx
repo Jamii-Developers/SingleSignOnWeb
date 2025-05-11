@@ -67,6 +67,24 @@ const Header = () => {
                                     About Us
                                 </Link>
                             </Nav.Link>
+                            <Nav.Link 
+                                id="changelogbutton" 
+                                className="button_inactive"
+                                onClick={handleClose}
+                            >
+                                <Link to="/changelog" className="jamiibuttonlink">
+                                    Changelog
+                                </Link>
+                            </Nav.Link>
+                            <Nav.Link 
+                                id="roadmapbutton" 
+                                className="button_inactive"
+                                onClick={handleClose}
+                            >
+                                <Link to="/roadmap" className="jamiibuttonlink">
+                                    Roadmap
+                                </Link>
+                            </Nav.Link>
                         </Nav>
                     </Navbar.Collapse>
                 </Container>

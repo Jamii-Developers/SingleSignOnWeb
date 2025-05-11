@@ -110,6 +110,8 @@ const myHomeHeader = () => {
         removeCookie("userSession", { path: "/" });
         removeCookie("csrfToken", { path: "/" });
         localStorage.removeItem('cachedUserData');
+        localStorage.removeItem('friends');
+        localStorage.removeItem('follows');
         navigate("/", { replace: true });
     };
 

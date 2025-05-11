@@ -87,6 +87,8 @@ const PageBrowser = ( ) => {
                     <Route path="/userlogin" element={ < Userlogin /> } />
                     <Route path="/signup" element={ < Createnewuser /> } />
                     <Route path="/aboutus" element={ < Aboutus /> } />
+                    <Route path="/changelog" element={ < Changelog /> } />
+                    <Route path="/roadmap" element={ < Roadmap /> } />
                     <Route path="/forgetpassword" element={ < Forgetpassword /> } />
                 </Route>
 

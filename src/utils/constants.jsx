@@ -1,5 +1,3 @@
-import { deprecatedPropType } from "@mui/material";
-
 const Constants = {
 
     SUCCESS_MESSAGE : {
@@ -29,7 +27,12 @@ const Constants = {
         TYPE_GET_BLOCK_USER_LIST_REQUEST : "SUC|022",
         TYPE_FETCH_USER_DATA :  "SUC|023",
         TYPE_LOGOFF:            "SUC|024",
-        TYPE_CONTACTSUPPORT :   "SUC|025"
+        TYPE_CONTACTSUPPORT :   "SUC|025",
+        TYPE_REMOVE_FOLLOWER : "SUC|026",
+        TYPE_UN_FRIEND : "SUC|027",
+        TYPE_UN_FOLLOW : "SUC|028",
+        TYPE_VIEW_USER_PROFILE : "SUC|029",
+        TYPE_UNBLOCK_USER : "SUC|030"
     },
 
     ERROR_MESSAGE : {

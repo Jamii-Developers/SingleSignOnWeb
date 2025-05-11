@@ -47,7 +47,12 @@ const Conn = {
         REJECT_FOLLOW_REQUEST: {'Service-Header' : 'rejectfollowrequest'},
         BLOCK_USER: {'Service-Header' : 'blockuser'},
         GET_FRIEND_LIST: {'Service-Header' : 'getfriendlist'},
-        GET_BLOCK_USER_LIST: {'Service-Header' : 'getblockuserlist'}
+        GET_BLOCK_USER_LIST: {'Service-Header' : 'getblockuserlist'},
+        REMOVE_FOLLOWER: {'Service-Header' : 'removefollower'},
+        UN_FRIEND: {'Service-Header' : 'unfriend'},
+        UN_FOLLOW: {'Service-Header' : 'unfollow'},
+        VIEW_USER_PROFILE: {'Service-Header' : 'viewuserprofile'},
+        UNBLOCK_USER: {'Service-Header' : 'unblockuser'}
     },
 };
 

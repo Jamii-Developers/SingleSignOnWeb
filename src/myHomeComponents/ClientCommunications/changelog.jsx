@@ -10,6 +10,18 @@ const Changelog = () => {
     // Mock data - replace with actual changelog data
     const changelogData = [
         {
+            date: '2025-05-11',
+            version: '0.0.2',
+            changes: [
+                'Added Ability to Block Users',
+                'Added Ability to Unfollow Users',
+                'Added Ability to Remove Followers',
+                'Added Ability to Remove Friends',
+                'Added Ability to Remove Blocks'
+                
+            ]
+        },
+        {
             date: '2025-05-03',
             version: '0.0.1',
             changes: [
