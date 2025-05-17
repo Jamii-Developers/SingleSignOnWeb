@@ -7,6 +7,7 @@ const LoadingOrErrorScreen = ({ serverError, serverReady, showSuccessMessage }) 
                 <div style={styles.cardError}>
                     <div style={styles.errorEmoji}>🚨</div>
                     <div style={{ marginTop: '1rem' }}>{serverError}</div>
+                    <div style={{ marginTop: '1rem' }}>Check status of the server by clicking <a href="https://stats.uptimerobot.com/lVPlTGKPh4" target="_blank" rel="noopener noreferrer">here</a></div>
                 </div>
                 <style>{animations}</style>
             </div>
