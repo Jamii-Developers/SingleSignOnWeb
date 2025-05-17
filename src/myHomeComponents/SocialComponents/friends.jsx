@@ -10,6 +10,7 @@ import conn from '../../configs/conn';
 import constants from '../../utils/constants';
 import ServerErrorMsg from '../../frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg';
+import ViewUserProfile from './ViewUserProfile';
 
 const Friends = () => {
 	const [cookies] = useCookies("userSession");
@@ -36,6 +37,9 @@ const Friends = () => {
 		ui_message: "",
 		succServMsgShow: false
 	});
+
+	const [selectedUserId, setSelectedUserId] = useState(null);
+	const [showProfileModal, setShowProfileModal] = useState(false);
 
 	const fetchFriends = async () => {
 		try {
@@ -137,45 +141,8 @@ const Friends = () => {
 	}, [searchQuery]);
 
 	const handleViewProfile = async (friendId) => {
-		try {
-			setProcessingActions(prev => ({
-				...prev,
-				viewProfile: new Set([...prev.viewProfile, friendId])
-			}));
-
-			const requestData = {
-				deviceKey: cookies.userSession.DEVICE_KEY,
-				userKey: cookies.userSession.USER_KEY,
-				sessionKey: cookies.userSession.SESSION_KEY,
-				targetUserKey: friendId
-			};
-
-			const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.VIEW_USER_PROFILE };
-			const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
-
-			if (result.status === 200) {
-				if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
-					setServerErrorResponse(prevState => ({
-						...prevState,
-						serverErrorCode: result.data.ERROR_FIELD_CODE,
-						serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
-						serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
-						errServMsgShow: true
-					}));
-					return;
-				}
-
-				// Handle successful profile view
-				console.log('View profile:', friendId);
-			}
-		} catch (error) {
-			console.error('Error viewing profile:', error);
-		} finally {
-			setProcessingActions(prev => ({
-				...prev,
-				viewProfile: new Set([...prev.viewProfile].filter(id => id !== friendId))
-			}));
-		}
+		setSelectedUserId(friendId);
+		setShowProfileModal(true);
 	};
 
 	const handleMessage = async (friendId) => {
@@ -505,6 +472,12 @@ const Friends = () => {
 					message={serverSuccessResponse.ui_message}
 				/>
 			</Container>
+
+			<ViewUserProfile
+				show={showProfileModal}
+				onHide={() => setShowProfileModal(false)}
+				userId={selectedUserId}
+			/>
 		</div>
 	);
 };

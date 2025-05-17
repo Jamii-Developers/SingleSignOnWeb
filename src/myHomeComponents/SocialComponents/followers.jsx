@@ -8,6 +8,7 @@ import conn from '../../configs/conn';
 import constants from '../../utils/constants';
 import ServerErrorMsg from '../../frequentlyUsedModals/servererrormsg';
 import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg';
+import ViewUserProfile from './ViewUserProfile';
 
 const Followers = () => {
     const [cookies] = useCookies("userSession");
@@ -19,6 +20,8 @@ const Followers = () => {
     const [processingUnfollow, setProcessingUnfollow] = useState(new Set());
     const [processingRemoveFollower, setProcessingRemoveFollower] = useState(new Set());
     const [processingBlock, setProcessingBlock] = useState(new Set());
+    const [selectedUserId, setSelectedUserId] = useState(null);
+	const [showProfileModal, setShowProfileModal] = useState(false);
 
     const [serverErrorResponse, setServerErrorResponse] = useState({
         serverErrorCode: "",
@@ -398,6 +401,11 @@ const Followers = () => {
         }
     };
 
+    const handleViewProfile = async (followerId) => {
+		setSelectedUserId(followerId);
+		setShowProfileModal(true);
+	};
+
     useEffect(() => {
         fetchFollows( );
     }, []);
@@ -433,7 +441,7 @@ const Followers = () => {
                                                 <Button
                                                     variant="outline-primary"
                                                     size="sm"
-                                                    onClick={() => navigate(`/profile/${user.id}`)}
+                                                    onClick={() => handleViewProfile(user.id)}
                                                     disabled={processingRemoveFollower.has(user.id)}
                                                 >
                                                     <FaUser />
@@ -587,6 +595,12 @@ const Followers = () => {
                 </Col>
             </Row>
 
+            <ViewUserProfile
+				show={showProfileModal}
+				onHide={() => setShowProfileModal(false)}
+				userId={selectedUserId}
+			/>
+
             <ServerErrorMsg
                 show={serverErrorResponse.errServMsgShow}
                 onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
@@ -601,6 +615,8 @@ const Followers = () => {
                 message={serverSuccessResponse.ui_message}
             />
         </Container>
+
+
     );
 };
 

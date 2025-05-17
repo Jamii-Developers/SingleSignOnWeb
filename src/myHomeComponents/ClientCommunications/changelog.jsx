@@ -10,6 +10,13 @@ const Changelog = () => {
     // Mock data - replace with actual changelog data
     const changelogData = [
         {
+            date: '2025-05-17',
+            version: '0.0.2.1',
+            changes: [
+                'Added ability to view user profiles'
+            ]
+        },
+        {
             date: '2025-05-11',
             version: '0.0.2',
             changes: [
@@ -34,6 +41,8 @@ const Changelog = () => {
                 'Added Change Log Page'
             ]
         },
+        
+        
     ];
 
     // Calculate pagination

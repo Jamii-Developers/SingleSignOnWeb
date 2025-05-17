@@ -38,6 +38,8 @@ import Recyclebin from './myHomeComponents/FileManagementComponents/recyclebin'
 import Profile from './myHomeComponents/SettingsComponents/profile'
 import Permissions from './myHomeComponents/SettingsComponents/permissions'
 import Requests from './myHomeComponents/SocialComponents/requests'
+import HealthCheck from './defaultClasses/healthCheck'
+import NotFound from './defaultClasses/notfound'
 
 const FetchBlankProfilePic = () => {
     return (
@@ -135,6 +137,12 @@ const PageBrowser = ( ) => {
                 {/* Static Routes */}
                 
                 <Route path="/img/:blankprofile" element = { <FetchBlankProfilePic/> }  />
+
+                {/* Health Check Route */}
+                <Route path="/health" element={< HealthCheck />} />
+
+                {/* Catch-All Route for 404 */}
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </BrowserRouter>
 

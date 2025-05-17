@@ -20,9 +20,9 @@ const Roadmap = () => {
                 { id: 10, text: 'Ability to view friend requests', completed: true, completionDate: '2025-05-03' },
                 { id: 11, text: 'Ability to view follow requests', completed: true, completionDate: '2025-05-03' },
                 { id: 12, text: 'Ability to view blocked users', completed: true, completionDate: '2025-05-10' },
-                { id: 13, text: 'Ability to View User Profiles', completed: false, completionDate: '2025-05-17' },
-                { id: 14, text: 'User Instant Messaging', completed: false, completionDate: '2025-05-17' },
-                { id: 14, text: 'User Notifications', completed: false, completionDate: '2025-05-17' },
+                { id: 13, text: 'Ability to View User Profiles', completed: true, completionDate: '2025-05-17' },
+                { id: 14, text: 'User Instant Messaging', completed: false, completionDate: '2025-05-26' },
+                { id: 14, text: 'User Notifications', completed: false, completionDate: '2025-05-26' },
             ]
         },
         {
