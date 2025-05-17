@@ -16,7 +16,8 @@ const JsonNetworkAdapter = axios.create({
                 mode: "cors",
                 headers: config.headers,
                 body: config.data,
-                signal: controller.signal
+                signal: controller.signal,
+                authentication : localStorage.getItem('userSession') !== null ? JSON.parse(localStorage.getItem('userSession')).token : null
             })
                 .then(async (response) => {
                     clearTimeout(timeoutId);
