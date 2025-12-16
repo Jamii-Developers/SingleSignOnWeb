@@ -112,6 +112,7 @@ const myHomeHeader = () => {
         localStorage.removeItem('cachedUserData');
         localStorage.removeItem('friends');
         localStorage.removeItem('follows');
+        localStorage.removeItem('userprofiles');
         navigate("/", { replace: true });
     };
 
