@@ -3,7 +3,7 @@ let selectedServer = null;
 const Conn = {
     SERVERS : [
         'http://localhost:8080/api/',
-        // 'https://singlesignonservice.onrender.com/api/'
+        'https://singlesignonservice.onrender.com/api/'
     ],
     setServer: (url) => {
         selectedServer = url;
