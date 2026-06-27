@@ -270,13 +270,13 @@ const Userlogin = (  ) => {
         localStorage.removeItem('loginLockout');
 
         // Create Cookie and navigate to the home page
-        const expirydate = new Date(result.data.EXPIRY_DATE);
+        const expirydate = new Date(result.data.expiryDate);
         const cookieData = {
-            USER_KEY: result.data.USER_KEY,
-            DEVICE_KEY: result.data.DEVICE_KEY,
-            SESSION_KEY: result.data.SESSION_KEY,
-            USERNAME: result.data.USERNAME,
-            EMAIL_ADDRESS : result.data.EMAIL_ADDRESS
+            USER_KEY: result.data.userKey,
+            DEVICE_KEY: result.data.deviceKey,
+            SESSION_KEY: result.data.sessionKey,
+            USERNAME: result.data.username,
+            EMAIL_ADDRESS : result.data.emailAddress
         }
         
         setCookie("userSession", cookieData , { path: "/", expires: expirydate });
