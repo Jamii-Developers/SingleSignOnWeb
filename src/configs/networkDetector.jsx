@@ -9,7 +9,7 @@ const testServerConnection = async (baseUrl) => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_DURATION);
 
-        const res = await fetch(baseUrl + 'health', {
+        const res = await fetch(baseUrl + 'jhealth', {
             method: 'POST', 
             mode: 'cors',
             signal: controller.signal
