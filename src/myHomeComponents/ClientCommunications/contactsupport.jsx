@@ -107,7 +107,7 @@ const Contactsupport = () => {
 
         try {
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.CONTACT_SUPPORT };
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, contactUsJSON, { headers });
+            const result = await JsonNetworkAdapter.post(conn.URL.JSUPPORT_URL, contactUsJSON, { headers });
 
             if (result.status !== 200) {
                 setServerErrorResponse(prevState => ({

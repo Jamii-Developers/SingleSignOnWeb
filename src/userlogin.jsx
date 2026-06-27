@@ -117,7 +117,7 @@ const Userlogin = (  ) => {
             }
 
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.USER_LOGIN };
-            const result = await JsonNetworkAdapter.post(conn.URL.PUBLIC_URL, loginJson, { headers: headers });
+            const result = await JsonNetworkAdapter.post(conn.URL.JPUBLIC_URL, loginJson, { headers: headers });
 
             if (result.status !== 200) {
                 handleLoginError(result);

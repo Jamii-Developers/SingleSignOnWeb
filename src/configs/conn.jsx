@@ -2,19 +2,31 @@ let selectedServer = null;
 
 const Conn = {
     SERVERS : [
-        'http://localhost:8080/api/',
-        'https://singlesignonservice.onrender.com/api/'
+        'http://localhost:8080/',
+        'https://singlesignonservice.onrender.com/'
     ],
     setServer: (url) => {
         selectedServer = url;
     },
     getServer: () => selectedServer,
     URL : {
-        get PUBLIC_URL() {
-            return selectedServer ? selectedServer + 'public' : null;
+        get JPUBLIC_URL() {
+            return selectedServer ? selectedServer + 'jpublic' : null;
         },
-        get USER_URL() {
-            return selectedServer ? selectedServer + 'user' : null;
+        get JUSER_URL() {
+            return selectedServer ? selectedServer + 'juser' : null;
+        },
+        get JSOCIAL_URL() {
+            return selectedServer ? selectedServer + 'jsocial' : null;
+        },
+        get JSUPPORT_URL() {
+            return selectedServer ? selectedServer + 'jsupport' : null;
+        },
+        get JDRIVE_URL() {
+            return selectedServer ? selectedServer + 'jdrive' : null;
+        },
+        get JADMIN_URL() {
+            return selectedServer ? selectedServer + 'jadmin' : null;
         }
     },
     CONTENT_TYPE : {

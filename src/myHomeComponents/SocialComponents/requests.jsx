@@ -44,7 +44,7 @@ const Requests = () => {
 
             // Fetch friend requests first
             const friendHeaders = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.GET_FRIEND_REQUEST_LIST };
-            const friendResult = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers: friendHeaders });
+            const friendResult = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers: friendHeaders });
 
             if (friendResult.status === 200) {
                 if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE !== friendResult.data.ERROR_MSG_TYPE) {
@@ -71,7 +71,7 @@ const Requests = () => {
 
             // Then fetch follower requests
             const followerHeaders = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.GET_FOLLOWER_REQUEST_LIST };
-            const followerResult = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers: followerHeaders });
+            const followerResult = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers: followerHeaders });
 
             if (followerResult.status === 200) {
                 if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE !== followerResult.data.ERROR_MSG_TYPE) {
@@ -119,7 +119,7 @@ const Requests = () => {
                 headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.ACCEPT_FOLLOW_REQUEST };
             }
 
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
+            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
 
             if (result.status === 200) {
                 if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {

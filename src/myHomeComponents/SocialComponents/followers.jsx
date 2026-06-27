@@ -59,7 +59,7 @@ const Followers = () => {
                 ...conn.SERVICE_HEADERS.GET_FOLLOW_LIST,
             };
 
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
+            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
             console.log(result);
             if (result.status === 200) {
                 if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
@@ -130,7 +130,7 @@ const Followers = () => {
             };
 
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.SEND_FOLLOW_REQUEST };
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
+            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
 
             if (result.status === 200) {
                 if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
@@ -199,7 +199,7 @@ const Followers = () => {
             };
 
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.UN_FOLLOW };
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
+            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
 
             if (result.status === 200) {
                 if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
@@ -263,7 +263,7 @@ const Followers = () => {
             };
 
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.BLOCK_USER };
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
+            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
             console.log('Block Response:', result.data);
 
             if (result.status === 200) {
@@ -345,7 +345,7 @@ const Followers = () => {
             };
 
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.REMOVE_FOLLOWER };
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
+            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
             console.log('Remove Follower Response:', result.data);
 
             if (result.status === 200) {

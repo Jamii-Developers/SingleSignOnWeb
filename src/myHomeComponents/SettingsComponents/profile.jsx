@@ -146,7 +146,7 @@ const Profile = () => {
 
 		console.log(cookieData);
 		let headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.FETCH_PROFILE };
-		const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, cookieData, { headers: headers })
+		const result = await JsonNetworkAdapter.post(conn.URL.JUSER_URL, cookieData, { headers: headers })
 			.then((response) => { return response })
 			.catch((error) => { return error; });
 
@@ -284,7 +284,7 @@ const Profile = () => {
 			};
 
 			const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.EDIT_PROFILE };
-			const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, postData, { headers });
+			const result = await JsonNetworkAdapter.post(conn.URL.JUSER_URL, postData, { headers });
 
 			if (result.status !== 200) {
 				setServerErrorResponse(prevState => ({

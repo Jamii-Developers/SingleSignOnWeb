@@ -197,7 +197,7 @@ const Createnewuser = (props) => {
 
         try {
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.CREATE_NEW_USER };
-            const result = await JsonNetworkAdapter.post(conn.URL.PUBLIC_URL, createNewUserJson, { headers: headers });
+            const result = await JsonNetworkAdapter.post(conn.URL.JPUBLIC_URL, createNewUserJson, { headers: headers });
 
             if (result.status !== 200) {
                 setServerErrorResponse(prevState => ({

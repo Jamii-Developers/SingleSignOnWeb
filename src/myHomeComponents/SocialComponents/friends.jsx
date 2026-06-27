@@ -60,7 +60,7 @@ const Friends = () => {
 			};
 
 			const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.GET_FRIEND_LIST };
-			const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
+			const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
 			console.log('Friends Response:', result.data);
 
 			if (result.status === 200) {
@@ -180,7 +180,7 @@ const Friends = () => {
 			};
 
 			const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.UN_FRIEND };
-			const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
+			const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
 			console.log('Remove Friend Response:', result.data);
 
 			if (result.status === 200) {
@@ -236,7 +236,7 @@ const Friends = () => {
 			};
 
 			const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.BLOCK_USER };
-			const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
+			const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
 			console.log('Block Response:', result.data);
 
 			if (result.status === 200) {

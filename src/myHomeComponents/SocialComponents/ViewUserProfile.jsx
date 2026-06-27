@@ -50,7 +50,7 @@ const ViewUserProfile = ({ show, onHide, userId }) => {
             };
 
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.VIEW_USER_PROFILE };
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
+            const result = await JsonNetworkAdapter.post(conn.URL.JUSER_URL, requestData, { headers });
 
             if (result.status === 200) {
                 if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {

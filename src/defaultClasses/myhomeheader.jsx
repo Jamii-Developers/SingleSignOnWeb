@@ -77,7 +77,7 @@ const myHomeHeader = () => {
                     ...conn.SERVICE_HEADERS.VALIDATE_SESSION,
                 };
 
-                const response = await JsonNetworkAdapter.post(conn.URL.USER_URL, validateSessionJson, { headers: headers });
+                const response = await JsonNetworkAdapter.post(conn.URL.JUSER_URL, validateSessionJson, { headers: headers });
 
                 if (response.status !== 200) {
                     handleSessionExpired();
@@ -147,7 +147,7 @@ const myHomeHeader = () => {
         };
 
         try {
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, logoffJson, { headers: headers });
+            const result = await JsonNetworkAdapter.post(conn.URL.JUSER_URL, logoffJson, { headers: headers });
 
             if (result.status !== 200) {
                 setServerErrorResponse(prevState => ({

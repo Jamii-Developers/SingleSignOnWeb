@@ -70,7 +70,7 @@ const GlobalSearch = () => {
 
         try {
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.SEARCH_USERS };
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, searchData, { headers });
+            const result = await JsonNetworkAdapter.post(conn.URL.JUSER_URL, searchData, { headers });
             console.log(result);
             if (result.status !== 200) {
                 throw new Error(result.statusText);
@@ -116,7 +116,7 @@ const GlobalSearch = () => {
             };
 
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.SEND_FRIEND_REQUEST };
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, friendData, { headers });
+            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, friendData, { headers });
 
             if (result.status === 200) {
                 // Update the UI to reflect the new friend status
@@ -169,7 +169,7 @@ const GlobalSearch = () => {
             };
 
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.SEND_FOLLOW_REQUEST };
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, followData, { headers });
+            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, followData, { headers });
             console.log(result);
             if (result.status === 200) {
                 // Update the UI to reflect the new following status
