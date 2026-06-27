@@ -11,22 +11,22 @@ const Conn = {
     getServer: () => selectedServer,
     URL : {
         get JPUBLIC_URL() {
-            return selectedServer ? selectedServer + 'jpublic' : null;
+            return selectedServer ? selectedServer + 'jpublic/' : null;
         },
         get JUSER_URL() {
-            return selectedServer ? selectedServer + 'juser' : null;
+            return selectedServer ? selectedServer + 'juser/' : null;
         },
         get JSOCIAL_URL() {
-            return selectedServer ? selectedServer + 'jsocial' : null;
+            return selectedServer ? selectedServer + 'jsocial/' : null;
         },
         get JSUPPORT_URL() {
-            return selectedServer ? selectedServer + 'jsupport' : null;
+            return selectedServer ? selectedServer + 'jsupport/' : null;
         },
         get JDRIVE_URL() {
-            return selectedServer ? selectedServer + 'jdrive' : null;
+            return selectedServer ? selectedServer + 'jdrive/' : null;
         },
         get JADMIN_URL() {
-            return selectedServer ? selectedServer + 'jadmin' : null;
+            return selectedServer ? selectedServer + 'jadmin/' : null;
         }
     },
     CONTENT_TYPE : {

@@ -9,7 +9,7 @@ const testServerConnection = async (baseUrl) => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_DURATION);
 
-        const res = await fetch(baseUrl + 'health', { 
+        const res = await fetch(baseUrl + 'health', {
             method: 'POST', 
             mode: 'cors',
             signal: controller.signal
@@ -37,7 +37,7 @@ const NetworkDetector = async () => {
             const isConnected = await testServerConnection(url);
             if (isConnected) {
                 Conn.setServer(url);
-                if(url !== "http://localhost:8080/api/"){
+                if(url !== "http://localhost:8080/"){
                     console.log(`✅ Using cached server: ${url}`);
                 }
                 return;
@@ -59,7 +59,7 @@ const NetworkDetector = async () => {
             localStorage.setItem(SERVER_CACHE_KEY, JSON.stringify(serverCache));
             
             Conn.setServer(baseUrl);
-            if(baseUrl !== "http://localhost:8080/api/"){
+            if(baseUrl !== "http://localhost:8080/"){
                 console.log(`✅ Connected to server: ${baseUrl}`);
             }
             return;
