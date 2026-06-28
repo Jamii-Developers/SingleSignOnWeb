@@ -60,7 +60,6 @@ const Followers = () => {
             };
 
             const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
-            console.log(result);
             if (result.status === 200) {
                 if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
                     setServerErrorResponse(prevState => ({
@@ -76,9 +75,8 @@ const Followers = () => {
                         username: user.username,
                         firstName: user.firstname === 'N/A' ? '' : user.firstname,
                         lastName: user.lastname === 'N/A' ? '' : user.lastname,
-                        typeOfFollow: user.typeOfFollow // This will come from the API response
+                        typeOfFollow: user.typeOfFollow
                     }));
-                    console.log(formattedUsers);
                     // Split the results based on typeOfFollow
                     const followers = formattedUsers.filter(user => user.typeOfFollow === 'follower');
                     const following = formattedUsers.filter(user => user.typeOfFollow === 'following');
@@ -264,8 +262,6 @@ const Followers = () => {
 
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.BLOCK_USER };
             const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
-            console.log('Block Response:', result.data);
-
             if (result.status === 200) {
                 if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
                     setServerErrorResponse(prevState => ({
@@ -346,8 +342,6 @@ const Followers = () => {
 
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.REMOVE_FOLLOWER };
             const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
-            console.log('Remove Follower Response:', result.data);
-
             if (result.status === 200) {
                 if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
                     setServerErrorResponse(prevState => ({

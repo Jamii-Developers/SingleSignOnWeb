@@ -49,7 +49,6 @@ const Currentfiles = () => {
 
     const handleSearch = () => {
         // Implement search functionality
-        console.log('Searching for:', searchQuery);
     };
 
     const handlePreview = (file) => {

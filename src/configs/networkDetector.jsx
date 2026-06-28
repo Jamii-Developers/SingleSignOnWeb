@@ -17,12 +17,7 @@ const testServerConnection = async (baseUrl) => {
 
         clearTimeout(timeoutId);
         return res.ok;
-    } catch (e) {
-        if (e.name === 'AbortError') {
-            console.warn(`⚠️ Connection timeout for ${baseUrl}`);
-        } else {
-            console.warn(`⚠️ Failed to connect to ${baseUrl}`);
-        }
+    } catch {
         return false;
     }
 };
@@ -37,9 +32,6 @@ const NetworkDetector = async () => {
             const isConnected = await testServerConnection(url);
             if (isConnected) {
                 Conn.setServer(url);
-                if(url !== "http://localhost:8080/"){
-                    console.log(`✅ Using cached server: ${url}`);
-                }
                 return;
             }
             // If cached server fails, remove it from cache
@@ -59,9 +51,6 @@ const NetworkDetector = async () => {
             localStorage.setItem(SERVER_CACHE_KEY, JSON.stringify(serverCache));
             
             Conn.setServer(baseUrl);
-            if(baseUrl !== "http://localhost:8080/"){
-                console.log(`✅ Connected to server: ${baseUrl}`);
-            }
             return;
         }
     }

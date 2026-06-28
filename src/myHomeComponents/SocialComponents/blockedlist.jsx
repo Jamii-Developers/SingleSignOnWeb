@@ -39,7 +39,6 @@ const BlockedList = () => {
 
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.GET_BLOCK_USER_LIST };
             const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
-            console.log(result.data);
             if (result.status === 200) {
                 if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
                     setServerErrorResponse(prevState => ({

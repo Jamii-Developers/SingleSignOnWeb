@@ -35,7 +35,6 @@ const UploadModal = ({ show, onHide }) => {
 
     const handleUpload = () => {
         // TODO: Implement file upload logic
-        console.log('Uploading file:', selectedFile);
         onHide();
     };
 

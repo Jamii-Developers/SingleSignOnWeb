@@ -28,7 +28,9 @@ const VALIDATION = {
 // Security utility functions
 const sanitizeInput = (input) => {
 	if (typeof input !== 'string') return input;
-	return input.replace(/[<>]/g, '');
+	const div = window.document.createElement('div');
+	div.appendChild(window.document.createTextNode(input));
+	return div.innerHTML;
 };
 
 const validateName = (name) => {
@@ -129,7 +131,7 @@ const Profile = () => {
 				await FetchLatestUserData();
 			}
 		} catch (error) {
-			console.log(error);
+
 		}
 	}
 
@@ -144,13 +146,10 @@ const Profile = () => {
 			sessionKey
 		};
 
-		console.log(cookieData);
 		let headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.FETCH_PROFILE };
 		const result = await JsonNetworkAdapter.post(conn.URL.JUSER_URL, cookieData, { headers: headers })
 			.then((response) => { return response })
 			.catch((error) => { return error; });
-
-		console.log(result);
 
 		if (result.status !== 200) {
 			setServerErrorResponse(prevState => { return { ...prevState, serverErrorCode: result.status } });

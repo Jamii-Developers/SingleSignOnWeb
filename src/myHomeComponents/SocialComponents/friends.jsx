@@ -61,7 +61,6 @@ const Friends = () => {
 
 			const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.GET_FRIEND_LIST };
 			const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
-			console.log('Friends Response:', result.data);
 
 			if (result.status === 200) {
 				if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
@@ -153,7 +152,6 @@ const Friends = () => {
 			}));
 
 			// Implement message functionality
-			console.log('Message friend:', friendId);
 			await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated delay
 		} catch (error) {
 			console.error('Error messaging friend:', error);
@@ -181,7 +179,6 @@ const Friends = () => {
 
 			const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.UN_FRIEND };
 			const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
-			console.log('Remove Friend Response:', result.data);
 
 			if (result.status === 200) {
 				if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
@@ -237,7 +234,6 @@ const Friends = () => {
 
 			const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.BLOCK_USER };
 			const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
-			console.log('Block Response:', result.data);
 
 			if (result.status === 200) {
 				if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {

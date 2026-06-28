@@ -71,7 +71,6 @@ const GlobalSearch = () => {
         try {
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.SEARCH_USERS };
             const result = await JsonNetworkAdapter.post(conn.URL.JUSER_URL, searchData, { headers });
-            console.log(result);
             if (result.status !== 200) {
                 throw new Error(result.statusText);
             }
@@ -80,7 +79,6 @@ const GlobalSearch = () => {
                 throw new Error(result.data.ERROR_FIELD_MESSAGE);
             }
 
-            console.log(result.data.results);
             // Transform the response data into the expected format
             return result.data.results.map(user => ({
                 id: user.userKey,
@@ -170,7 +168,6 @@ const GlobalSearch = () => {
 
             const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.SEND_FOLLOW_REQUEST };
             const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, followData, { headers });
-            console.log(result);
             if (result.status === 200) {
                 // Update the UI to reflect the new following status
                 setSearchResults(prevResults => 

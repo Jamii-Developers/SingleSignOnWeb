@@ -3,6 +3,31 @@ import { Modal, Button, Form, ProgressBar, Alert } from 'react-bootstrap';
 import { FaCloudUploadAlt, FaTimes, FaFolder } from 'react-icons/fa';
 import '../sass/fileupload.sass';
 
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
+const ALLOWED_FILE_TYPES = [
+    'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+    'application/pdf',
+    'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'text/plain', 'text/csv',
+];
+const BLOCKED_EXTENSIONS = ['exe', 'bat', 'cmd', 'sh', 'ps1', 'msi', 'dll', 'com', 'scr', 'js', 'vbs', 'wsf', 'jar'];
+
+const validateFile = (file) => {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (BLOCKED_EXTENSIONS.includes(ext)) {
+        return `"${file.name}" has a blocked file extension (.${ext}).`;
+    }
+    if (ALLOWED_FILE_TYPES.length > 0 && file.type && !ALLOWED_FILE_TYPES.includes(file.type)) {
+        return `"${file.name}" has an unsupported file type (${file.type || 'unknown'}).`;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+        return `"${file.name}" exceeds the ${MAX_FILE_SIZE / (1024 * 1024)}MB size limit.`;
+    }
+    return null;
+};
+
 const FileUpload = ({ onUploadComplete, selectedFolder }) => {
     const [showModal, setShowModal] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
@@ -28,18 +53,37 @@ const FileUpload = ({ onUploadComplete, selectedFolder }) => {
         e.stopPropagation();
     }, []);
 
+    const addValidatedFiles = useCallback((files) => {
+        const errors = [];
+        const valid = [];
+        for (const file of files) {
+            const error = validateFile(file);
+            if (error) {
+                errors.push(error);
+            } else {
+                valid.push(file);
+            }
+        }
+        if (errors.length > 0) {
+            setUploadError(errors.join(' '));
+        }
+        if (valid.length > 0) {
+            setSelectedFiles(prev => [...prev, ...valid]);
+        }
+    }, []);
+
     const handleDrop = useCallback((e) => {
         e.preventDefault();
         e.stopPropagation();
         setIsDragging(false);
         
         const droppedFiles = Array.from(e.dataTransfer.files);
-        setSelectedFiles(prev => [...prev, ...droppedFiles]);
-    }, []);
+        addValidatedFiles(droppedFiles);
+    }, [addValidatedFiles]);
 
     const handleFileInput = (e) => {
         const files = Array.from(e.target.files);
-        setSelectedFiles(prev => [...prev, ...files]);
+        addValidatedFiles(files);
     };
 
     const handleRemoveFile = (index) => {
