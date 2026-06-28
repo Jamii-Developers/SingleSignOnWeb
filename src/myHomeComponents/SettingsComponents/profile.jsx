@@ -92,7 +92,7 @@ const Profile = () => {
 			province: result.province || "",
 			zipcode: result.zipcode || "",
 			country: result.country || "",
-			privacy: result.privacy === 1
+			privacy: result.privacy ? 1 : 0
 		});
 	}
 
@@ -106,7 +106,7 @@ const Profile = () => {
 			if (cachedData) {
 				let cache = Lock("decrypt", cachedData, secretKey);
 				setData(cache);
-				applyProfileData(cache);
+				applyProfileData(JSON.parse(cache));
 			} else {
 				await FetchLatestUserData();
 			}
@@ -139,7 +139,7 @@ const Profile = () => {
 				return;
 			}
 
-			localStorage.setItem('cachedUserData', Lock("encrypt", JSON.stringify(result.data), secretKey));
+			localStorage.setItem('cachedUserData', Lock("encrypt", result.data, secretKey));
 			setData(JSON.parse(JSON.stringify(result.data)));
 			applyProfileData(result.data);
 		} catch (error) {
@@ -256,7 +256,7 @@ const Profile = () => {
 				zipcode: pageFields.zipcode,
 				privacy: pageFields.privacy
 			};
-			localStorage.setItem('cachedUserData', Lock("encrypt", JSON.stringify(storeData), secretKey));
+			localStorage.setItem('cachedUserData', Lock("encrypt", storeData, secretKey));
 
 			if (result.data.MSG_TYPE === constants.SUCCESS_MESSAGE.TYPE_EDIT_USER_DATA) {
 				showSuccess(result.data.UI_SUBJECT, result.data.UI_MESSAGE);
