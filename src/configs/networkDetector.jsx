@@ -26,15 +26,20 @@ const NetworkDetector = async () => {
     // Check if we have a cached server selection
     const cachedServer = localStorage.getItem(SERVER_CACHE_KEY);
     if (cachedServer) {
-        const { url, timestamp } = JSON.parse(cachedServer);
-        // If the cache is still valid, test the connection
-        if (Date.now() - timestamp < CACHE_DURATION) {
-            const isConnected = await testServerConnection(url);
-            if (isConnected) {
-                Conn.setServer(url);
-                return;
+        try {
+            const { url, timestamp } = JSON.parse(cachedServer);
+            // If the cache is still valid, test the connection
+            if (url && timestamp && Date.now() - timestamp < CACHE_DURATION) {
+                const isConnected = await testServerConnection(url);
+                if (isConnected) {
+                    Conn.setServer(url);
+                    return;
+                }
             }
-            // If cached server fails, remove it from cache
+            // If cached server fails or cache is invalid, remove it
+            localStorage.removeItem(SERVER_CACHE_KEY);
+        } catch (e) {
+            console.warn("Corrupt server cache entry, clearing it");
             localStorage.removeItem(SERVER_CACHE_KEY);
         }
     }

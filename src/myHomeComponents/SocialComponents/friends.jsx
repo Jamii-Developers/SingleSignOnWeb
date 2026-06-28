@@ -155,6 +155,13 @@ const Friends = () => {
 			await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated delay
 		} catch (error) {
 			console.error('Error messaging friend:', error);
+			setServerErrorResponse(prevState => ({
+				...prevState,
+				serverErrorCode: "Network Error",
+				serverErrorSubject: "Message Failed",
+				serverErrorMessage: "Unable to send message. Please try again.",
+				errServMsgShow: true
+			}));
 		} finally {
 			setProcessingActions(prev => ({
 				...prev,
@@ -210,6 +217,13 @@ const Friends = () => {
 			}
 		} catch (error) {
 			console.error('Error removing friend:', error);
+			setServerErrorResponse(prevState => ({
+				...prevState,
+				serverErrorCode: "Network Error",
+				serverErrorSubject: "Remove Friend Failed",
+				serverErrorMessage: "Unable to remove friend. Please try again.",
+				errServMsgShow: true
+			}));
 		} finally {
 			setProcessingActions(prev => ({
 				...prev,
@@ -265,6 +279,13 @@ const Friends = () => {
 			}
 		} catch (error) {
 			console.error('Error blocking friend:', error);
+			setServerErrorResponse(prevState => ({
+				...prevState,
+				serverErrorCode: "Network Error",
+				serverErrorSubject: "Block User Failed",
+				serverErrorMessage: "Unable to block user. Please try again.",
+				errServMsgShow: true
+			}));
 		} finally {
 			setProcessingActions(prev => ({
 				...prev,

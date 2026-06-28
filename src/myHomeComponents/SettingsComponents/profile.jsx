@@ -124,14 +124,26 @@ const Profile = () => {
 		try {
 			const cachedData = localStorage.getItem("cachedUserData");
 			if (cachedData) {
-				let cache = JSON.parse(Lock("decrypt", cachedData, secretKey));
+				let cache = Lock("decrypt", cachedData, secretKey);
 				setData(cache);
 				await SetFormData(cache);
 			} else {
 				await FetchLatestUserData();
 			}
 		} catch (error) {
-
+			console.error("Failed to load cached user data, fetching from server:", error.message);
+			localStorage.removeItem("cachedUserData");
+			try {
+				await FetchLatestUserData();
+			} catch (fetchError) {
+				setServerErrorResponse(prevState => ({
+					...prevState,
+					serverErrorCode: "Data Error",
+					serverErrorSubject: "Failed to Load Profile",
+					serverErrorMessage: "Unable to load your profile data. Please try refreshing the page.",
+					errServMsgShow: true
+				}));
+			}
 		}
 	}
 
@@ -147,30 +159,45 @@ const Profile = () => {
 		};
 
 		let headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.FETCH_PROFILE };
-		const result = await JsonNetworkAdapter.post(conn.URL.JUSER_URL, cookieData, { headers: headers })
-			.then((response) => { return response })
-			.catch((error) => { return error; });
 
-		if (result.status !== 200) {
-			setServerErrorResponse(prevState => { return { ...prevState, serverErrorCode: result.status } });
-			setServerErrorResponse(prevState => { return { ...prevState, serverErrorSubject: result.statusText } });
-			setServerErrorResponse(prevState => { return { ...prevState, serverErrorMessage: result.message } });
-			setServerErrorResponse(prevState => { return { ...prevState, errServMsgShow: true } });
-			return;
+		try {
+			const result = await JsonNetworkAdapter.post(conn.URL.JUSER_URL, cookieData, { headers: headers });
+
+			if (result.status !== 200) {
+				setServerErrorResponse(prevState => ({
+					...prevState,
+					serverErrorCode: result.status,
+					serverErrorSubject: result.statusText,
+					serverErrorMessage: result.message,
+					errServMsgShow: true
+				}));
+				return;
+			}
+
+			if (result.data.ERROR_MSG_TYPE === constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE) {
+				setServerErrorResponse(prevState => ({
+					...prevState,
+					serverErrorCode: result.data.ERROR_FIELD_CODE,
+					serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
+					serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
+					errServMsgShow: true
+				}));
+				setData(" ");
+				return;
+			}
+
+			localStorage.setItem('cachedUserData', Lock("encrypt", JSON.stringify(result.data), secretKey));
+			setData(JSON.parse(JSON.stringify(result.data)));
+			SetFormData(result.data);
+		} catch (error) {
+			setServerErrorResponse(prevState => ({
+				...prevState,
+				serverErrorCode: "Network Error",
+				serverErrorSubject: "Connection Error",
+				serverErrorMessage: "Unable to fetch profile data. Please try again later.",
+				errServMsgShow: true
+			}));
 		}
-
-		if (result.data.ERROR_MSG_TYPE === constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE) {
-			setServerErrorResponse(prevState => { return { ...prevState, serverErrorCode: result.data.ERROR_FIELD_CODE } });
-			setServerErrorResponse(prevState => { return { ...prevState, serverErrorSubject: result.data.ERROR_FIELD_SUBJECT } });
-			setServerErrorResponse(prevState => { return { ...prevState, serverErrorMessage: result.data.ERROR_FIELD_MESSAGE } });
-			setServerErrorResponse(prevState => { return { ...prevState, errServMsgShow: true } });
-			setData(" ");
-			return;
-		}
-
-		localStorage.setItem('cachedUserData', Lock("encrypt", JSON.stringify(result.data), secretKey));
-		setData(JSON.parse(JSON.stringify(result.data)));
-		SetFormData(result.data);
 	}
 
 	const CheckNullException = (value, option) => {
@@ -204,7 +231,17 @@ const Profile = () => {
 	const Clear = () => {
 		document.getElementById("UserProfileForm").reset();
 		const cachedData = localStorage.getItem("cachedUserData");
-		let result = JSON.parse(Lock("decrypt", cachedData, secretKey));
+		if (!cachedData) {
+			return;
+		}
+		let result;
+		try {
+			result = Lock("decrypt", cachedData, secretKey);
+		} catch (error) {
+			console.error("Failed to decrypt cached profile data:", error.message);
+			localStorage.removeItem("cachedUserData");
+			return;
+		}
 		setPageFields(prevState => { return { ...prevState, firstname: result.firstname } });
 		setPageFields(prevState => { return { ...prevState, middlename: result.middlename } });
 		setPageFields(prevState => { return { ...prevState, lastname: result.lastname } });

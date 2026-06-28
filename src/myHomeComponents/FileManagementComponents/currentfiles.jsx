@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Button, ButtonGroup, Form, InputGroup, Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, ButtonGroup, Form, InputGroup, Modal, OverlayTrigger, Tooltip, Alert } from 'react-bootstrap';
 import { FaFile, FaFilePdf, FaFileWord, FaFileImage, FaFolder, FaSearch, FaDownload, FaShare, FaTrash, FaEye, FaChevronLeft, FaChevronRight, FaExpand, FaCompress, FaTimes, FaUpload, FaFileAlt, FaPlus } from 'react-icons/fa';
 import UploadModal from './UploadModal';
 import TextEditorModal from './TextEditorModal';
@@ -184,7 +184,10 @@ const Currentfiles = () => {
         setShowTextEditor(true);
     };
 
+    const [saveError, setSaveError] = useState(null);
+
     const handleSaveDocx = async (content) => {
+        setSaveError(null);
         try {
             // TODO: Replace with actual API endpoint
             const response = await fetch('/api/files/create', {
@@ -203,12 +206,10 @@ const Currentfiles = () => {
                 throw new Error('Failed to save document');
             }
 
-            // Refresh the files list
-            fetchFiles();
             setShowTextEditor(false);
         } catch (error) {
             console.error('Error saving document:', error);
-            // TODO: Add error handling/notification
+            setSaveError(error.message || 'Failed to save document. Please try again.');
         }
     };
 
@@ -389,6 +390,12 @@ const Currentfiles = () => {
                         </Button>
                     </Modal.Footer>
                 </Modal>
+
+                {saveError && (
+                    <Alert variant="danger" onClose={() => setSaveError(null)} dismissible className="mt-3">
+                        {saveError}
+                    </Alert>
+                )}
 
                 <TextEditorModal
                     show={showTextEditor}

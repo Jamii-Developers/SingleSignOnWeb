@@ -16,7 +16,6 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Spinner from 'react-bootstrap/Spinner';
 import Alert from '@mui/material/Alert';
 import Collapse from '@mui/material/Collapse';
-import { uniqueSort } from 'jquery';
 
 const Createnewuser = (props) => {
     // Enhanced email validation regex
@@ -284,7 +283,7 @@ const Createnewuser = (props) => {
     }
 
     function CheckUsername(u) {
-        if (uniqueSort === "") {
+        if (u === "") {
             setErrorData(prevState => ({
                 ...prevState,
                 usernameErrorMessage: "Username is empty",

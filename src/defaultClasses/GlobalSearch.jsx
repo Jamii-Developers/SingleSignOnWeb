@@ -55,6 +55,13 @@ const GlobalSearch = () => {
         } catch (error) {
             console.error('Search error:', error);
             setSearchResults([]);
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "Search Error",
+                serverErrorSubject: "Search Failed",
+                serverErrorMessage: error.message || "Unable to complete search. Please try again.",
+                errServMsgShow: true
+            }));
         } finally {
             setIsLoading(false);
         }
@@ -97,7 +104,7 @@ const GlobalSearch = () => {
             }));
         } catch (error) {
             console.error('Search API error:', error);
-            return [];
+            throw error;
         }
     };
 
@@ -148,6 +155,13 @@ const GlobalSearch = () => {
             }
         } catch (error) {
             console.error('Error adding friend:', error);
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "Network Error",
+                serverErrorSubject: "Friend Request Failed",
+                serverErrorMessage: "Unable to send friend request. Please try again.",
+                errServMsgShow: true
+            }));
         } finally {
             // Clear loading state for this button
             setLoadingStates(prev => ({ ...prev, [`friend-${userId}`]: false }));
@@ -200,6 +214,13 @@ const GlobalSearch = () => {
             }
         } catch (error) {
             console.error('Error following user:', error);
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "Network Error",
+                serverErrorSubject: "Follow Request Failed",
+                serverErrorMessage: "Unable to send follow request. Please try again.",
+                errServMsgShow: true
+            }));
         } finally {
             // Clear loading state for this button
             setLoadingStates(prev => ({ ...prev, [`follow-${userId}`]: false }));
