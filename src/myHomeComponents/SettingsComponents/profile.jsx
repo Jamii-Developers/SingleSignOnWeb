@@ -1,17 +1,16 @@
 import React from "react";
 import { Container, Row, Col, Card, Form, Button, ButtonGroup, Spinner } from 'react-bootstrap';
-import { useCookies } from "react-cookie";
 import { useEffect, useState } from "react";
 import { FaUser, FaEnvelope, FaLock, FaUnlock } from 'react-icons/fa';
 import JsonNetworkAdapter from "../../configs/networkadapter";
-import ServerErrorMsg from "../../frequentlyUsedModals/servererrormsg";
-import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg';
+import useServerResponse from "../../hooks/useServerResponse";
+import useSessionCredentials from "../../hooks/useSessionCredentials";
+import LoadingSpinner from "../../components/LoadingSpinner";
 import Lock from "../../configs/encryption";
 import constants from "../../utils/constants";
 import conn from "../../configs/conn";
 import '../sass/profile.sass';
 
-// Validation constants
 const VALIDATION = {
 	NAME_MAX_LENGTH: 50,
 	ADDRESS_MAX_LENGTH: 100,
@@ -25,7 +24,6 @@ const VALIDATION = {
 	ADDRESS_REGEX: /^[A-Za-z0-9\s.,'-]+$/
 };
 
-// Security utility functions
 const sanitizeInput = (input) => {
 	if (typeof input !== 'string') return input;
 	const div = window.document.createElement('div');
@@ -49,23 +47,11 @@ const validateZipCode = (zipcode) => {
 };
 
 const Profile = () => {
-	const [cookies] = useCookies("userSession");
+	const { cookies, getSessionData } = useSessionCredentials();
+	const { showError, showSuccess, showNetworkError, ServerResponseModals } = useServerResponse();
 	const [data, setData] = useState(null);
 	const [loginButtonSpinner, setLoginButtonSpinner] = useState(false);
 	const secretKey = cookies.userSession.USER_KEY;
-
-	const [serverErrorResponse, setServerErrorResponse] = useState({
-		serverErrorCode: "",
-		serverErrorSubject: "",
-		serverErrorMessage: "",
-		errServMsgShow: false
-	});
-
-	const [serverSuccessResponse, setServerSuccessResponse] = useState({
-		ui_subject: "",
-		ui_message: "",
-		succServMsgShow: false
-	});
 
 	const [validationErrors, setValidationErrors] = useState({
 		firstname: false,
@@ -94,30 +80,24 @@ const Profile = () => {
 		privacy: false
 	});
 
-	async function SetFormData(result) {
-		setPageFields(prevState => { return { ...prevState, firstname: result.firstname } });
-		setPageFields(prevState => { return { ...prevState, middlename: result.middlename } });
-		setPageFields(prevState => { return { ...prevState, lastname: result.lastname } });
-		setPageFields(prevState => { return { ...prevState, address1: result.address1 } });
-		setPageFields(prevState => { return { ...prevState, address2: result.address2 } });
-		setPageFields(prevState => { return { ...prevState, city: result.city } });
-		setPageFields(prevState => { return { ...prevState, state: result.state } });
-		setPageFields(prevState => { return { ...prevState, province: result.province } });
-		setPageFields(prevState => { return { ...prevState, zipcode: result.zipcode } });
-		setPageFields(prevState => { return { ...prevState, country: result.country } });
-		if (result.privacy === 0) {
-			setPageFields(prevState => { return { ...prevState, privacy: false } });
-		} else if (result.privacy === 1) {
-			setPageFields(prevState => { return { ...prevState, privacy: true } });
-		}
+	function applyProfileData(result) {
+		setPageFields({
+			firstname: result.firstname || "",
+			middlename: result.middlename || "",
+			lastname: result.lastname || "",
+			address1: result.address1 || "",
+			address2: result.address2 || "",
+			city: result.city || "",
+			state: result.state || "",
+			province: result.province || "",
+			zipcode: result.zipcode || "",
+			country: result.country || "",
+			privacy: result.privacy === 1
+		});
 	}
 
 	const getPrivacy = () => {
-		if (pageFields.privacy === true) {
-			return 1;
-		} else if (pageFields.privacy === false) {
-			return 0;
-		}
+		return pageFields.privacy ? 1 : 0;
 	}
 
 	async function ApplyUserData() {
@@ -126,7 +106,7 @@ const Profile = () => {
 			if (cachedData) {
 				let cache = Lock("decrypt", cachedData, secretKey);
 				setData(cache);
-				await SetFormData(cache);
+				applyProfileData(cache);
 			} else {
 				await FetchLatestUserData();
 			}
@@ -136,96 +116,49 @@ const Profile = () => {
 			try {
 				await FetchLatestUserData();
 			} catch (fetchError) {
-				setServerErrorResponse(prevState => ({
-					...prevState,
-					serverErrorCode: "Data Error",
-					serverErrorSubject: "Failed to Load Profile",
-					serverErrorMessage: "Unable to load your profile data. Please try refreshing the page.",
-					errServMsgShow: true
-				}));
+				showError("Data Error", "Failed to Load Profile", "Unable to load your profile data. Please try refreshing the page.");
 			}
 		}
 	}
 
 	async function FetchLatestUserData() {
-		let userKey = cookies.userSession.USER_KEY;
-		let deviceKey = cookies.userSession.DEVICE_KEY;
-		let sessionKey = cookies.userSession.SESSION_KEY;
-
-		var cookieData = {
-			userKey,
-			deviceKey,
-			sessionKey
-		};
-
+		const cookieData = getSessionData();
 		let headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.FETCH_PROFILE };
 
 		try {
 			const result = await JsonNetworkAdapter.post(conn.URL.JUSER_URL, cookieData, { headers: headers });
 
 			if (result.status !== 200) {
-				setServerErrorResponse(prevState => ({
-					...prevState,
-					serverErrorCode: result.status,
-					serverErrorSubject: result.statusText,
-					serverErrorMessage: result.message,
-					errServMsgShow: true
-				}));
+				showError(result.status, result.statusText, result.message);
 				return;
 			}
 
 			if (result.data.ERROR_MSG_TYPE === constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE) {
-				setServerErrorResponse(prevState => ({
-					...prevState,
-					serverErrorCode: result.data.ERROR_FIELD_CODE,
-					serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
-					serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
-					errServMsgShow: true
-				}));
+				showError(result.data.ERROR_FIELD_CODE, result.data.ERROR_FIELD_SUBJECT, result.data.ERROR_FIELD_MESSAGE);
 				setData(" ");
 				return;
 			}
 
 			localStorage.setItem('cachedUserData', Lock("encrypt", JSON.stringify(result.data), secretKey));
 			setData(JSON.parse(JSON.stringify(result.data)));
-			SetFormData(result.data);
+			applyProfileData(result.data);
 		} catch (error) {
-			setServerErrorResponse(prevState => ({
-				...prevState,
-				serverErrorCode: "Network Error",
-				serverErrorSubject: "Connection Error",
-				serverErrorMessage: "Unable to fetch profile data. Please try again later.",
-				errServMsgShow: true
-			}));
+			showNetworkError("fetch profile data.");
 		}
 	}
 
 	const CheckNullException = (value, option) => {
-		if (value === null) {
-			return option;
-		} else if (typeof (value) === Object) {
-			return option;
-		} else if (value === undefined) {
-			return option;
-		} else if (value === "") {
+		if (value === null || typeof(value) === Object || value === undefined || value === "") {
 			return option;
 		}
-		else {
-			return value;
-		}
+		return value;
 	}
 
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(() => { ApplyUserData() }, []);
 
 	if (!data) {
-		return (
-			<div class="text-center">
-				<div class="spinner-border" role="status">
-					<span class="visually-hidden">Loading...</span>
-				</div>
-			</div>
-		);
+		return <LoadingSpinner className="text-center" />;
 	}
 
 	const Clear = () => {
@@ -242,21 +175,7 @@ const Profile = () => {
 			localStorage.removeItem("cachedUserData");
 			return;
 		}
-		setPageFields(prevState => { return { ...prevState, firstname: result.firstname } });
-		setPageFields(prevState => { return { ...prevState, middlename: result.middlename } });
-		setPageFields(prevState => { return { ...prevState, lastname: result.lastname } });
-		setPageFields(prevState => { return { ...prevState, address1: result.address1 } });
-		setPageFields(prevState => { return { ...prevState, address2: result.address2 } });
-		setPageFields(prevState => { return { ...prevState, city: result.city } });
-		setPageFields(prevState => { return { ...prevState, state: result.state } });
-		setPageFields(prevState => { return { ...prevState, province: result.province } });
-		setPageFields(prevState => { return { ...prevState, zipcode: result.zipcode } });
-		setPageFields(prevState => { return { ...prevState, country: result.country } });
-		if (result.privacy === 0) {
-			setPageFields(prevState => { return { ...prevState, privacy: false } });
-		} else if (result.privacy === 1) {
-			setPageFields(prevState => { return { ...prevState, privacy: true } });
-		}
+		applyProfileData(result);
 	}
 
 	const validateForm = () => {
@@ -281,7 +200,6 @@ const Profile = () => {
 		const sanitizedValue = sanitizeInput(value);
 		setPageFields(prevState => ({ ...prevState, [field]: sanitizedValue }));
 		
-		// Clear validation error when user starts typing
 		if (validationErrors[field]) {
 			setValidationErrors(prevState => ({ ...prevState, [field]: false }));
 		}
@@ -289,13 +207,7 @@ const Profile = () => {
 
 	const Update = async () => {
 		if (!validateForm()) {
-			setServerErrorResponse(prevState => ({
-				...prevState,
-				serverErrorCode: "Validation Error",
-				serverErrorSubject: "Invalid Input",
-				serverErrorMessage: "Please check the form for errors",
-				errServMsgShow: true
-			}));
+			showError("Validation Error", "Invalid Input", "Please check the form for errors");
 			return;
 		}
 
@@ -303,9 +215,7 @@ const Profile = () => {
 
 		try {
 			const postData = {
-				userKey: cookies.userSession.USER_KEY,
-				deviceKey: cookies.userSession.DEVICE_KEY,
-				sessionKey: cookies.userSession.SESSION_KEY,
+				...getSessionData(),
 				firstname: pageFields.firstname,
 				middlename: pageFields.middlename,
 				lastname: pageFields.lastname,
@@ -323,24 +233,12 @@ const Profile = () => {
 			const result = await JsonNetworkAdapter.post(conn.URL.JUSER_URL, postData, { headers });
 
 			if (result.status !== 200) {
-				setServerErrorResponse(prevState => ({
-					...prevState,
-					serverErrorCode: result.status,
-					serverErrorSubject: result.statusText,
-					serverErrorMessage: result.message,
-					errServMsgShow: true
-				}));
+				showError(result.status, result.statusText, result.message);
 				return;
 			}
 
 			if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.MSG_TYPE) {
-				setServerErrorResponse(prevState => ({
-					...prevState,
-					serverErrorCode: result.data.ERROR_FIELD_CODE,
-					serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
-					serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
-					errServMsgShow: true
-				}));
+				showError(result.data.ERROR_FIELD_CODE, result.data.ERROR_FIELD_SUBJECT, result.data.ERROR_FIELD_MESSAGE);
 				return;
 			}
 
@@ -361,22 +259,11 @@ const Profile = () => {
 			localStorage.setItem('cachedUserData', Lock("encrypt", JSON.stringify(storeData), secretKey));
 
 			if (result.data.MSG_TYPE === constants.SUCCESS_MESSAGE.TYPE_EDIT_USER_DATA) {
-				setServerSuccessResponse(prevState => ({
-					...prevState,
-					ui_subject: result.data.UI_SUBJECT,
-					ui_message: result.data.UI_MESSAGE,
-					succServMsgShow: true
-				}));
+				showSuccess(result.data.UI_SUBJECT, result.data.UI_MESSAGE);
 				Clear();
 			}
 		} catch (error) {
-			setServerErrorResponse(prevState => ({
-				...prevState,
-				serverErrorCode: "Network Error",
-				serverErrorSubject: "Connection Error",
-				serverErrorMessage: "Unable to connect to the server. Please try again later.",
-				errServMsgShow: true
-			}));
+			showNetworkError();
 		} finally {
 			setLoginButtonSpinner(false);
 		}
@@ -671,19 +558,7 @@ const Profile = () => {
 				</Card>
 			</Container>
 
-			<ServerErrorMsg
-				show={serverErrorResponse.errServMsgShow}
-				onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
-				subject={serverErrorResponse.serverErrorSubject}
-				message={serverErrorResponse.serverErrorMessage}
-			/>
-
-			<ServerSuccessMsg
-				show={serverSuccessResponse.succServMsgShow}
-				onClose={() => setServerSuccessResponse(prevState => ({ ...prevState, succServMsgShow: false }))}
-				subject={serverSuccessResponse.ui_subject}
-				message={serverSuccessResponse.ui_message}
-			/>
+			<ServerResponseModals />
 		</div>
 	);
 };

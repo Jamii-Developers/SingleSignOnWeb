@@ -1,29 +1,19 @@
 import React from 'react';
-import { Container, Row, Col, Card, Form, Button, ButtonGroup, Spinner, Collapse, Alert } from 'react-bootstrap';
-import { useCookies } from "react-cookie";
+import { Container, Row, Col, Card, Form, Button, ButtonGroup, Spinner } from 'react-bootstrap';
 import { useState } from "react";
 import { FaHeadset, FaUser, FaEnvelope } from 'react-icons/fa';
-import JsonNetworkAdapter from "../../configs/networkadapter";
-import ServerErrorMsg from "../../frequentlyUsedModals/servererrormsg";
-import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg';
+import useServerResponse from '../../hooks/useServerResponse';
+import useSessionCredentials from '../../hooks/useSessionCredentials';
+import FieldValidationError from '../../components/FieldValidationError';
+import apiRequest from '../../utils/apiRequest';
+import { validateMinLength } from '../../utils/validators';
 import conn from "../../configs/conn";
 import constants from "../../utils/constants";
 import '../sass/clientcommunication.sass';
 
 const Contactsupport = () => {
-    const [cookies] = useCookies("userSession");
-    const [serverErrorResponse, setServerErrorResponse] = useState({
-        serverErrorCode: "",
-        serverErrorSubject: "",
-        serverErrorMessage: "",
-        errServMsgShow: false
-    });
-
-    const [serverSuccessResponse, setServerSuccessResponse] = useState({
-        ui_subject: "",
-        ui_message: "",
-        succServMsgShow: false
-    });
+    const { cookies, getSessionData } = useSessionCredentials();
+    const { showError, showSuccess, showNetworkError, ServerResponseModals } = useServerResponse();
 
     const [pageFields, setPageFields] = useState({
         email: cookies.userSession.EMAIL_ADDRESS,
@@ -32,10 +22,6 @@ const Contactsupport = () => {
     });
 
     const [errordata, setErrorData] = useState({
-        emailErrorTrigger: false,
-        emailErrorMessage: "",
-        usernameErrorTrigger: false,
-        usernameErrorMessage: "",
         thoughtsErrorTrigger: false,
         thoughtsErrorMessage: ""
     });
@@ -47,57 +33,32 @@ const Contactsupport = () => {
         setPageFields(prevState => ({ ...prevState, thoughts: "" }));
     }
 
-    function ShowThoughtsError() {
-        return (
-            <Collapse in={errordata.thoughtsErrorTrigger}>
-                <Alert variant="filled" severity="warning" className='mb-3'>{errordata.thoughtsErrorMessage}</Alert>
-            </Collapse>
-        );
-    }
-
     function CheckThoughts(thoughts) {
-        if (thoughts === "") {
-            setErrorData(prevState => ({ ...prevState, thoughtsErrorMessage: "Please share your thoughts as this is blank currently" }));
-            setErrorData(prevState => ({ ...prevState, thoughtsErrorTrigger: true }));
+        const result = validateMinLength(thoughts, 5, "Thoughts");
+        if (!result.valid) {
+            setErrorData(prevState => ({
+                ...prevState,
+                thoughtsErrorMessage: thoughts === "" ? "Please share your thoughts as this is blank currently" : result.message,
+                thoughtsErrorTrigger: true
+            }));
             return;
         }
-
-        if (pageFields.thoughts.length < 5) {
-            setErrorData(prevState => ({ ...prevState, thoughtsErrorMessage: "Please enter more than 5 characters." }));
-            setErrorData(prevState => ({ ...prevState, thoughtsErrorTrigger: true }));
-            return;
-        }
-
         setErrorData(prevState => ({ ...prevState, thoughtsErrorTrigger: false }));
     }
 
     async function submitThoughts() {
         if (pageFields.thoughts === "") {
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "Generated at ContactUsJS",
-                serverErrorSubject: "Thought Input Error!",
-                serverErrorMessage: "Your thoughts are empty, please share your thoughts",
-                errServMsgShow: true
-            }));
+            showError("Generated at ContactUsJS", "Thought Input Error!", "Your thoughts are empty, please share your thoughts");
             return;
         }
 
         if (pageFields.thoughts.length < 5) {
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "Generated at ContactUsJS",
-                serverErrorSubject: "Thought Input Error!",
-                serverErrorMessage: "Your thoughts are empty, please share your thoughts",
-                errServMsgShow: true
-            }));
+            showError("Generated at ContactUsJS", "Thought Input Error!", "Your thoughts are empty, please share your thoughts");
             return;
         }
 
         const contactUsJSON = {
-            userKey: cookies.userSession.USER_KEY,
-            deviceKey: cookies.userSession.DEVICE_KEY,
-            sessionKey: cookies.userSession.SESSION_KEY,
+            ...getSessionData(),
             emailaddress: cookies.userSession.EMAIL_ADDRESS,
             username: cookies.userSession.USERNAME,
             client_thoughts: pageFields.thoughts,
@@ -106,48 +67,19 @@ const Contactsupport = () => {
         setSubmitThoughtsButtonSpinner(true);
 
         try {
-            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.CONTACT_SUPPORT };
-            const result = await JsonNetworkAdapter.post(conn.URL.JSUPPORT_URL, contactUsJSON, { headers });
-
-            if (result.status !== 200) {
-                setServerErrorResponse(prevState => ({
-                    ...prevState,
-                    serverErrorCode: result.status,
-                    serverErrorSubject: result.statusText,
-                    serverErrorMessage: result.message,
-                    errServMsgShow: true
-                }));
-                return;
-            }
-
-            if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
-                setServerErrorResponse(prevState => ({
-                    ...prevState,
-                    serverErrorCode: result.data.ERROR_FIELD_CODE,
-                    serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
-                    serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
-                    errServMsgShow: true
-                }));
-                return;
-            }
-
-            if (constants.SUCCESS_MESSAGE.TYPE_CONTACTSUPPORT === result.data.MSG_TYPE) {
-                setServerSuccessResponse(prevState => ({
-                    ...prevState,
-                    ui_subject: result.data.UI_SUBJECT,
-                    ui_message: result.data.UI_MESSAGE,
-                    succServMsgShow: true
-                }));
-                clear();
-            }
+            await apiRequest(
+                conn.URL.JSUPPORT_URL,
+                contactUsJSON,
+                conn.SERVICE_HEADERS.CONTACT_SUPPORT,
+                {
+                    showError,
+                    showSuccess,
+                    successMsgType: constants.SUCCESS_MESSAGE.TYPE_CONTACTSUPPORT,
+                    onSuccess: () => clear()
+                }
+            );
         } catch (error) {
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "Network Error",
-                serverErrorSubject: "Connection Error",
-                serverErrorMessage: "Unable to connect to the server. Please try again later.",
-                errServMsgShow: true
-            }));
+            showNetworkError();
         } finally {
             setSubmitThoughtsButtonSpinner(false);
         }
@@ -216,7 +148,7 @@ const Contactsupport = () => {
                                             onChange={(e) => CheckThoughts(e.target.value)}
                                         />
                                     </Form.Group>
-                                    <ShowThoughtsError />
+                                    <FieldValidationError show={errordata.thoughtsErrorTrigger} message={errordata.thoughtsErrorMessage} />
                                 </Col>
                             </Row>
 
@@ -256,19 +188,7 @@ const Contactsupport = () => {
                 </Card>
             </Container>
 
-            <ServerErrorMsg
-                show={serverErrorResponse.errServMsgShow}
-                onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
-                subject={serverErrorResponse.serverErrorSubject}
-                message={serverErrorResponse.serverErrorMessage}
-            />
-
-            <ServerSuccessMsg
-                show={serverSuccessResponse.succServMsgShow}
-                onClose={() => setServerSuccessResponse(prevState => ({ ...prevState, succServMsgShow: false }))}
-                subject={serverSuccessResponse.ui_subject}
-                message={serverSuccessResponse.ui_message}
-            />
+            <ServerResponseModals />
         </div>
     );
 };

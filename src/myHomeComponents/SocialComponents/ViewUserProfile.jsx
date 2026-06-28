@@ -1,36 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Spinner, Row, Col, Card } from 'react-bootstrap';
-import { useCookies } from "react-cookie";
 import { FaUser, FaEnvelope, FaMapMarkerAlt, FaGlobe } from 'react-icons/fa';
-import JsonNetworkAdapter from '../../configs/networkadapter';
+import useServerResponse from '../../hooks/useServerResponse';
+import useSessionCredentials from '../../hooks/useSessionCredentials';
+import apiRequest from '../../utils/apiRequest';
 import conn from '../../configs/conn';
-import constants from '../../utils/constants';
-import ServerErrorMsg from '../../frequentlyUsedModals/servererrormsg';
-import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg';
 import BlankProfilePic from '../../img/blankprofile.png';
 import '../sass/viewuserprofile.sass';
 
 const ViewUserProfile = ({ show, onHide, userId }) => {
-    const [cookies] = useCookies("userSession");
+    const { getSessionData } = useSessionCredentials();
+    const { showError, showNetworkError, ServerResponseModals } = useServerResponse();
     const [loading, setLoading] = useState(true);
     const [profileData, setProfileData] = useState(null);
 
-    const [serverErrorResponse, setServerErrorResponse] = useState({
-        serverErrorCode: "",
-        serverErrorSubject: "",
-        serverErrorMessage: "",
-        errServMsgShow: false
-    });
-
-    const [serverSuccessResponse, setServerSuccessResponse] = useState({
-        ui_subject: "",
-        ui_message: "",
-        succServMsgShow: false
-    });
-
     const fetchProfileData = async () => {
         try {
-            // First check localStorage for cached data
             const cachedProfiles = localStorage.getItem('userprofiles');
             if (cachedProfiles) {
                 const profiles = JSON.parse(cachedProfiles);
@@ -41,45 +26,27 @@ const ViewUserProfile = ({ show, onHide, userId }) => {
                 }
             }
 
-            // Make server request to get fresh data
             const requestData = {
-                deviceKey: cookies.userSession.DEVICE_KEY,
-                userKey: cookies.userSession.USER_KEY,
-                sessionKey: cookies.userSession.SESSION_KEY,
+                ...getSessionData(),
                 targetUserKey: userId
             };
 
-            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.VIEW_USER_PROFILE };
-            const result = await JsonNetworkAdapter.post(conn.URL.JUSER_URL, requestData, { headers });
+            const { success, result } = await apiRequest(
+                conn.URL.JUSER_URL,
+                requestData,
+                conn.SERVICE_HEADERS.VIEW_USER_PROFILE,
+                { showError }
+            );
 
-            if (result.status === 200) {
-                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
-                    setServerErrorResponse(prevState => ({
-                        ...prevState,
-                        serverErrorCode: result.data.ERROR_FIELD_CODE,
-                        serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
-                        serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
-                        errServMsgShow: true
-                    }));
-                    return;
-                }
-
-                // Update localStorage with new data
+            if (success) {
                 const profiles = JSON.parse(localStorage.getItem('userprofiles') || '{}');
                 profiles[userId] = result.data;
                 localStorage.setItem('userprofiles', JSON.stringify(profiles));
-
                 setProfileData(result.data);
             }
         } catch (error) {
             console.error('Error fetching profile:', error);
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "Network Error",
-                serverErrorSubject: "Connection Error",
-                serverErrorMessage: "Unable to fetch profile data. Please try again later.",
-                errServMsgShow: true
-            }));
+            showNetworkError("fetch profile data.");
         } finally {
             setLoading(false);
         }
@@ -245,19 +212,7 @@ const ViewUserProfile = ({ show, onHide, userId }) => {
                 </Modal.Footer>
             </Modal>
 
-            <ServerErrorMsg
-                show={serverErrorResponse.errServMsgShow}
-                onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
-                subject={serverErrorResponse.serverErrorSubject}
-                message={serverErrorResponse.serverErrorMessage}
-            />
-
-            <ServerSuccessMsg
-                show={serverSuccessResponse.succServMsgShow}
-                onClose={() => setServerSuccessResponse(prevState => ({ ...prevState, succServMsgShow: false }))}
-                subject={serverSuccessResponse.ui_subject}
-                message={serverSuccessResponse.ui_message}
-            />
+            <ServerResponseModals />
         </>
     );
 };

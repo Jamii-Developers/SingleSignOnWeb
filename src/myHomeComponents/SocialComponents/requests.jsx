@@ -1,397 +1,175 @@
-import React, { useState, useEffect } from "react";
-import { Button, ListGroup, Badge, OverlayTrigger, Tooltip, Container, Row, Col, Nav, Tab, ButtonGroup } from 'react-bootstrap';
-import { FaUserPlus, FaUserCheck, FaUserTimes, FaUserFriends, FaArrowLeft, FaUser, FaBan } from 'react-icons/fa';
-import { useCookies } from "react-cookie";
+import React, { useState, useEffect } from 'react';
+import { ListGroup, Button, Container, Row, Col, Badge, ButtonGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { FaArrowLeft, FaCheck, FaTimes, FaBan, FaUserPlus, FaUser } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import '../sass/requests.sass';
-import JsonNetworkAdapter from '../../configs/networkadapter';
+import useServerResponse from '../../hooks/useServerResponse';
+import useSessionCredentials from '../../hooks/useSessionCredentials';
+import apiRequest from '../../utils/apiRequest';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import conn from '../../configs/conn';
 import constants from '../../utils/constants';
-import ServerErrorMsg from '../../frequentlyUsedModals/servererrormsg';
-import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg';
+import ViewUserProfile from './ViewUserProfile';
 
 const Requests = () => {
-    const [cookies] = useCookies("userSession");
     const navigate = useNavigate();
-    const [requests, setRequests] = useState({
-        friendRequests: [],
-        followerRequests: []
-    });
-
-    const [serverErrorResponse, setServerErrorResponse] = useState({
-        serverErrorCode: "",
-        serverErrorSubject: "",
-        serverErrorMessage: "",
-        errServMsgShow: false
-    });
-
-    const [serverSuccessResponse, setServerSuccessResponse] = useState({
-        ui_subject: "",
-        ui_message: "",
-        succServMsgShow: false
-    });
-
+    const { getSessionData } = useSessionCredentials();
+    const { showError, showSuccess, ServerResponseModals } = useServerResponse();
+    const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [processingRequests, setProcessingRequests] = useState(new Set());
+    const [processingActions, setProcessingActions] = useState({
+        accept: new Set(),
+        reject: new Set(),
+        block: new Set()
+    });
+
+    const [selectedUserId, setSelectedUserId] = useState(null);
+    const [showProfileModal, setShowProfileModal] = useState(false);
 
     const fetchRequests = async () => {
         try {
-            const requestData = {
-                deviceKey: cookies.userSession.DEVICE_KEY,
-                userKey: cookies.userSession.USER_KEY,
-                sessionKey: cookies.userSession.SESSION_KEY
-            };
+            const requestData = getSessionData();
 
-            // Fetch friend requests first
-            const friendHeaders = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.GET_FRIEND_REQUEST_LIST };
-            const friendResult = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers: friendHeaders });
+            const { success, result } = await apiRequest(
+                conn.URL.JSOCIAL_URL,
+                requestData,
+                conn.SERVICE_HEADERS.GET_FRIEND_REQUEST_LIST,
+                { showError }
+            );
 
-            if (friendResult.status === 200) {
-                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE !== friendResult.data.ERROR_MSG_TYPE) {
-                    if (constants.SUCCESS_MESSAGE.TYPE_GET_FRIEND_REQUEST_LIST_REQUEST === friendResult.data.MSG_TYPE) {
-                        setServerSuccessResponse(prevState => ({
-                            ...prevState,
-                            ui_subject: friendResult.data.UI_SUBJECT,
-                            ui_message: friendResult.data.UI_MESSAGE,
-                            succServMsgShow: true   
-                        }));
-                    }
-
-                    const formattedFriendRequests = friendResult.data.results.map(request => ({
-                        id: request.userKey,
-                        username: request.username,
-                        name: request.firstname === 'N/A' || request.lastname === 'N/A' 
-                            ? request.username 
-                            : `${request.firstname} ${request.lastname}`.trim(),
-                        type: 'friend'
-                    }));
-                    setRequests(prev => ({ ...prev, friendRequests: formattedFriendRequests }));
-                }
-            }
-
-            // Then fetch follower requests
-            const followerHeaders = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.GET_FOLLOWER_REQUEST_LIST };
-            const followerResult = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers: followerHeaders });
-
-            if (followerResult.status === 200) {
-                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE !== followerResult.data.ERROR_MSG_TYPE) {
-                    const formattedFollowerRequests = followerResult.data.results.map(request => ({
-                        id: request.userKey,
-                        username: request.username,
-                        name: request.firstname === 'N/A' || request.lastname === 'N/A' 
-                            ? request.username 
-                            : `${request.firstname} ${request.lastname}`.trim(),
-                        type: 'follower'
-                    }));
-                    setRequests(prev => ({ ...prev, followerRequests: formattedFollowerRequests }));
-                }
+            if (success) {
+                const formattedRequests = result.data.results.map(user => ({
+                    id: user.userKey,
+                    username: user.username,
+                    firstName: user.firstname === 'N/A' ? '' : user.firstname,
+                    lastName: user.lastname === 'N/A' ? '' : user.lastname,
+                    requestDate: user.requestDate
+                }));
+                setRequests(formattedRequests);
             }
         } catch (error) {
             console.error('Error fetching requests:', error);
-            setRequests(prev => ({ 
-                ...prev, 
-                friendRequests: [], 
-                followerRequests: [] 
-            }));
+            showError("ERR|001", "Error", "Failed to fetch friend requests");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleViewProfile = async (userId) => {
+        setSelectedUserId(userId);
+        setShowProfileModal(true);
+    };
+
+    const handleAccept = async (userId) => {
+        try {
+            setProcessingActions(prev => ({
+                ...prev,
+                accept: new Set([...prev.accept, userId])
+            }));
+
+            const requestData = {
+                ...getSessionData(),
+                targetUserKey: userId
+            };
+
+            const { success } = await apiRequest(
+                conn.URL.JSOCIAL_URL,
+                requestData,
+                conn.SERVICE_HEADERS.ACCEPT_FRIEND_REQUEST,
+                {
+                    showError,
+                    showSuccess,
+                    successMsgType: constants.SUCCESS_MESSAGE.TYPE_ACCEPT_FRIEND_REQUEST,
+                    onSuccess: () => {
+                        setRequests(prev => prev.filter(req => req.id !== userId));
+                    }
+                }
+            );
+        } catch (error) {
+            console.error('Error accepting request:', error);
+            showError("ERR|001", "Error", "Failed to accept friend request");
+        } finally {
+            setProcessingActions(prev => ({
+                ...prev,
+                accept: new Set([...prev.accept].filter(id => id !== userId))
+            }));
+        }
+    };
+
+    const handleReject = async (userId) => {
+        try {
+            setProcessingActions(prev => ({
+                ...prev,
+                reject: new Set([...prev.reject, userId])
+            }));
+
+            const requestData = {
+                ...getSessionData(),
+                targetUserKey: userId
+            };
+
+            const { success } = await apiRequest(
+                conn.URL.JSOCIAL_URL,
+                requestData,
+                conn.SERVICE_HEADERS.REJECT_FRIEND_REQUEST,
+                {
+                    showError,
+                    showSuccess,
+                    successMsgType: constants.SUCCESS_MESSAGE.TYPE_REJECT_FRIEND_REQUEST,
+                    onSuccess: () => {
+                        setRequests(prev => prev.filter(req => req.id !== userId));
+                    }
+                }
+            );
+        } catch (error) {
+            console.error('Error rejecting request:', error);
+            showError("ERR|001", "Error", "Failed to reject friend request");
+        } finally {
+            setProcessingActions(prev => ({
+                ...prev,
+                reject: new Set([...prev.reject].filter(id => id !== userId))
+            }));
+        }
+    };
+
+    const handleBlock = async (userId) => {
+        try {
+            setProcessingActions(prev => ({
+                ...prev,
+                block: new Set([...prev.block, userId])
+            }));
+
+            const requestData = {
+                ...getSessionData(),
+                targetUserKey: userId
+            };
+
+            const { success } = await apiRequest(
+                conn.URL.JSOCIAL_URL,
+                requestData,
+                conn.SERVICE_HEADERS.BLOCK_USER,
+                {
+                    showError,
+                    showSuccess,
+                    successMsgType: constants.SUCCESS_MESSAGE.TYPE_BLOCK_USER_REQUEST,
+                    onSuccess: () => {
+                        setRequests(prev => prev.filter(req => req.id !== userId));
+                    }
+                }
+            );
+        } catch (error) {
+            console.error('Error blocking user:', error);
+            showError("ERR|001", "Error", "Failed to block user");
+        } finally {
+            setProcessingActions(prev => ({
+                ...prev,
+                block: new Set([...prev.block].filter(id => id !== userId))
+            }));
         }
     };
 
     useEffect(() => {
         fetchRequests();
     }, []);
-
-    const handleAccept = async (request) => {
-        try {
-            setProcessingRequests(prev => new Set([...prev, request.id]));
-            const requestData = {
-                deviceKey: cookies.userSession.DEVICE_KEY,
-                userKey: cookies.userSession.USER_KEY,
-                sessionKey: cookies.userSession.SESSION_KEY,
-                targetUserKey: request.id
-            };
-
-            let headers;
-            if (request.type === 'friend') {
-                headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.ACCEPT_FRIEND_REQUEST };
-            } else {
-                headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.ACCEPT_FOLLOW_REQUEST };
-            }
-
-            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
-
-            if (result.status === 200) {
-                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
-                    setServerErrorResponse(prevState => ({
-                        ...prevState,
-                        serverErrorCode: result.data.ERROR_FIELD_CODE,
-                        serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
-                        serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
-                        errServMsgShow: true
-                    }));
-                    return;
-                }
-
-                setServerSuccessResponse(prevState => ({
-                    ...prevState,
-                    ui_subject: result.data.UI_SUBJECT,
-                    ui_message: result.data.UI_MESSAGE,
-                    succServMsgShow: true
-                }));
-
-                if (request.type === 'friend') {
-                    setRequests(prev => ({
-                        ...prev,
-                        friendRequests: prev.friendRequests.filter(req => req.id !== request.id)
-                    }));
-                } else {
-                    setRequests(prev => ({
-                        ...prev,
-                        followerRequests: prev.followerRequests.filter(req => req.id !== request.id)
-                    }));
-                }
-            }
-        } catch (error) {
-            console.error('Error accepting request:', error);
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "ERR|001",
-                serverErrorSubject: "Error",
-                serverErrorMessage: "Failed to accept request",
-                errServMsgShow: true
-            }));
-        } finally {
-            setProcessingRequests(prev => {
-                const newSet = new Set(prev);
-                newSet.delete(request.id);
-                return newSet;
-            });
-        }
-    };
-
-    const handleDecline = async (request) => {
-        try {
-            setProcessingRequests(prev => new Set([...prev, request.id]));
-            const requestData = {
-                deviceKey: cookies.userSession.DEVICE_KEY,
-                userKey: cookies.userSession.USER_KEY,
-                sessionKey: cookies.userSession.SESSION_KEY,
-                targetUserKey: request.id
-            };
-
-            let headers;
-            if (request.type === 'friend') {
-                headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.REJECT_FRIEND_REQUEST };
-            } else {
-                headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.REJECT_FOLLOW_REQUEST };
-            }
-
-            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
-
-            if (result.status === 200) {
-                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
-                    setServerErrorResponse(prevState => ({
-                        ...prevState,
-                        serverErrorCode: result.data.ERROR_FIELD_CODE,
-                        serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
-                        serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
-                        errServMsgShow: true
-                    }));
-                    return;
-                }
-
-                setServerSuccessResponse(prevState => ({
-                    ...prevState,
-                    ui_subject: result.data.UI_SUBJECT,
-                    ui_message: result.data.UI_MESSAGE,
-                    succServMsgShow: true
-                }));
-
-                if (request.type === 'friend') {
-                    setRequests(prev => ({
-                        ...prev,
-                        friendRequests: prev.friendRequests.filter(req => req.id !== request.id)
-                    }));
-                } else {
-                    setRequests(prev => ({
-                        ...prev,
-                        followerRequests: prev.followerRequests.filter(req => req.id !== request.id)
-                    }));
-                }
-            }
-        } catch (error) {
-            console.error('Error declining request:', error);
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "ERR|001",
-                serverErrorSubject: "Error",
-                serverErrorMessage: "Failed to decline request",
-                errServMsgShow: true
-            }));
-        } finally {
-            setProcessingRequests(prev => {
-                const newSet = new Set(prev);
-                newSet.delete(request.id);
-                return newSet;
-            });
-        }
-    };
-
-    const handleBlock = async (userId) => {
-        try {
-            setProcessingRequests(prev => new Set([...prev, userId]));
-            const requestData = {
-                deviceKey: cookies.userSession.DEVICE_KEY,
-                userKey: cookies.userSession.USER_KEY,
-                sessionKey: cookies.userSession.SESSION_KEY,
-                targetUserKey: userId
-            };
-
-            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.BLOCK_USER };
-            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
-
-            if (result.status === 200) {
-                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
-                    setServerErrorResponse(prevState => ({
-                        ...prevState,
-                        serverErrorCode: result.data.ERROR_FIELD_CODE,
-                        serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
-                        serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
-                        errServMsgShow: true
-                    }));
-                    return;
-                }
-
-                if (constants.SUCCESS_MESSAGE.TYPE_BLOCK_USER_REQUEST === result.data.MSG_TYPE) {
-                    setServerSuccessResponse(prevState => ({
-                        ...prevState,
-                        ui_subject: result.data.UI_SUBJECT,
-                        ui_message: result.data.UI_MESSAGE,
-                        succServMsgShow: true
-                    }));
-                    setRequests(prev => ({
-                        ...prev,
-                        friendRequests: prev.friendRequests.filter(req => req.id !== userId),
-                        followerRequests: prev.followerRequests.filter(req => req.id !== userId)
-                    }));
-                }
-            }
-        } catch (error) {
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "Network Error",
-                serverErrorSubject: "Block User Failed",
-                serverErrorMessage: "Unable to block user. Please try again.",
-                errServMsgShow: true
-            }));
-        } finally {
-            setProcessingRequests(prev => {
-                const newSet = new Set(prev);
-                newSet.delete(userId);
-                return newSet;
-            });
-        }
-    };
-
-
-    const RequestList = ({ requests, type }) => (
-        <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-            {loading ? (
-                <Col xs={12} className="text-center p-4">
-                    <div className="spinner-border" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                </Col>
-            ) : (
-                <>
-                    {requests.map(request => (
-                        <Col key={request.id}>
-                            <div className="user-card p-3 border rounded h-100">
-                                <div className="d-flex flex-column h-100">
-                                    <div className="mb-3">
-                                        <h6 className="mb-1">
-                                            {request.name}
-                                        </h6>
-                                        <small className="text-muted">@{request.username}</small>
-                                    </div>
-                                    <div className="mt-auto">
-                                        <ButtonGroup className="w-100">
-                                            <OverlayTrigger
-                                                placement="top"
-                                                overlay={<Tooltip>View Profile</Tooltip>}
-                                            >
-                                                <Button
-                                                    variant="outline-primary"
-                                                    size="sm"
-                                                    onClick={() => navigate(`/profile/${request.id}`)}
-                                                >
-                                                    <FaUser />
-                                                </Button>
-                                            </OverlayTrigger>
-                                            <OverlayTrigger
-                                                placement="top"
-                                                overlay={<Tooltip>Accept Request</Tooltip>}
-                                            >
-                                                <Button
-                                                    variant="outline-success"
-                                                    size="sm"
-                                                    onClick={() => handleAccept(request)}
-                                                    disabled={processingRequests.has(request.id)}
-                                                >
-                                                    {processingRequests.has(request.id) ? (
-                                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-                                                    ) : (
-                                                        <FaUserCheck />
-                                                    )}
-                                                </Button>
-                                            </OverlayTrigger>
-                                            <OverlayTrigger
-                                                placement="top"
-                                                overlay={<Tooltip>Decline Request</Tooltip>}
-                                            >
-                                                <Button
-                                                    variant="outline-danger"
-                                                    size="sm"
-                                                    onClick={() => handleDecline(request)}
-                                                    disabled={processingRequests.has(request.id)}
-                                                >
-                                                    {processingRequests.has(request.id) ? (
-                                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-                                                    ) : (
-                                                        <FaUserTimes />
-                                                    )}
-                                                </Button>
-                                            </OverlayTrigger>
-                                            <OverlayTrigger
-                                                placement="top"
-                                                overlay={<Tooltip>Block User</Tooltip>}
-                                            >
-                                                <Button
-                                                    variant="outline-danger"
-                                                    size="sm"
-                                                    onClick={() => handleBlock(request.id)}
-                                                >
-                                                    <FaBan />
-                                                </Button>
-                                            </OverlayTrigger>
-                                        </ButtonGroup>
-                                    </div>
-                                </div>
-                            </div>
-                        </Col>
-                    ))}
-                    {requests.length === 0 && (
-                        <Col xs={12}>
-                            <div className="text-center text-muted p-4 border rounded">
-                                No {type} requests found
-                            </div>
-                        </Col>
-                    )}
-                </>
-            )}
-        </Row>
-    );
 
     return (
         <Container fluid className="requests-page">
@@ -405,62 +183,139 @@ const Requests = () => {
                         >
                             <FaArrowLeft />
                         </Button>
-                        <h2 className="mb-0">Requests</h2>
+                        <h2 className="mb-0">
+                            Friend Requests
+                            {requests.length > 0 && (
+                                <Badge bg="primary" className="ms-2" pill>
+                                    {requests.length}
+                                </Badge>
+                            )}
+                        </h2>
                     </div>
                 </Col>
             </Row>
 
             <Row>
                 <Col>
-                    <Tab.Container defaultActiveKey="friend-requests">
-                        <Nav variant="tabs" className="mb-3">
-                            <Nav.Item>
-                                <Nav.Link eventKey="friend-requests">
-                                    <FaUserFriends className="me-2" />
-                                    Friend Requests
-                                    <Badge bg="primary" className="ms-2">
-                                        {requests.friendRequests.length}
-                                    </Badge>
-                                </Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                                <Nav.Link eventKey="follower-requests">
-                                    <FaUserPlus className="me-2" />
-                                    Follower Requests
-                                    <Badge bg="primary" className="ms-2">
-                                        {requests.followerRequests.length}
-                                    </Badge>
-                                </Nav.Link>
-                            </Nav.Item>
-                        </Nav>
-
-                        <Tab.Content>
-                            <Tab.Pane eventKey="friend-requests">
-                                <RequestList requests={requests.friendRequests} type="friend" />
-                            </Tab.Pane>
-                            <Tab.Pane eventKey="follower-requests">
-                                <RequestList requests={requests.followerRequests} type="follower" />
-                            </Tab.Pane>
-                        </Tab.Content>
-                    </Tab.Container>
+                    <ListGroup>
+                        {loading ? (
+                            <LoadingSpinner className="text-center p-4" />
+                        ) : (
+                            <>
+                                {requests.map(request => (
+                                    <ListGroup.Item key={request.id} className="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 className="mb-0">
+                                                {request.firstName && request.lastName 
+                                                    ? `${request.firstName} ${request.lastName}`.trim()
+                                                    : request.username}
+                                            </h6>
+                                            <small className="text-muted">@{request.username}</small>
+                                        </div>
+                                        <ButtonGroup>
+                                            <OverlayTrigger
+                                                placement="top"
+                                                overlay={<Tooltip>View Profile</Tooltip>}
+                                            >
+                                                <Button
+                                                    variant="outline-primary"
+                                                    size="sm"
+                                                    onClick={() => handleViewProfile(request.id)}
+                                                    disabled={
+                                                        processingActions.accept.has(request.id) ||
+                                                        processingActions.reject.has(request.id) ||
+                                                        processingActions.block.has(request.id)
+                                                    }
+                                                >
+                                                    <FaUser />
+                                                </Button>
+                                            </OverlayTrigger>
+                                            <OverlayTrigger
+                                                placement="top"
+                                                overlay={<Tooltip>Accept</Tooltip>}
+                                            >
+                                                <Button
+                                                    variant="outline-success"
+                                                    size="sm"
+                                                    onClick={() => handleAccept(request.id)}
+                                                    disabled={
+                                                        processingActions.accept.has(request.id) ||
+                                                        processingActions.reject.has(request.id) ||
+                                                        processingActions.block.has(request.id)
+                                                    }
+                                                >
+                                                    {processingActions.accept.has(request.id) ? (
+                                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                                                    ) : (
+                                                        <FaCheck />
+                                                    )}
+                                                </Button>
+                                            </OverlayTrigger>
+                                            <OverlayTrigger
+                                                placement="top"
+                                                overlay={<Tooltip>Reject</Tooltip>}
+                                            >
+                                                <Button
+                                                    variant="outline-danger"
+                                                    size="sm"
+                                                    onClick={() => handleReject(request.id)}
+                                                    disabled={
+                                                        processingActions.accept.has(request.id) ||
+                                                        processingActions.reject.has(request.id) ||
+                                                        processingActions.block.has(request.id)
+                                                    }
+                                                >
+                                                    {processingActions.reject.has(request.id) ? (
+                                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                                                    ) : (
+                                                        <FaTimes />
+                                                    )}
+                                                </Button>
+                                            </OverlayTrigger>
+                                            <OverlayTrigger
+                                                placement="top"
+                                                overlay={<Tooltip>Block</Tooltip>}
+                                            >
+                                                <Button
+                                                    variant="outline-secondary"
+                                                    size="sm"
+                                                    onClick={() => handleBlock(request.id)}
+                                                    disabled={
+                                                        processingActions.accept.has(request.id) ||
+                                                        processingActions.reject.has(request.id) ||
+                                                        processingActions.block.has(request.id)
+                                                    }
+                                                >
+                                                    {processingActions.block.has(request.id) ? (
+                                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                                                    ) : (
+                                                        <FaBan />
+                                                    )}
+                                                </Button>
+                                            </OverlayTrigger>
+                                        </ButtonGroup>
+                                    </ListGroup.Item>
+                                ))}
+                                {requests.length === 0 && (
+                                    <ListGroup.Item className="text-center text-muted">
+                                        No pending friend requests
+                                    </ListGroup.Item>
+                                )}
+                            </>
+                        )}
+                    </ListGroup>
                 </Col>
             </Row>
 
-            <ServerErrorMsg
-                show={serverErrorResponse.errServMsgShow}
-                onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
-                subject={serverErrorResponse.serverErrorSubject}
-                message={serverErrorResponse.serverErrorMessage}
+            <ViewUserProfile
+                show={showProfileModal}
+                onHide={() => setShowProfileModal(false)}
+                userId={selectedUserId}
             />
 
-            <ServerSuccessMsg
-                show={serverSuccessResponse.succServMsgShow}
-                onClose={() => setServerSuccessResponse(prevState => ({ ...prevState, succServMsgShow: false }))}
-                subject={serverSuccessResponse.ui_subject}
-                message={serverSuccessResponse.ui_message}
-            />
+            <ServerResponseModals />
         </Container>
     );
 };
 
-export default Requests; 
+export default Requests;
