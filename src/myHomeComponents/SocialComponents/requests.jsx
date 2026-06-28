@@ -187,7 +187,7 @@ const Requests = () => {
                 headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.REJECT_FOLLOW_REQUEST };
             }
 
-            const result = await JsonNetworkAdapter.post(conn.URL.USER_URL, requestData, { headers });
+            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
 
             if (result.status === 200) {
                 if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
@@ -280,9 +280,9 @@ const Requests = () => {
         } catch (error) {
             setServerErrorResponse(prevState => ({
                 ...prevState,
-                serverErrorCode: "ERR|001",
-                serverErrorSubject: "Error",
-                serverErrorMessage: "Failed to block user",
+                serverErrorCode: "Network Error",
+                serverErrorSubject: "Block User Failed",
+                serverErrorMessage: "Unable to block user. Please try again.",
                 errServMsgShow: true
             }));
         } finally {
@@ -293,6 +293,7 @@ const Requests = () => {
             });
         }
     };
+
 
     const RequestList = ({ requests, type }) => (
         <Row xs={1} sm={2} md={3} lg={4} className="g-4">

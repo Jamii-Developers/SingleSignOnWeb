@@ -42,7 +42,6 @@ const JsonNetworkAdapter = axios.create({
                 })
                 .catch((error) => {
                     clearTimeout(timeoutId);
-                    // Handle errors here
                     if (error.name === 'AbortError') {
                         reject({
                             message: "Request timeout",
@@ -51,11 +50,10 @@ const JsonNetworkAdapter = axios.create({
                             config: config,
                         });
                     } else {
-                        reject(error);
                         reject({
-                            message: "Something went wrong!",
-                            status: 404,
-                            statusText: "Oops!",
+                            message: error.message || "Network request failed",
+                            status: 0,
+                            statusText: "Network Error",
                             config: config,
                         });
                     }
