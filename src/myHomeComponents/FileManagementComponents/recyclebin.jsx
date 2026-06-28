@@ -108,7 +108,6 @@ const Recyclebin = () => {
 
     const handleSearch = () => {
         setCurrentPage(1); // Reset to first page on new search
-        console.log('Searching for:', searchQuery);
     };
 
     const handlePreview = (file) => {
@@ -120,12 +119,10 @@ const Recyclebin = () => {
 
     const handleRestore = (file) => {
         // Implement restore functionality
-        console.log('Restoring file:', file);
     };
 
     const handlePermanentDelete = (file) => {
         // Implement permanent delete functionality
-        console.log('Permanently deleting file:', file);
     };
 
     const getFileIcon = (type) => {

@@ -1,26 +1,66 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Modal, Button, ButtonGroup, Form } from 'react-bootstrap';
 import { FaBold, FaItalic, FaUnderline, FaListUl, FaListOl, FaAlignLeft, FaAlignCenter, FaAlignRight, FaSave } from 'react-icons/fa';
 import '../sass/texteditor.sass';
 
-const TextEditorModal = ({ show, onHide, document, onSave }) => {
+const ALLOWED_TAGS = ['B', 'I', 'U', 'UL', 'OL', 'LI', 'P', 'BR', 'DIV', 'SPAN'];
+
+const sanitizeHtml = (html) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const clean = (node) => {
+        const children = Array.from(node.childNodes);
+        for (const child of children) {
+            if (child.nodeType === Node.ELEMENT_NODE) {
+                if (!ALLOWED_TAGS.includes(child.tagName)) {
+                    child.replaceWith(...child.childNodes);
+                } else {
+                    const attrs = Array.from(child.attributes);
+                    for (const attr of attrs) {
+                        if (attr.name.startsWith('on') || attr.value.trim().toLowerCase().startsWith('javascript:')) {
+                            child.removeAttribute(attr.name);
+                        }
+                    }
+                    clean(child);
+                }
+            }
+        }
+    };
+    clean(doc.body);
+    return doc.body.innerHTML;
+};
+
+const TextEditorModal = ({ show, onHide, document: docProp, onSave }) => {
     const [content, setContent] = useState('');
     const [fileName, setFileName] = useState('');
+    const editorRef = useRef(null);
 
     useEffect(() => {
-        if (document) {
-            setContent(document.content || '');
-            setFileName(document.name || 'New Document.docx');
+        if (docProp) {
+            const sanitized = sanitizeHtml(docProp.content || '');
+            setContent(sanitized);
+            setFileName(docProp.name || 'New Document.docx');
         }
-    }, [document]);
+    }, [docProp]);
+
+    useEffect(() => {
+        if (editorRef.current && content && !editorRef.current.innerHTML) {
+            editorRef.current.innerHTML = content;
+        }
+    }, [content]);
 
     const handleSave = () => {
-        onSave(content);
+        const sanitized = sanitizeHtml(content);
+        onSave(sanitized);
     };
 
-    const handleFormat = (command) => {
-        document.execCommand(command, false, null);
-    };
+    const handleFormat = useCallback((command) => {
+        window.document.execCommand(command, false, null);
+    }, []);
+
+    const handleEditorInput = useCallback((e) => {
+        setContent(e.currentTarget.innerHTML);
+    }, []);
 
     return (
         <Modal
@@ -77,10 +117,10 @@ const TextEditorModal = ({ show, onHide, document, onSave }) => {
                 </div>
 
                 <div
+                    ref={editorRef}
                     className="editor-content"
                     contentEditable
-                    onInput={(e) => setContent(e.currentTarget.innerHTML)}
-                    dangerouslySetInnerHTML={{ __html: content }}
+                    onInput={handleEditorInput}
                 />
             </Modal.Body>
             <Modal.Footer>
@@ -95,4 +135,4 @@ const TextEditorModal = ({ show, onHide, document, onSave }) => {
     );
 };
 
-export default TextEditorModal; 
+export default TextEditorModal;

@@ -279,7 +279,7 @@ const Userlogin = (  ) => {
             EMAIL_ADDRESS : result.data.emailAddress
         }
         
-        setCookie("userSession", cookieData , { path: "/", expires: expirydate });
+        setCookie("userSession", cookieData , { path: "/", expires: expirydate, secure: true, sameSite: "strict" });
         navigate("/myhome/dashboard");
     }
 

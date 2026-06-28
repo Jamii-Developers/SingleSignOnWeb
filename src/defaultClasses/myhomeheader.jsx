@@ -27,11 +27,15 @@ const validateSession = (cookies) => {
 
 const sanitizeInput = (input) => {
     if (typeof input !== 'string') return input;
-    return input.replace(/[<>]/g, '');
+    const div = window.document.createElement('div');
+    div.appendChild(window.document.createTextNode(input));
+    return div.innerHTML;
 };
 
 const generateCSRFToken = () => {
-    return Math.random().toString(36).substring(2) + Date.now().toString(36);
+    const buffer = new Uint8Array(32);
+    crypto.getRandomValues(buffer);
+    return Array.from(buffer, (b) => b.toString(16).padStart(2, '0')).join('');
 };
 
 const myHomeHeader = () => {

@@ -238,6 +238,62 @@ const Requests = () => {
         }
     };
 
+    const handleBlock = async (userId) => {
+        try {
+            setProcessingRequests(prev => new Set([...prev, userId]));
+            const requestData = {
+                deviceKey: cookies.userSession.DEVICE_KEY,
+                userKey: cookies.userSession.USER_KEY,
+                sessionKey: cookies.userSession.SESSION_KEY,
+                targetUserKey: userId
+            };
+
+            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.BLOCK_USER };
+            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
+
+            if (result.status === 200) {
+                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
+                    setServerErrorResponse(prevState => ({
+                        ...prevState,
+                        serverErrorCode: result.data.ERROR_FIELD_CODE,
+                        serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
+                        serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
+                        errServMsgShow: true
+                    }));
+                    return;
+                }
+
+                if (constants.SUCCESS_MESSAGE.TYPE_BLOCK_USER_REQUEST === result.data.MSG_TYPE) {
+                    setServerSuccessResponse(prevState => ({
+                        ...prevState,
+                        ui_subject: result.data.UI_SUBJECT,
+                        ui_message: result.data.UI_MESSAGE,
+                        succServMsgShow: true
+                    }));
+                    setRequests(prev => ({
+                        ...prev,
+                        friendRequests: prev.friendRequests.filter(req => req.id !== userId),
+                        followerRequests: prev.followerRequests.filter(req => req.id !== userId)
+                    }));
+                }
+            }
+        } catch (error) {
+            setServerErrorResponse(prevState => ({
+                ...prevState,
+                serverErrorCode: "ERR|001",
+                serverErrorSubject: "Error",
+                serverErrorMessage: "Failed to block user",
+                errServMsgShow: true
+            }));
+        } finally {
+            setProcessingRequests(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(userId);
+                return newSet;
+            });
+        }
+    };
+
     const RequestList = ({ requests, type }) => (
         <Row xs={1} sm={2} md={3} lg={4} className="g-4">
             {loading ? (
