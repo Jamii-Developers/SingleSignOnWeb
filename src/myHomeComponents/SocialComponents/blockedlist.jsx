@@ -2,55 +2,33 @@ import React, { useState, useEffect } from 'react';
 import { ListGroup, Button, Container, Row, Col } from 'react-bootstrap';
 import { FaArrowLeft, FaUserSlash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { useCookies } from 'react-cookie';
-import JsonNetworkAdapter from '../../configs/networkadapter';
+import useServerResponse from '../../hooks/useServerResponse';
+import useSessionCredentials from '../../hooks/useSessionCredentials';
+import apiRequest from '../../utils/apiRequest';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import conn from '../../configs/conn';
 import constants from '../../utils/constants';
-import ServerErrorMsg from '../../frequentlyUsedModals/servererrormsg';
-import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg';
 
 const BlockedList = () => {
-    const [cookies] = useCookies("userSession");
     const navigate = useNavigate();
+    const { getSessionData } = useSessionCredentials();
+    const { showError, showSuccess, ServerResponseModals } = useServerResponse();
     const [blockedUsers, setBlockedUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [processingUnblock, setProcessingUnblock] = useState(new Set());
 
-    const [serverErrorResponse, setServerErrorResponse] = useState({
-        serverErrorCode: "",
-        serverErrorSubject: "",
-        serverErrorMessage: "",
-        errServMsgShow: false
-    });
-
-    const [serverSuccessResponse, setServerSuccessResponse] = useState({
-        ui_subject: "",
-        ui_message: "",
-        succServMsgShow: false
-    });
-
     const fetchBlockedUsers = async () => {
         try {
-            const requestData = {
-                deviceKey: cookies.userSession.DEVICE_KEY,
-                userKey: cookies.userSession.USER_KEY,
-                sessionKey: cookies.userSession.SESSION_KEY
-            };
+            const requestData = getSessionData();
 
-            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.GET_BLOCK_USER_LIST };
-            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
-            if (result.status === 200) {
-                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
-                    setServerErrorResponse(prevState => ({
-                        ...prevState,
-                        serverErrorCode: result.data.ERROR_FIELD_CODE,
-                        serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
-                        serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
-                        errServMsgShow: true
-                    }));
-                    return;
-                }
+            const { success, result } = await apiRequest(
+                conn.URL.JSOCIAL_URL,
+                requestData,
+                conn.SERVICE_HEADERS.GET_BLOCK_USER_LIST,
+                { showError }
+            );
 
+            if (success) {
                 const formattedUsers = result.data.results.map(user => ({
                     id: user.userKey,
                     username: user.username,
@@ -61,13 +39,7 @@ const BlockedList = () => {
             }
         } catch (error) {
             console.error('Error fetching blocked users:', error);
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "ERR|001",
-                serverErrorSubject: "Error",
-                serverErrorMessage: "Failed to fetch blocked users",
-                errServMsgShow: true
-            }));
+            showError("ERR|001", "Error", "Failed to fetch blocked users");
         } finally {
             setLoading(false);
         }
@@ -77,45 +49,25 @@ const BlockedList = () => {
         try {
             setProcessingUnblock(prev => new Set([...prev, userId]));
             const requestData = {
-                deviceKey: cookies.userSession.DEVICE_KEY,
-                userKey: cookies.userSession.USER_KEY,
-                sessionKey: cookies.userSession.SESSION_KEY,
+                ...getSessionData(),
                 targetUserKey: userId
             };
 
-            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.UNBLOCK_USER };
-            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
-
-            if (result.status === 200) {
-                if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
-                    setServerErrorResponse(prevState => ({
-                        ...prevState,
-                        serverErrorCode: result.data.ERROR_FIELD_CODE,
-                        serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
-                        serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
-                        errServMsgShow: true
-                    }));
-                    return;
+            const { success } = await apiRequest(
+                conn.URL.JSOCIAL_URL,
+                requestData,
+                conn.SERVICE_HEADERS.UNBLOCK_USER,
+                {
+                    showError,
+                    showSuccess,
+                    onSuccess: () => {
+                        setBlockedUsers(prev => prev.filter(user => user.id !== userId));
+                    }
                 }
-
-                setServerSuccessResponse(prevState => ({
-                    ...prevState,
-                    ui_subject: result.data.UI_SUBJECT,
-                    ui_message: result.data.UI_MESSAGE,
-                    succServMsgShow: true
-                }));
-
-                setBlockedUsers(prev => prev.filter(user => user.id !== userId));
-            }
+            );
         } catch (error) {
             console.error('Error unblocking user:', error);
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "ERR|001",
-                serverErrorSubject: "Error",
-                serverErrorMessage: "Failed to unblock user",
-                errServMsgShow: true
-            }));
+            showError("ERR|001", "Error", "Failed to unblock user");
         } finally {
             setProcessingUnblock(prev => {
                 const newSet = new Set(prev);
@@ -150,11 +102,7 @@ const BlockedList = () => {
                 <Col>
                     <ListGroup>
                         {loading ? (
-                            <div className="text-center p-4">
-                                <div className="spinner-border" role="status">
-                                    <span className="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
+                            <LoadingSpinner className="text-center p-4" />
                         ) : (
                             <>
                                 {blockedUsers.map(user => (
@@ -195,19 +143,7 @@ const BlockedList = () => {
                 </Col>
             </Row>
 
-            <ServerErrorMsg
-                show={serverErrorResponse.errServMsgShow}
-                onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
-                subject={serverErrorResponse.serverErrorSubject}
-                message={serverErrorResponse.serverErrorMessage}
-            />
-
-            <ServerSuccessMsg
-                show={serverSuccessResponse.succServMsgShow}
-                onClose={() => setServerSuccessResponse(prevState => ({ ...prevState, succServMsgShow: false }))}
-                subject={serverSuccessResponse.ui_subject}
-                message={serverSuccessResponse.ui_message}
-            />
+            <ServerResponseModals />
         </Container>
     );
 };

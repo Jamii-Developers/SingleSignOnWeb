@@ -2,8 +2,9 @@ import './sass/userlogin.sass';
 import JsonNetworkAdapter from './configs/networkadapter';
 import conn from './configs/conn';
 import constants from "./utils/constants";
-import ServerErrorMsg from './frequentlyUsedModals/servererrormsg';
-import ServerSuccessMsg from './frequentlyUsedModals/serversuccessmsg';
+import useServerResponse from './hooks/useServerResponse';
+import FieldValidationError from './components/FieldValidationError';
+import { validateLoginCredential, validatePassword, PASSWORD_MIN_LENGTH } from './utils/validators';
 
 import React from 'react';
 import { useState, useEffect } from "react";
@@ -15,33 +16,14 @@ import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Spinner from 'react-bootstrap/Spinner';
-import Alert from '@mui/material/Alert';
-import Collapse from '@mui/material/Collapse';
 
 const Userlogin = (  ) => {
-    // Security-related constants
     const MAX_LOGIN_ATTEMPTS = 5;
-    const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
-    const PASSWORD_MIN_LENGTH = 8;
-    const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const USERNAME_REGEX = /^[a-zA-Z0-9_]{5,}$/;
+    const LOCKOUT_DURATION = 15 * 60 * 1000;
 
     const navigate = useNavigate();
     const [, setCookie] = useCookies("userSession");
-
-    const [serverErrorResponse, setServerErrorResponse] = useState({
-        serverErrorCode: "",
-        serverErrorSubject: "",
-        serverErrorMessage: "",
-        errServMsgShow: false
-    });
-
-    const [serverSuccessResponse, setServerSuccessResponse] = useState({
-        ui_subject: "",
-        ui_message: "",
-        succServMsgShow: false
-    });
-
+    const { showError, showSuccess, ServerResponseModals } = useServerResponse();
 
     const [pageFields, setPageFields] = useState({
         loginCredential: "",
@@ -61,7 +43,6 @@ const Userlogin = (  ) => {
     const [loginAttempts, setLoginAttempts] = useState(0);
     const [lockoutUntil, setLockoutUntil] = useState(null);
 
-    // Check for existing lockout on component mount
     useEffect(() => {
         const storedLockout = localStorage.getItem('loginLockout');
         if (storedLockout) {
@@ -75,23 +56,14 @@ const Userlogin = (  ) => {
     }, []);
 
     async function sendUserLogin() {
-        // Check for lockout
         if (lockoutUntil && Date.now() < lockoutUntil) {
             const remainingTime = Math.ceil((lockoutUntil - Date.now()) / 60000);
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "Security Error",
-                serverErrorSubject: "Account Locked",
-                serverErrorMessage: `Too many failed attempts. Please try again in ${remainingTime} minutes.`,
-                errServMsgShow: true
-            }));
+            showError("Security Error", "Account Locked", `Too many failed attempts. Please try again in ${remainingTime} minutes.`);
             return;
         }
 
-        // Convert credential to lowercase
         setPageFields(prevState => ({ ...prevState, loginCredential: pageFields.loginCredential.toLowerCase() }));
 
-        // Enhanced input validation
         if (!validateInputs()) {
             return;
         }
@@ -99,7 +71,6 @@ const Userlogin = (  ) => {
         setLoginButtonSpinner(true);
 
         try {
-            // Get device and location information
             const deviceInfo = await getDeviceInfo();
             const location = await getLocation();
 
@@ -140,53 +111,15 @@ const Userlogin = (  ) => {
     }
 
     function validateInputs() {
-        // Validate login credential (email or username)
-        if (pageFields.loginCredential === "") {
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "Input Error",
-                serverErrorSubject: "Login Credential Required",
-                serverErrorMessage: "Please enter your email address or username",
-                errServMsgShow: true
-            }));
+        const credentialResult = validateLoginCredential(pageFields.loginCredential);
+        if (!credentialResult.valid) {
+            showError("Input Error", "Invalid Credential", credentialResult.message);
             return false;
         }
 
-        // Check if credential is email or username
-        const isEmail = EMAIL_REGEX.test(pageFields.loginCredential);
-        const isUsername = USERNAME_REGEX.test(pageFields.loginCredential);
-
-        if (!isEmail && !isUsername) {
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "Input Error",
-                serverErrorSubject: "Invalid Credential",
-                serverErrorMessage: "Please enter a valid email address or username",
-                errServMsgShow: true
-            }));
-            return false;
-        }
-
-        // Validate password
-        if (pageFields.loginPassword === "") {
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "Input Error",
-                serverErrorSubject: "Password Required",
-                serverErrorMessage: "Please enter your password",
-                errServMsgShow: true
-            }));
-            return false;
-        }
-
-        if (pageFields.loginPassword.length < PASSWORD_MIN_LENGTH) {
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "Input Error",
-                serverErrorSubject: "Invalid Password",
-                serverErrorMessage: `Password must be at least ${PASSWORD_MIN_LENGTH} characters long`,
-                errServMsgShow: true
-            }));
+        const passwordResult = validatePassword(pageFields.loginPassword);
+        if (!passwordResult.valid) {
+            showError("Input Error", "Invalid Password", passwordResult.message);
             return false;
         }
 
@@ -214,7 +147,6 @@ const Userlogin = (  ) => {
     }
 
     async function generateDeviceId() {
-        // Generate a unique device ID based on browser fingerprint
         const components = [
             navigator.userAgent,
             navigator.language,
@@ -245,31 +177,22 @@ const Userlogin = (  ) => {
             return newAttempts;
         });
 
-        setServerErrorResponse(prevState => ({
-            ...prevState,
-            serverErrorCode: error.status || "Error",
-            serverErrorSubject: error.statusText || "Login Failed",
-            serverErrorMessage: error.message || "Invalid credentials. Please try again.",
-            errServMsgShow: true
-        }));
+        showError(
+            error.status || "Error",
+            error.statusText || "Login Failed",
+            error.message || "Invalid credentials. Please try again."
+        );
     }
 
     async function handleLoginSuccess(result) {
-        setServerSuccessResponse(prevState => ({
-            ...prevState,
-            ui_subject: result.data.UI_SUBJECT,
-            ui_message: result.data.UI_MESSAGE,
-            succServMsgShow: true
-        }));
+        showSuccess(result.data.UI_SUBJECT, result.data.UI_MESSAGE);
         clear();
 
         await new Promise(r => setTimeout(r, 3000));
 
-        // Reset login attempts on successful login
         setLoginAttempts(0);
         localStorage.removeItem('loginLockout');
 
-        // Create Cookie and navigate to the home page
         const expirydate = new Date(result.data.expiryDate);
         const cookieData = {
             USER_KEY: result.data.userKey,
@@ -290,73 +213,30 @@ const Userlogin = (  ) => {
         setPageFields(prevState => ({ ...prevState, rememberLogin: false }));
     }
 
-    function ShowLoginCredentialError() {
-        return (
-            <Collapse in={errordata.loginCredentialErrorTrigger}>
-                <Alert variant="filled" severity="warning" className='mb-3'>{errordata.loginCredentialErrorMessage}</Alert>
-            </Collapse>
-        );
-    }
-
-    function ShowLoginPasswordError() {
-        return (
-            <Collapse in={errordata.loginPasswordErrorTrigger}>
-                <Alert variant="filled" severity="warning" className='mb-3'>{errordata.loginPasswordErrorMessage}</Alert>
-            </Collapse>
-        );
-    }
-
     function CheckLoginCredential(loginCredential) {
-        if (loginCredential === "") {
+        const result = validateLoginCredential(loginCredential);
+        if (!result.valid) {
             setErrorData(prevState => ({
                 ...prevState,
-                loginCredentialErrorMessage: "Please enter your email address or username",
+                loginCredentialErrorMessage: result.message,
                 loginCredentialErrorTrigger: true
             }));
             return;
         }
-
-        const isEmail = EMAIL_REGEX.test(loginCredential);
-        const isUsername = USERNAME_REGEX.test(loginCredential);
-
-        if (!isEmail && !isUsername) {
-            setErrorData(prevState => ({
-                ...prevState,
-                loginCredentialErrorMessage: "Please enter a valid email address or username",
-                loginCredentialErrorTrigger: true
-            }));
-            return;
-        }
-
-        setErrorData(prevState => ({
-            ...prevState,
-            loginCredentialErrorTrigger: false
-        }));
+        setErrorData(prevState => ({ ...prevState, loginCredentialErrorTrigger: false }));
     }
 
     function CheckLoginPassword(loginPassword) {
-        if (loginPassword === "") {
+        const result = validatePassword(loginPassword);
+        if (!result.valid) {
             setErrorData(prevState => ({
                 ...prevState,
-                loginPasswordErrorMessage: "Please enter your password",
+                loginPasswordErrorMessage: result.message,
                 loginPasswordErrorTrigger: true
             }));
             return;
         }
-
-        if (loginPassword.length < PASSWORD_MIN_LENGTH) {
-            setErrorData(prevState => ({
-                ...prevState,
-                loginPasswordErrorMessage: `Password must be at least ${PASSWORD_MIN_LENGTH} characters long`,
-                loginPasswordErrorTrigger: true
-            }));
-            return;
-        }
-
-        setErrorData(prevState => ({
-            ...prevState,
-            loginPasswordErrorTrigger: false
-        }));
+        setErrorData(prevState => ({ ...prevState, loginPasswordErrorTrigger: false }));
     }
 
     const getRememberLogin = () => {
@@ -383,7 +263,7 @@ const Userlogin = (  ) => {
                         />
                     </Form.Group>
 
-                    <ShowLoginCredentialError />
+                    <FieldValidationError show={errordata.loginCredentialErrorTrigger} message={errordata.loginCredentialErrorMessage} />
 
                     <Form.Group className="mb-3">
                         <Form.Control
@@ -394,7 +274,8 @@ const Userlogin = (  ) => {
                             disabled={lockoutUntil && Date.now() < lockoutUntil}
                         />
                     </Form.Group>
-                    <ShowLoginPasswordError />
+
+                    <FieldValidationError show={errordata.loginPasswordErrorTrigger} message={errordata.loginPasswordErrorMessage} />
 
                     <Form.Check
                         type="switch"
@@ -419,19 +300,7 @@ const Userlogin = (  ) => {
                     </ButtonGroup>
                 </Form>
 
-            <ServerErrorMsg
-                show={serverErrorResponse.errServMsgShow}
-                onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
-                subject={serverErrorResponse.serverErrorSubject}
-                message={serverErrorResponse.serverErrorMessage}
-            />
-
-            <ServerSuccessMsg
-                show={serverSuccessResponse.succServMsgShow}
-                onClose={() => setServerSuccessResponse(prevState => ({ ...prevState, succServMsgShow: false }))}
-                subject={serverSuccessResponse.ui_subject}
-                message={serverSuccessResponse.ui_message}
-            />
+            <ServerResponseModals />
 
                 
             </div>

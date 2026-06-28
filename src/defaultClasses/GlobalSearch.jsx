@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Form, InputGroup, Dropdown, Spinner, Button } from 'react-bootstrap';
-import { FaSearch, FaFile, FaUser, FaFolder, FaUserPlus, FaUserCheck } from 'react-icons/fa';
+import { Form, InputGroup, Spinner, Button } from 'react-bootstrap';
+import { FaSearch, FaUser, FaUserPlus, FaUserCheck } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { useCookies } from 'react-cookie';
+import useServerResponse from '../hooks/useServerResponse';
+import useSessionCredentials from '../hooks/useSessionCredentials';
+import apiRequest from '../utils/apiRequest';
 import JsonNetworkAdapter from '../configs/networkadapter';
 import conn from '../configs/conn';
-import '../sass/globalsearch.sass';
 import constants from '../utils/constants';
-import ServerErrorMsg from '../frequentlyUsedModals/servererrormsg';
-import ServerSuccessMsg from '../frequentlyUsedModals/serversuccessmsg';
+import '../sass/globalsearch.sass';
 
 const GlobalSearch = () => {
-    const [cookies] = useCookies("userSession");
+    const { getSessionData } = useSessionCredentials();
+    const { showError, showSuccess, ServerResponseModals } = useServerResponse();
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -20,21 +21,7 @@ const GlobalSearch = () => {
     const searchTimeout = useRef(null);
     const navigate = useNavigate();
 
-    const [serverErrorResponse, setServerErrorResponse] = useState({
-        serverErrorCode: "",
-        serverErrorSubject: "",
-        serverErrorMessage: "",
-        errServMsgShow: false
-    });
-
-    const [serverSuccessResponse, setServerSuccessResponse] = useState({
-        ui_subject: "",
-        ui_message: "",
-        succServMsgShow: false
-    });
-
     useEffect(() => {
-        // Cleanup timeout on component unmount
         return () => {
             if (searchTimeout.current) {
                 clearTimeout(searchTimeout.current);
@@ -55,13 +42,7 @@ const GlobalSearch = () => {
         } catch (error) {
             console.error('Search error:', error);
             setSearchResults([]);
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "Search Error",
-                serverErrorSubject: "Search Failed",
-                serverErrorMessage: error.message || "Unable to complete search. Please try again.",
-                errServMsgShow: true
-            }));
+            showError("Search Error", "Search Failed", error.message || "Unable to complete search. Please try again.");
         } finally {
             setIsLoading(false);
         }
@@ -69,160 +50,106 @@ const GlobalSearch = () => {
 
     const fetchSearchResults = async (query) => {
         const searchData = {
-            deviceKey: cookies.userSession.DEVICE_KEY,
-            userKey: cookies.userSession.USER_KEY,
-            sessionKey: cookies.userSession.SESSION_KEY,
+            ...getSessionData(),
             searchstring: query
         };
 
-        try {
-            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.SEARCH_USERS };
-            const result = await JsonNetworkAdapter.post(conn.URL.JUSER_URL, searchData, { headers });
-            if (result.status !== 200) {
-                throw new Error(result.statusText);
-            }
+        const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.SEARCH_USERS };
+        const result = await JsonNetworkAdapter.post(conn.URL.JUSER_URL, searchData, { headers });
 
-            if (result.data.ERROR_MSG_TYPE === constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE) {
-                throw new Error(result.data.ERROR_FIELD_MESSAGE);
-            }
-
-            // Transform the response data into the expected format
-            return result.data.results.map(user => ({
-                id: user.userKey,
-                type: 'user',
-                name: user.firstname === 'N/A' || user.lastname === 'N/A' 
-                    ? user.username 
-                    : `${user.firstname} ${user.lastname}`.trim(),
-                username: user.username,
-                path: `/myhome/social/friends`,
-                icon: <FaUser className="text-primary" />,
-                isOnline: false,
-                isFriend: user.friend ,
-                isFollowing: user.following,
-                hasPendingFriendRequest: user.hasPendingFriendRequest,
-                hasPendingFollowingRequest: user.hasPendingFollowingRequest
-            }));
-        } catch (error) {
-            console.error('Search API error:', error);
-            throw error;
+        if (result.status !== 200) {
+            throw new Error(result.statusText);
         }
+
+        if (result.data.ERROR_MSG_TYPE === constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE) {
+            throw new Error(result.data.ERROR_FIELD_MESSAGE);
+        }
+
+        return result.data.results.map(user => ({
+            id: user.userKey,
+            type: 'user',
+            name: user.firstname === 'N/A' || user.lastname === 'N/A'
+                ? user.username
+                : `${user.firstname} ${user.lastname}`.trim(),
+            username: user.username,
+            path: `/myhome/social/friends`,
+            icon: <FaUser className="text-primary" />,
+            isOnline: false,
+            isFriend: user.friend,
+            isFollowing: user.following,
+            hasPendingFriendRequest: user.hasPendingFriendRequest,
+            hasPendingFollowingRequest: user.hasPendingFollowingRequest
+        }));
     };
 
     const handleAddFriend = async (userId) => {
         try {
-            // Set loading state for this specific button
             setLoadingStates(prev => ({ ...prev, [`friend-${userId}`]: true }));
 
             const friendData = {
-                deviceKey: cookies.userSession.DEVICE_KEY,
-                userKey: cookies.userSession.USER_KEY,
-                sessionKey: cookies.userSession.SESSION_KEY,
+                ...getSessionData(),
                 friendKey: userId
             };
 
-            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.SEND_FRIEND_REQUEST };
-            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, friendData, { headers });
-
-            if (result.status === 200) {
-                // Update the UI to reflect the new friend status
-                setSearchResults(prevResults => 
-                    prevResults.map(result => 
-                        result.id === userId 
-                            ? { ...result, hasPendingFriendRequest: true, isFriend: false }
-                            : result
-                    )
-                );
-            }
-
-            if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
-                setServerErrorResponse(prevState => ({
-                    ...prevState,
-                    serverErrorCode: result.data.ERROR_FIELD_CODE,
-                    serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
-                    serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
-                    errServMsgShow: true
-                }));
-                return;
-            }
-
-            if (constants.SUCCESS_MESSAGE.TYPE_SEND_FRIEND_REQUEST === result.data.MSG_TYPE) {
-                setServerSuccessResponse(prevState => ({
-                    ...prevState,
-                    ui_subject: result.data.UI_SUBJECT,
-                    ui_message: result.data.UI_MESSAGE,
-                    succServMsgShow: true
-                }));
-            }
+            const { success, result } = await apiRequest(
+                conn.URL.JSOCIAL_URL,
+                friendData,
+                conn.SERVICE_HEADERS.SEND_FRIEND_REQUEST,
+                {
+                    showError,
+                    showSuccess,
+                    successMsgType: constants.SUCCESS_MESSAGE.TYPE_SEND_FRIEND_REQUEST,
+                    onSuccess: () => {
+                        setSearchResults(prevResults =>
+                            prevResults.map(r =>
+                                r.id === userId
+                                    ? { ...r, hasPendingFriendRequest: true, isFriend: false }
+                                    : r
+                            )
+                        );
+                    }
+                }
+            );
         } catch (error) {
             console.error('Error adding friend:', error);
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "Network Error",
-                serverErrorSubject: "Friend Request Failed",
-                serverErrorMessage: "Unable to send friend request. Please try again.",
-                errServMsgShow: true
-            }));
+            showError("Network Error", "Friend Request Failed", "Unable to send friend request. Please try again.");
         } finally {
-            // Clear loading state for this button
             setLoadingStates(prev => ({ ...prev, [`friend-${userId}`]: false }));
         }
     };
 
     const handleFollow = async (userId) => {
         try {
-            // Set loading state for this specific button
             setLoadingStates(prev => ({ ...prev, [`follow-${userId}`]: true }));
 
             const followData = {
-                deviceKey: cookies.userSession.DEVICE_KEY,
-                userKey: cookies.userSession.USER_KEY,
-                sessionKey: cookies.userSession.SESSION_KEY,
+                ...getSessionData(),
                 followKey: userId
             };
 
-            const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.SEND_FOLLOW_REQUEST };
-            const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, followData, { headers });
-            if (result.status === 200) {
-                // Update the UI to reflect the new following status
-                setSearchResults(prevResults => 
-                    prevResults.map(result => 
-                        result.id === userId 
-                            ? { ...result, hasPendingFollowingRequest: true, isFollowing: false }
-                            : result
-                    )
-                );
-            }
-
-            if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
-                setServerErrorResponse(prevState => ({
-                    ...prevState,
-                    serverErrorCode: result.data.ERROR_FIELD_CODE,
-                    serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
-                    serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
-                    errServMsgShow: true
-                }));
-                return;
-            }
-
-            if (constants.SUCCESS_MESSAGE.TYPE_SEND_FOLLOW_REQUEST === result.data.MSG_TYPE) {
-                setServerSuccessResponse(prevState => ({
-                    ...prevState,
-                    ui_subject: result.data.UI_SUBJECT,
-                    ui_message: result.data.UI_MESSAGE,
-                    succServMsgShow: true
-                }));
-            }
+            const { success, result } = await apiRequest(
+                conn.URL.JSOCIAL_URL,
+                followData,
+                conn.SERVICE_HEADERS.SEND_FOLLOW_REQUEST,
+                {
+                    showError,
+                    showSuccess,
+                    successMsgType: constants.SUCCESS_MESSAGE.TYPE_SEND_FOLLOW_REQUEST,
+                    onSuccess: () => {
+                        setSearchResults(prevResults =>
+                            prevResults.map(r =>
+                                r.id === userId
+                                    ? { ...r, hasPendingFollowingRequest: true, isFollowing: false }
+                                    : r
+                            )
+                        );
+                    }
+                }
+            );
         } catch (error) {
             console.error('Error following user:', error);
-            setServerErrorResponse(prevState => ({
-                ...prevState,
-                serverErrorCode: "Network Error",
-                serverErrorSubject: "Follow Request Failed",
-                serverErrorMessage: "Unable to send follow request. Please try again.",
-                errServMsgShow: true
-            }));
+            showError("Network Error", "Follow Request Failed", "Unable to send follow request. Please try again.");
         } finally {
-            // Clear loading state for this button
             setLoadingStates(prev => ({ ...prev, [`follow-${userId}`]: false }));
         }
     };
@@ -231,15 +158,6 @@ const GlobalSearch = () => {
         const query = e.target.value;
         setSearchQuery(query);
         setShowResults(true);
-
-        // Debounce search
-        // if (searchTimeout.current) {
-        //     clearTimeout(searchTimeout.current);
-        // }
-
-        // searchTimeout.current = setTimeout(() => {
-        //     handleSearch(query);
-        // }, 300);
     };
 
     const handleResultClick = (result) => {
@@ -397,19 +315,7 @@ const GlobalSearch = () => {
                 </div>
             )}
 
-            <ServerErrorMsg
-                show={serverErrorResponse.errServMsgShow}
-                onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
-                subject={serverErrorResponse.serverErrorSubject}
-                message={serverErrorResponse.serverErrorMessage}
-            />
-
-            <ServerSuccessMsg
-                show={serverSuccessResponse.succServMsgShow}
-                onClose={() => setServerSuccessResponse(prevState => ({ ...prevState, succServMsgShow: false }))}
-                subject={serverSuccessResponse.ui_subject}
-                message={serverSuccessResponse.ui_message}
-            />
+            <ServerResponseModals />
         </div>
     );
 };

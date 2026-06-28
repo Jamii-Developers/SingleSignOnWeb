@@ -1,19 +1,20 @@
 import React from "react";
 import { Container, Row, Col, Card, Button, ButtonGroup, Form, InputGroup, OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
-import { useCookies } from "react-cookie";
 import { useEffect, useState } from "react";
 import { FaUser, FaEnvelope, FaUserMinus, FaBan, FaSearch, FaUserFriends } from 'react-icons/fa';
 import BlankProfilePic from '../../img/blankprofile.png';
 import '../sass/friends.sass';
-import JsonNetworkAdapter from '../../configs/networkadapter';
+import useServerResponse from '../../hooks/useServerResponse';
+import useSessionCredentials from '../../hooks/useSessionCredentials';
+import apiRequest from '../../utils/apiRequest';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import conn from '../../configs/conn';
 import constants from '../../utils/constants';
-import ServerErrorMsg from '../../frequentlyUsedModals/servererrormsg';
-import ServerSuccessMsg from '../../frequentlyUsedModals/serversuccessmsg';
 import ViewUserProfile from './ViewUserProfile';
 
 const Friends = () => {
-	const [cookies] = useCookies("userSession");
+	const { getSessionData } = useSessionCredentials();
+	const { showError, showSuccess, showNetworkError, ServerResponseModals } = useServerResponse();
 	const [friends, setFriends] = useState([]);
 	const [filteredFriends, setFilteredFriends] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -25,25 +26,11 @@ const Friends = () => {
 		block: new Set()
 	});
 
-	const [serverErrorResponse, setServerErrorResponse] = useState({
-		serverErrorCode: "",
-		serverErrorSubject: "",
-		serverErrorMessage: "",
-		errServMsgShow: false
-	});
-
-	const [serverSuccessResponse, setServerSuccessResponse] = useState({
-		ui_subject: "",
-		ui_message: "",
-		succServMsgShow: false
-	});
-
 	const [selectedUserId, setSelectedUserId] = useState(null);
 	const [showProfileModal, setShowProfileModal] = useState(false);
 
 	const fetchFriends = async () => {
 		try {
-			// First, try to get cached data from localStorage
 			const cachedData = localStorage.getItem('friends');
 			if (cachedData) {
 				const parsedData = JSON.parse(cachedData);
@@ -52,37 +39,20 @@ const Friends = () => {
 				setLoading(false);
 			}
 
-			// Then make the server request in the background
-			const requestData = {
-				deviceKey: cookies.userSession.DEVICE_KEY,
-				userKey: cookies.userSession.USER_KEY,
-				sessionKey: cookies.userSession.SESSION_KEY
-			};
+			const requestData = getSessionData();
 
-			const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.GET_FRIEND_LIST };
-			const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
-
-			if (result.status === 200) {
-				if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
-					setServerErrorResponse(prevState => ({
-						...prevState,
-						serverErrorCode: result.data.ERROR_FIELD_CODE,
-						serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
-						serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
-						errServMsgShow: true
-					}));
-					return;
+			const { success, result } = await apiRequest(
+				conn.URL.JSOCIAL_URL,
+				requestData,
+				conn.SERVICE_HEADERS.GET_FRIEND_LIST,
+				{
+					showError,
+					showSuccess,
+					successMsgType: constants.SUCCESS_MESSAGE.TYPE_GET_FRIEND_LIST_REQUEST
 				}
+			);
 
-				if (constants.SUCCESS_MESSAGE.TYPE_GET_FRIEND_LIST_REQUEST === result.data.MSG_TYPE) {
-					setServerSuccessResponse(prevState => ({
-						...prevState,
-						ui_subject: result.data.UI_SUBJECT,
-						ui_message: result.data.UI_MESSAGE,
-						succServMsgShow: true   
-					}));
-				}
-
+			if (success) {
 				const formattedFriends = result.data.results.map(friend => ({
 					id: friend.userKey,
 					username: friend.username,
@@ -91,22 +61,15 @@ const Friends = () => {
 						: `${friend.firstname} ${friend.lastname}`.trim()
 				}));
 
-				// Update localStorage with new data
 				localStorage.setItem('friends', JSON.stringify(formattedFriends));
-				
-				// Update state with new data
 				setFriends(formattedFriends);
 				setFilteredFriends(formattedFriends);
-			} else {
-				// If server request fails and we don't have cached data, clear the lists
-				if (!cachedData) {
-					setFriends([]);
-					setFilteredFriends([]);
-				}
+			} else if (!cachedData) {
+				setFriends([]);
+				setFilteredFriends([]);
 			}
 		} catch (error) {
 			console.error('Error fetching friends:', error);
-			// Only clear lists if we don't have cached data
 			if (!localStorage.getItem('friends')) {
 				setFriends([]);
 				setFilteredFriends([]);
@@ -151,17 +114,10 @@ const Friends = () => {
 				message: new Set([...prev.message, friendId])
 			}));
 
-			// Implement message functionality
-			await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated delay
+			await new Promise(resolve => setTimeout(resolve, 1000));
 		} catch (error) {
 			console.error('Error messaging friend:', error);
-			setServerErrorResponse(prevState => ({
-				...prevState,
-				serverErrorCode: "Network Error",
-				serverErrorSubject: "Message Failed",
-				serverErrorMessage: "Unable to send message. Please try again.",
-				errServMsgShow: true
-			}));
+			showError("Network Error", "Message Failed", "Unable to send message. Please try again.");
 		} finally {
 			setProcessingActions(prev => ({
 				...prev,
@@ -178,52 +134,31 @@ const Friends = () => {
 			}));
 
 			const requestData = {
-				deviceKey: cookies.userSession.DEVICE_KEY,
-				userKey: cookies.userSession.USER_KEY,
-				sessionKey: cookies.userSession.SESSION_KEY,
+				...getSessionData(),
 				targetUserKey: friendId
 			};
 
-			const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.UN_FRIEND };
-			const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
-
-			if (result.status === 200) {
-				if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
-					setServerErrorResponse(prevState => ({
-						...prevState,
-						serverErrorCode: result.data.ERROR_FIELD_CODE,
-						serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
-						serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
-						errServMsgShow: true
-					}));
-					return;
+			const { success } = await apiRequest(
+				conn.URL.JSOCIAL_URL,
+				requestData,
+				conn.SERVICE_HEADERS.UN_FRIEND,
+				{
+					showError,
+					showSuccess,
+					successMsgType: constants.SUCCESS_MESSAGE.TYPE_UN_FRIEND,
+					onSuccess: () => {
+						setFriends(prev => {
+							const newFriends = prev.filter(f => f.id !== friendId);
+							localStorage.setItem('friends', JSON.stringify(newFriends));
+							return newFriends;
+						});
+						setFilteredFriends(prev => prev.filter(f => f.id !== friendId));
+					}
 				}
-
-				if (constants.SUCCESS_MESSAGE.TYPE_UN_FRIEND === result.data.MSG_TYPE) {
-					setServerSuccessResponse(prevState => ({
-						...prevState,
-						ui_subject: result.data.UI_SUBJECT,
-						ui_message: result.data.UI_MESSAGE,
-						succServMsgShow: true
-					}));
-					// Remove the friend from the list and update localStorage
-					setFriends(prev => {
-						const newFriends = prev.filter(f => f.id !== friendId);
-						localStorage.setItem('friends', JSON.stringify(newFriends));
-						return newFriends;
-					});
-					setFilteredFriends(prev => prev.filter(f => f.id !== friendId));
-				}
-			}
+			);
 		} catch (error) {
 			console.error('Error removing friend:', error);
-			setServerErrorResponse(prevState => ({
-				...prevState,
-				serverErrorCode: "Network Error",
-				serverErrorSubject: "Remove Friend Failed",
-				serverErrorMessage: "Unable to remove friend. Please try again.",
-				errServMsgShow: true
-			}));
+			showError("Network Error", "Remove Friend Failed", "Unable to remove friend. Please try again.");
 		} finally {
 			setProcessingActions(prev => ({
 				...prev,
@@ -240,52 +175,31 @@ const Friends = () => {
 			}));
 
 			const requestData = {
-				deviceKey: cookies.userSession.DEVICE_KEY,
-				userKey: cookies.userSession.USER_KEY,
-				sessionKey: cookies.userSession.SESSION_KEY,
+				...getSessionData(),
 				targetUserKey: friendId
 			};
 
-			const headers = { ...conn.CONTENT_TYPE.CONTENT_JSON, ...conn.SERVICE_HEADERS.BLOCK_USER };
-			const result = await JsonNetworkAdapter.post(conn.URL.JSOCIAL_URL, requestData, { headers });
-
-			if (result.status === 200) {
-				if (constants.ERROR_MESSAGE.TYPE_ERROR_MESSAGE === result.data.ERROR_MSG_TYPE) {
-					setServerErrorResponse(prevState => ({
-						...prevState,
-						serverErrorCode: result.data.ERROR_FIELD_CODE,
-						serverErrorSubject: result.data.ERROR_FIELD_SUBJECT,
-						serverErrorMessage: result.data.ERROR_FIELD_MESSAGE,
-						errServMsgShow: true
-					}));
-					return;
+			const { success } = await apiRequest(
+				conn.URL.JSOCIAL_URL,
+				requestData,
+				conn.SERVICE_HEADERS.BLOCK_USER,
+				{
+					showError,
+					showSuccess,
+					successMsgType: constants.SUCCESS_MESSAGE.TYPE_BLOCK_USER_REQUEST,
+					onSuccess: () => {
+						setFriends(prev => {
+							const newFriends = prev.filter(f => f.id !== friendId);
+							localStorage.setItem('friends', JSON.stringify(newFriends));
+							return newFriends;
+						});
+						setFilteredFriends(prev => prev.filter(f => f.id !== friendId));
+					}
 				}
-
-				if (constants.SUCCESS_MESSAGE.TYPE_BLOCK_USER_REQUEST === result.data.MSG_TYPE) {
-					setServerSuccessResponse(prevState => ({
-						...prevState,
-						ui_subject: result.data.UI_SUBJECT,
-						ui_message: result.data.UI_MESSAGE,
-						succServMsgShow: true
-					}));
-					// Remove the blocked friend from the list and update localStorage
-					setFriends(prev => {
-						const newFriends = prev.filter(f => f.id !== friendId);
-						localStorage.setItem('friends', JSON.stringify(newFriends));
-						return newFriends;
-					});
-					setFilteredFriends(prev => prev.filter(f => f.id !== friendId));
-				}
-			}
+			);
 		} catch (error) {
 			console.error('Error blocking friend:', error);
-			setServerErrorResponse(prevState => ({
-				...prevState,
-				serverErrorCode: "Network Error",
-				serverErrorSubject: "Block User Failed",
-				serverErrorMessage: "Unable to block user. Please try again.",
-				errServMsgShow: true
-			}));
+			showError("Network Error", "Block User Failed", "Unable to block user. Please try again.");
 		} finally {
 			setProcessingActions(prev => ({
 				...prev,
@@ -402,13 +316,7 @@ const Friends = () => {
 	);
 
 	if (loading) {
-		return (
-			<div className="text-center p-5">
-				<div className="spinner-border text-primary" role="status">
-					<span className="visually-hidden">Loading...</span>
-				</div>
-			</div>
-		);
+		return <LoadingSpinner />;
 	}
 
 	return (
@@ -475,19 +383,7 @@ const Friends = () => {
 					</Row>
 				)}
 
-				<ServerErrorMsg
-					show={serverErrorResponse.errServMsgShow}
-					onClose={() => setServerErrorResponse(prevState => ({ ...prevState, errServMsgShow: false }))}
-					subject={serverErrorResponse.serverErrorSubject}
-					message={serverErrorResponse.serverErrorMessage}
-				/>
-
-				<ServerSuccessMsg
-					show={serverSuccessResponse.succServMsgShow}
-					onClose={() => setServerSuccessResponse(prevState => ({ ...prevState, succServMsgShow: false }))}
-					subject={serverSuccessResponse.ui_subject}
-					message={serverSuccessResponse.ui_message}
-				/>
+				<ServerResponseModals />
 			</Container>
 
 			<ViewUserProfile
